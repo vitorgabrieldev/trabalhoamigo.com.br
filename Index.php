@@ -87,7 +87,15 @@
         *
         * Sistema de verificação de sessão existente
         *
+        *
         * -------------------------------------------------------------------------- */
+
+        $EnvDeveloper = true;
+
+        if ($EnvDeveloper == true) {
+            header('location: src/views/contratante/EntrarConta/');
+            return;
+        };
 
         if ( !isset($_SESSION) ) session_start();
 

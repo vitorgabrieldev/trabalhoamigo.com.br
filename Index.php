@@ -87,7 +87,6 @@
         *
         * Sistema de verificação de sessão existente
         *
-        *
         * -------------------------------------------------------------------------- */
 
         $EnvDeveloper = true;

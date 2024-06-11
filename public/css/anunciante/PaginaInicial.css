@@ -1,0 +1,256 @@
+
+
+/* ====================================================================================== */
+/* Bloco Carossel */
+#bloco-categorias {
+    padding: 40px 100px 20px 100px;
+    text-align: center;
+}
+#bloco-categorias .titulo {
+    font-size: 22px;
+    font-weight: 700;
+    color: #FA511D;
+}
+#bloco-categorias .container-icon {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+#bloco-categorias .image-box {
+    padding: 0 30px;
+    user-select: none;
+}
+#bloco-categorias .titulo-categoria {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgb(71, 71, 71);
+    text-decoration: none;
+}
+#bloco-categorias .swiper-pagination .swiper-pagination-bullet {
+    background: transparent;
+    width: 8px;
+    height: 8px;
+    border: 1px solid #424141;
+}
+#bloco-categorias .swiper-pagination .swiper-pagination-bullet-active {
+    background: #424141;
+}
+#bloco-categorias .container-icon:hover {
+    cursor: pointer;
+    transition: .33s;
+    transform: scale(1.1);
+}
+@media screen and (max-width:500px) {
+    #bloco-categorias {
+        padding: 20px 40px;
+    }
+}
+/* ====================================================================================== */
+/* Bloco Banner */
+#bloco-banner {
+    width: 100%;
+    height: 500px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.123);
+}
+#bloco-banner img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+}
+#bloco-banner .absolute-text {
+    position: absolute;
+    margin-left: 10%;
+    margin-top: 10%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 50px;
+}
+#bloco-banner .absolute-text .descricaoBanner {
+    color: #fff;
+    font-size: 27px;
+    font-weight: 700;
+    width: 40%;
+}
+#bloco-banner .absolute-text .link-saibamais {
+    background: #FA511D;
+    padding: 10px 50px;
+    width: 100px;
+    color: #fff;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 500px;
+    border: 2px solid transparent;transition: .33s;
+    cursor: pointer;
+}
+#bloco-banner .absolute-text .link-saibamais:hover {
+    border: 2px solid #fff;
+    background: transparent;
+}
+@media screen and (max-width: 650px) {
+    #bloco-banner .absolute-text .descricaoBanner {
+        width: 65%;
+    }
+}
+
+/* ====================================================================================== */
+/* Bloco Como Funciona */
+#bloco-comoFunciona {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 50px 0;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.123);
+}
+#bloco-comoFunciona .conteudo {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+    padding-bottom: 50px;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+#bloco-comoFunciona .conteudo .titulo {
+    font-size: 32px;
+    color: #FA511D;
+    font-weight: 800;
+}
+#bloco-comoFunciona .conteudo .descricao-bloco {
+    color: #292929;
+    font-size: 18px;
+    font-weight: 500;
+}
+#bloco-comoFunciona .steep {
+    display: flex;
+    align-items: center;
+    padding: 0 100px;
+    gap: 100px;
+}
+#bloco-comoFunciona .steep .item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    cursor: pointer;
+}
+#bloco-comoFunciona .steep .item:hover {
+    transition: .33s ease-in-out;
+    transform: scale(1.1);
+}
+#bloco-comoFunciona .steep  img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px;
+}
+#bloco-comoFunciona .steep .item .titulo-steep {
+    font-weight: 700;
+    color: #12141D;
+    font-size: 22px;
+}
+#bloco-comoFunciona .steep .item .descricap-steep {
+    font-size: 18px;
+    color: #8A8A8A;
+    font-weight: 400;
+}
+@media screen and (max-width:900px) {
+    #bloco-comoFunciona .steep {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+    #bloco-comoFunciona .steep .item {
+        width: 100%;
+    }
+}
+@media screen and (max-width:500px) {
+    #bloco-comoFunciona .steep {
+        padding: 0 20px;
+    }
+}
+/* ====================================================================================== */
+/* Bloco Video */
+#bloco-video .conteudo{
+    padding: 50px 50px;
+    text-align: center;
+}
+#bloco-video .conteudo .titulo {
+    font-size: 32px;
+    color: #FA511D;
+    font-weight: 800;
+}
+#bloco-video .conteudo .descricao-bloco {
+    color: #292929;
+    font-size: 18px;
+    font-weight: 500;
+}
+#bloco-video .play-button {
+    position: absolute;
+    width: 100px;
+    left: calc(50% - 50px);
+    margin-top: 250px;
+    cursor: pointer;
+}
+#bloco-video .play-button:hover {
+    transition: .33s;
+    transform: scale(.9);
+}
+#bloco-video .play-button:active {
+    transform: scale(.8);
+}
+#bloco-video .iframeVideo {
+    width: 100%;
+    height: 550px;
+    filter: brightness(70%);
+}
+#bloco-video .iframeVideo img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+/* ====================================================================================== */
+/* Bloco Video */
+#bloco-chamadaServico{
+    padding: 50px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #FA511D;
+}
+#bloco-chamadaServico .titulo {
+    font-weight: 600;
+    font-size: 22px;
+    color: #fff;
+    text-align: left;
+}
+#bloco-chamadaServico .button {
+    padding: 10px 30px;
+    border: 2px solid #fff;
+    border-radius: 12px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    transition: .33s;
+}
+#bloco-chamadaServico .button:hover {
+    background: #fff;
+    color: #FA511D;
+}
+@media screen and (max-width:500px) {
+    #bloco-chamadaServico {
+        padding: 50px 20px;
+        flex-direction: column;
+        row-gap: 50px;
+    }
+    #bloco-chamadaServico .button svg {
+        display: none;
+    }
+    #bloco-chamadaServico .titulo {
+        text-align: center;
+    }
+}

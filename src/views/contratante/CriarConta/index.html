@@ -27,6 +27,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
 
 <body>
     <section id="CriarContaUsuario">
@@ -35,7 +36,10 @@
         </header>
 
         <div class="left">
-            <img src="../../assets/images/CriarUsuario/imagen-criar-ususario.png" alt="">
+            <div class="imagem">
+                <img src="../../../../public/img/CriarUsuario/imagen-criar-ususario.png" alt="Imagem Padrão Criar Usuário">
+            </div>
+            <p class="descricao">Encontre milhares de serviços a sua disposição de forma simples e rápida!</p>
         </div>
 
         <div class="right">
@@ -44,7 +48,7 @@
                     <h1 class="titulo">Crie sua conta aqui</h1>
                     <p class="descricao">Crie sua conta gratuitamente em nossa plataforma</p>
                 </section>
-                <form id="FormCriarUsurio">
+                <form id="FormCriarUsuario">
                     <section class="inputGroup">
                         <div class="input-group">
                             <input required type="text" name="text" autocomplete="off" class="input nome">
@@ -87,10 +91,26 @@
                                     style="color: #FF8682;">Politicas de Privicidade</strong></p>
                         </div>
                     </div>
+                    <div class="rowOthersLogin">
+                        <h2 class="titulo">Ou faça login com</h2>
+                        <div class="flexSocial">
+                            <div class="box-social">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Facebook.png"
+                                    alt="Icone de Login">
+                            </div>
+                            <div class="box-social">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Google.png"
+                                    alt="Icone de Login">
+                            </div>
+                            <div class="box-social">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Apple.png"
+                                    alt="Icone de Login">
+                            </div>
+                        </div>
 
-                    <div class="rowBtn">
-                        <button type="submit" class="SendForm">Acessar sua conta</button>
-                    </div>
+                        <div class="rowBtn">
+                            <button type="submit" class="SendForm">Acessar sua conta</button>
+                        </div>
                 </form>
             </main>
         </div>

@@ -28,71 +28,72 @@
 
 
     <body>
-        <section id="CriarContaUsuario">
-        <header class="site-topo">
-            <img src="../../assets/images/EntrarUsuario/logo-trabalhoamigo.png" alt="">
-        </header>
-
-        <div class="left">
-            <img src="../../assets/images/CriarUsuario/imagen-criar-ususario.png" alt="">
-        </div>
-
-        <div class="right">
-            <main class="corpo">
-                <section class="content-titulo">
-                    <h1 class="titulo">Crie sua conta aqui</h1>
-                    <p class="descricao">Crie sua conta gratuitamente em nossa plataforma</p>
-                </section>
-                <form id="FormCriarUsurio">
-                    <section class="inputGroup">
-                        <div class="input-group">
-                            <input required type="text" name="text" autocomplete="off" class="input nome">
-                            <label class="user-label">Primeiro Nome</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input required type="text" name="text" autocomplete="off" class="input nome">
-                            <label class="user-label">Sobrenome</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input required type="email" name="email" autocomplete="off" class="input email">
-                            <label class="user-label">Email</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input required type="tel" name="telefone" autocomplete="off" class="input telefone">
-                            <label class="user-label">Telefone</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input required="" type="password" name="text" autocomplete="off" class="input senha">
-                            <label class="user-label">Senha</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input required="" type="password" name="text" autocomplete="off" class="input senha">
-                            <label class="user-label">Repetir Senha</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
-                        </div>
+        <section id="EntrarContaUsuario">
+            <div class="left">
+                </header>
+                <main class="corpo">
+                    <section class="content-titulo">
+                        <h1 class="titulo">Entrar como anunciante</h1>
+                        <p class="descricao">Gerencie seus anúncios e conquiste novos clientes</p>
                     </section>
-                    <div class="row">
-                        <div id="checkTerms">
-                            <label class="container">
-                                <input type="checkbox">
-                                <div class="checkmark"></div>
-                            </label>
-                            <p>Eu aceito <strong style="color: #FF8682;">Termos</strong> e <strong
-                                    style="color: #FF8682;">Politicas de Privicidade</strong></p>
+                    <form id="FormEntrarUsuario">
+                        <section class="inputGroup">
+                            <div class="input-group">
+                                <input required="" type="text" name="text" autocomplete="off" class="input email">
+                                <label class="user-label">Email</label>
+                                <h4 class="errorMessage errorMessageEmail hidden">Preencha corretamente este campo!</h4>
+                            </div>
+                            <div class="input-group">
+                                <input required="" type="password" name="text" autocomplete="off" class="input senha">
+                                <label class="user-label">Senha</label>
+                                <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            </div>
+                        </section>
+                        <div class="row">
+                            <div id="checkTerms">
+                                <label class="container">
+                                    <input type="checkbox">
+                                    <div class="checkmark"></div>
+                                </label>
+                                <h2 class="titulo">Lembrar acesso</h2>
+                            </div>
+                            <a class="PassForgout" href="#">Esqueceu a senha?</a>
+                        </div>
+    
+                        <div class="rowBtn">
+                            <button type="submit" class="SendForm">Acessar sua conta</button>
+                        </div>
+    
+                        <section class="NoLogin">
+                            <h2 class="titulo">Não tem cadastro? <a href="./Criar.html" class="link">Cadastre-se gratuitamente</a></h2>
+                        </section>
+                    </form>
+                    <div class="rowOthersLogin">
+                        <h2 class="titulo">Ou faça login com</h2>
+                        <div class="flexSocial">
+                            <div class="box-social">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Facebook.png" alt="Icone de Login">
+                            </div>
+                            <div class="box-social">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Google.png" alt="Icone de Login">
+                            </div>
+                            <div class="box-social">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Apple.png" alt="Icone de Login">
+                            </div>
                         </div>
                     </div>
-
-                    <div class="rowBtn">
-                        <button type="submit" class="SendForm">Acessar sua conta</button>
+                    <div class="SouAnunciante">
+                        <h2 class="titulo">Outras opções de entrada</h2>
+                        <a class="buttonLinkAnunciante" href="../../contratante/EntrarConta/">SOU CONTRATANTE</a>
                     </div>
-                </form>
-            </main>
-        </div>
-    </section>
+                </main>
+            </div>
+            <div class="right">
+                <div class="imagem">
+                    <img src="../../../../public/img/EntrarAnunciante/Imagem-direita.png" alt="Imagem Padrão Entrar Usuário">
+                </div>
+                <p class="descricao">Encontre milhares de serviços a sua disposição de forma simples e rápida!</p>
+            </div>
+        </section>
     </body>
 </html>

@@ -1,0 +1,407 @@
+/* =============================================================================== */
+/*   Estilização da Página de "Criar Conta do Usuário" e "Entrar Conta do Usuário" */
+/* =============================================================================== */
+
+.input-group {
+    position: relative;
+}
+   
+.input {
+    width: calc(100% - 28px);
+    border: solid 1.5px #1C1B1F;
+    border-radius: 4px;
+    background: none;
+    padding: 1rem;
+    font-size: 1rem;
+    color: #2e2c2c;
+    transition: border 150ms cubic-bezier(0.4,0,0.2,1);
+}
+.errorMessage {
+    color: rgb(249, 84, 84);
+    font-size: 14px;
+}   
+.user-label {
+    position: absolute;
+    left: 15px;
+    color: #b8b8b8;
+    pointer-events: none;
+    transform: translateY(-2.3rem);
+    transition: 150ms cubic-bezier(0.4,0,0.2,1);
+    font-size: 16px;
+    font-weight: 500;
+}
+   
+.input:focus, input:valid {
+    outline: none;
+    border: 1.5px solid #1a73e8;
+}
+   
+.input:focus ~ label, input:valid ~ label {
+    transform: translateY(-330%) scale(0.8);
+    background-color: #ffffff;
+    padding: 0 .2em;
+    color: #2196f3;
+}
+/* Hide the default checkbox */
+.container input {
+    display: none;
+}  
+.container {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+/* Create a custom checkbox */
+.checkmark {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 1.3em;
+    width: 1.3em;
+    background-color: #2196F300;
+    border-radius: 0.25em;
+    transition: all 0.25s;
+} 
+/* When the checkbox is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+  /* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    transform: rotate(0deg);
+    border: 0.1em solid black;
+    left: 0;
+    top: 0;
+    width: 1.05em;
+    height: 1.05em;
+    border-radius: 0.25em;
+    transition: all 0.25s, border-width 0.1s;
+}
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+    left: 0.45em;
+    top: 0.25em;
+    width: 0.25em;
+    height: 0.5em;
+    border-color: #fff0 white white #fff0;
+    border-width: 0 0.15em 0.15em 0;
+    border-radius: 0em;
+    transform: rotate(45deg);
+}
+#EntrarContaUsuario {
+    padding: 70px 140px;
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+}
+#EntrarContaUsuario .right {
+    width: 50%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+#EntrarContaUsuario .right .imagem {
+    width: 100%;
+    height: auto;
+}
+#EntrarContaUsuario .right .imagem img {
+    width: 100%;
+    height: 100%;
+}
+#EntrarContaUsuario .right .descricao {
+    color: #645F60;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 30px;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+}
+#EntrarContaUsuario .left {
+    display: flex;
+    flex-direction: column;
+    row-gap: 30px;
+    width: 42%;
+}
+#EntrarContaUsuario .left .topo {
+    display: flex;
+    justify-content: start;
+}
+#EntrarContaUsuario .left .topo .logo {
+    width: 202px;
+    height: 30px;
+}
+#EntrarContaUsuario .left .corpo {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+}
+
+#EntrarContaUsuario .left .corpo .content-titulo {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+}
+#EntrarContaUsuario .left .corpo .content-titulo .titulo {
+    color: #FA511D;
+    font-size: 40px;
+    font-weight: 600;
+    line-height: auto;
+    margin: 0;
+}
+#EntrarContaUsuario .left .corpo .content-titulo .descricao {
+    font-size: 16px;
+    color: #313131;
+    font-weight: 400;
+    margin: 0;
+}
+
+#FormEntrarUsuario {
+    margin-top: 20px;
+}
+
+#FormEntrarUsuario .inputGroup {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+#FormEntrarUsuario .row {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+#FormEntrarUsuario .row #checkTerms {
+    display: flex;
+    justify-content: start;
+    gap: 10px;
+    align-items: center;
+}
+#FormEntrarUsuario .row #checkTerms .titulo {
+    color: #313131;
+    font-size: 14px;
+    font-weight: 500;
+}
+#FormEntrarUsuario .row .PassForgout {
+    color: #FF8682;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+}
+#FormEntrarUsuario .row .PassForgout:hover {
+    color: #fca9a7;
+}
+#FormEntrarUsuario .rowBtn {
+    width: 100%;
+    margin-bottom: 20px;
+}
+#FormEntrarUsuario .rowBtn .SendForm {
+    background: #515DEF;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+#FormEntrarUsuario .rowBtn .SendForm:disabled {
+    background: #b0b5ed;
+    cursor: no-drop;
+}
+#FormEntrarUsuario .rowBtn .SendForm:hover {
+    background: #6a76f7;
+}
+#FormEntrarUsuario .NoLogin {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+#FormEntrarUsuario .NoLogin .titulo {
+    color: #313131;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: auto;
+}
+#FormEntrarUsuario .NoLogin .titulo .link {
+    color: #FF8682;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+}
+#EntrarContaUsuario .rowOthersLogin {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+    align-items: center;
+    z-index: 2;
+}
+#EntrarContaUsuario .rowOthersLogin .titulo {
+    color: #747474;
+    font-size: 14px;
+    font-weight: 500;
+    background: #fff;
+    padding: 0 20px;
+    z-index: 2;
+}
+#EntrarContaUsuario .rowOthersLogin::before {
+    content: '';
+    width: 35%;
+    height: 1px;
+    background: rgb(217, 217, 217);
+    margin-top: 10px;
+    position: absolute;
+    z-index: 1;
+}
+#EntrarContaUsuario .rowOthersLogin .flexSocial {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+}
+#EntrarContaUsuario .rowOthersLogin .flexSocial .box-social {
+    width: 100%;
+    padding: 10px 0;
+    border: 2px solid #d4d4d4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: .33s;
+}
+#EntrarContaUsuario .rowOthersLogin .flexSocial .box-social:hover {
+    border-color: #3b3b3d;
+    background: #f7f7f7;
+}
+#EntrarContaUsuario .rowOthersLogin .flexSocial .box-social:active {
+    transition: .1s;
+    transform: scale(.9);
+}
+#EntrarContaUsuario .SouAnunciante {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    align-items: center;
+}
+
+#EntrarContaUsuario .SouAnunciante .titulo {
+    color: #747474;
+    font-size: 14px;
+    font-weight: 500;
+    background: #fff;
+    padding: 0 20px;
+    z-index: 2;
+}
+#EntrarContaUsuario .SouAnunciante::before {
+    content: '';
+    width: 35%;
+    height: 1px;
+    background: rgb(217, 217, 217);
+    margin-top: 9spx;
+    position: absolute;
+    z-index: 1;
+}
+#EntrarContaUsuario .SouAnunciante .buttonLinkAnunciante {
+    width: 100%;
+    padding: 10px 0;
+    background:#FA511D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 18px;
+    text-decoration: none;
+    transition: .33s;
+    border-radius: 4px;
+}
+#EntrarContaUsuario .SouAnunciante .buttonLinkAnunciante:hover {
+    background:#fc6a3e;   
+}
+
+@media screen and (max-width: 950px) {
+    #EntrarContaUsuario {
+        flex-direction: column;
+        row-gap: 40px;
+    }
+    #EntrarContaUsuario .left,
+    #EntrarContaUsuario .right {
+        width: 100%;
+    }
+}
+@media screen and (max-width: 700px) {
+    #EntrarContaUsuario {
+        padding: 20px;
+    }
+}
+@media screen and (max-width: 500px) {
+    #EntrarContaUsuario .left .corpo .content-titulo .titulo {
+        font-size: 24px;
+    }
+    #EntrarContaUsuario .left .corpo .content-titulo .descricao {
+        font-size: 14px;
+    }
+    #FormEntrarUsuario {
+        margin-top: 10px;
+    }
+    #EntrarContaUsuario .rowOthersLogin::before {
+        width: 100% !important;
+    }
+    #EntrarContaUsuario .SouAnunciante::before {
+        width: 100% !important;
+    }
+}
+@media screen and (max-width: 400px) {
+    .PassForgout {
+        font-size: 14px !important;
+    }
+    .NoLogin .titulo {
+        font-size: 14px !important;
+    }
+    .NoLogin .titulo .link {
+        font-size: 14px !important;
+    }
+    .buttonLinkAnunciante {
+        font-size: 16px !important;
+    }
+    .SendForm {
+        font-size: 16px !important;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+.TopPage {
+    width: 100%;
+    height: 7vh;
+    margin: 0;
+    padding: 0;
+    background-color: #FA511D;
+    z-index: 0;
+    display: flex;
+}
+
+.BarLow {
+    width: 100%;
+    height: 30vh;
+    margin: 0;
+    padding: 0;
+    background-color: #6400A1;
+    z-index: -1;
+    position: absolute;
+    margin-bottom: 0;
+}

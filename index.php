@@ -36,6 +36,8 @@ ob_end_flush(); // Envia o conteúdo do buffer para o navegador
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./app.css">
+    <script src="./app.js"></script>
+
     <style>
         body, html {
             margin: 0;

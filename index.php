@@ -1,33 +1,30 @@
 <?php
-// Remove qualquer saída antes da execução do código PHP
-ob_start(); // Inicia o buffer de saída
+    ob_start();
 
-// Inicie a sessão se ainda não estiver iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Defina as URLs de redirecionamento conforme o tipo de usuário
-$redirectUrlLogin = 'src/views/contratante/EntrarConta/'; // URL para redirecionar se o usuário não estiver logado
-$redirectUrlContratante = 'src/views/contratante/PaginaInicial'; // URL para redirecionar se o usuário for contratante
-$redirectUrlAnunciante = 'src/views/anunciante/PaginaInicial'; // URL para redirecionar se o usuário for anunciante
-
-// Verifique se o usuário está logado e exiba o tipo de usuário
-if (isset($_SESSION['IsLogged'])) {
-    if ($_SESSION['TypeUser'] == 'contrante') {
-        header('location: ' . $redirectUrlContratante);
-        exit();
-    } else {
-        header('location: ' . $redirectUrlAnunciante);
-        exit();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
-} else {
-    header('location: ' . $redirectUrlLogin);
-    exit(); // Usa exit() para garantir que o script pare após o redirecionamento
-}
 
-ob_end_flush(); // Envia o conteúdo do buffer para o navegador
+    $redirectUrlLogin = 'src/views/contratante/EntrarConta/'; 
+    $redirectUrlContratante = 'src/views/contratante/PaginaInicial';
+    $redirectUrlAnunciante = 'src/views/anunciante/PaginaInicial'; 
+
+    if (isset($_SESSION['IsLogged'])) {
+        if ($_SESSION['TypeUser'] == 'contrante') {
+            header('location: ' . $redirectUrlContratante);
+            exit();
+        } else {
+            header('location: ' . $redirectUrlAnunciante);
+            exit();
+        }
+    } else {
+        header('location: ' . $redirectUrlLogin);
+        exit(); 
+    }
+
+    ob_end_flush(); 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

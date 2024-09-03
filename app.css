@@ -348,3 +348,6 @@ a {
 ::-webkit-scrollbar-thumb {
     background: #1f6feb;
 }
+.disabled-campo {
+    background: rgba(94, 94, 94, 0.116) !important;
+}

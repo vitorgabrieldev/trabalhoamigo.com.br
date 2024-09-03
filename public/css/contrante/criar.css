@@ -142,9 +142,9 @@
 .left .imagem img {
     width: 100%;
 }
-.left {
+/* .left {
     position: fixed;
-}
+} */
 @media screen and (max-width: 1100px) {
     .left {
         display: none !important;

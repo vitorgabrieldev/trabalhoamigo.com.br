@@ -201,14 +201,14 @@ addSEOData();
 /* ------------------------------------------------------------
 | Sistema de Inserção de política de Segurança de Conteúdo (CSP)
 /-------------------------------------------------------------- */
-function setContentSecurityPolicy() {
-    const meta = document.createElement('meta');
-    meta.httpEquiv = 'Content-Security-Policy';
-    meta.content = "default-src 'self'; img-src * data:; script-src 'self' https://trusted.cdn.com; style-src 'self' 'unsafe-inline';";
-    document.head.appendChild(meta);
-}
+// function setContentSecurityPolicy() {
+//     const meta = document.createElement('meta');
+//     meta.httpEquiv = 'Content-Security-Policy';
+//     meta.content = "default-src 'self'; img-src * data:; script-src 'self' https://trusted.cdn.com; style-src 'self' 'unsafe-inline';";
+//     document.head.appendChild(meta);
+// }
 
-setContentSecurityPolicy();
+// setContentSecurityPolicy();
 
 /* ------------------------------------------------------------
 | Sistema de Inserção de logs para auditoria
@@ -227,7 +227,7 @@ function logUserAccess() {
             screenHeight: screenHeight 
         },
         success: function(response) {
-            console.log('Log registrado com sucesso.');
+            // console.log('Log registrado com sucesso.');
         },
         error: function(xhr, status, error) {
             console.error('Erro ao registrar o log:', status, error);
@@ -243,35 +243,35 @@ $(document).ready(function() {
 /* ------------------------------------------------------------
 | Sistema de broqueio para telas menores (Temporário)
 /-------------------------------------------------------------- */
-setInterval(() => {
-    const blurMediaScreen = document.querySelector('.blurMediaScreen');
+// setInterval(() => {
+//     const blurMediaScreen = document.querySelector('.blurMediaScreen');
 
-    if (window.innerWidth < 1024) {
-        if (!blurMediaScreen) {
-            document.body.innerHTML += `
-                <div class="blurMediaScreen" style="
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    background-color: black;
-                    color: white;
-                    font-family: Arial, sans-serif;
-                    font-size: 24px;
-                    text-align: center;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    z-index: 1000;
-                ">
-                    <p>Este site não está disponível para dispositivos móveis.</p>
-                </div>
-            `;
-        }
-    } else {
-        if (blurMediaScreen) {
-            blurMediaScreen.remove();
-        }
-    }
-}, 1000);
+//     if (window.innerWidth < 1024) {
+//         if (!blurMediaScreen) {
+//             document.body.innerHTML += `
+//                 <div class="blurMediaScreen" style="
+//                     display: flex;
+//                     justify-content: center;
+//                     align-items: center;
+//                     height: 100vh;
+//                     background-color: black;
+//                     color: white;
+//                     font-family: Arial, sans-serif;
+//                     font-size: 24px;
+//                     text-align: center;
+//                     position: fixed;
+//                     top: 0;
+//                     left: 0;
+//                     width: 100%;
+//                     z-index: 1000;
+//                 ">
+//                     <p>Este site não está disponível para dispositivos móveis.</p>
+//                 </div>
+//             `;
+//         }
+//     } else {
+//         if (blurMediaScreen) {
+//             blurMediaScreen.remove();
+//         }
+//     }
+// }, 1000);

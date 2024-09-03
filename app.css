@@ -337,3 +337,14 @@ a {
 .high-contrast a {
     color: #0f0 !important;
 }
+
+::-webkit-scrollbar-track {
+    background-color: #F4F4F4;
+}
+::-webkit-scrollbar {
+    width: 6px;
+    background: #F4F4F4;
+}
+::-webkit-scrollbar-thumb {
+    background: #1f6feb;
+}

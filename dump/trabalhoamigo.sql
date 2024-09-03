@@ -151,19 +151,17 @@ CREATE TABLE `default_usuarios` (
   `whatsapp` varchar(45) DEFAULT NULL,
   `telefone` varchar(45) DEFAULT NULL,
   `email` varchar(66) DEFAULT NULL,
-  `email_recuperacao` varchar(66) DEFAULT NULL,
   `senha` varchar(512) DEFAULT NULL,
   `cpf` varchar(25) DEFAULT NULL,
   `cnpj` varchar(40) DEFAULT NULL,
-  `endereco` varchar(120) DEFAULT NULL,
   `cep` varchar(20) DEFAULT NULL,
   `rua` varchar(120) DEFAULT NULL,
+  `bairro` varchar(70) DEFAULT NULL,
   `numero` int(11) DEFAULT NULL,
   `complemento` varchar(255) DEFAULT NULL,
   `data_Criacao` datetime DEFAULT NULL,
   `tipo_usuario` varchar(20) DEFAULT NULL,
   `ativo` int(11) DEFAULT NULL,
-  `bairro` varchar(70) DEFAULT NULL,
   PRIMARY KEY (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;

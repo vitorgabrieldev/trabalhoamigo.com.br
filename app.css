@@ -330,3 +330,10 @@ a {
 .hidden {
     display: none !important;
 }
+.high-contrast {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+.high-contrast a {
+    color: #0f0 !important;
+}

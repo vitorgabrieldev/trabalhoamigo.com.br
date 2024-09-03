@@ -1,4 +1,14 @@
 <?php
+
+/* ---------------------------------------------------
+| Sistema de Registros de Logs
+| ----------------------------------------------------*/
+$isActiveLogs = 0;
+
+if ($isActiveLogs == 0) {
+    return;
+};
+
 $logDir = __DIR__ . '/';
 $logFile = $logDir . 'Audit.log';
 

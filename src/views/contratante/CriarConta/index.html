@@ -22,12 +22,11 @@
 
     <!-- Tags Especificas de cada página-->
     <link rel="stylesheet" href="../../../../public/css/contrante/criar.css">
-    <script src="../../../../public/js/contrante/conta.js" defer></script>
 
     <!-- Importação da bibliotecas -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </head>
 
 <body>
@@ -49,78 +48,55 @@
                     <h1 class="titulo">Crie sua conta aqui</h1>
                     <p class="descricao">Crie sua conta gratuitamente em nossa plataforma</p>
                 </section>
-                <form id="FormCriarUsuario" method="post" action="../../../controllers/contratante/indexController.php">
+                <form id="FormCriarUsuario">
                     <section class="inputGroup">
-                        <!-- Campos já existentes -->
                         <div class="input-group">
-                            <input  type="text" name="primeiro_nome" autocomplete="off" class="input nome">
-                            <label class="user-label">Primeiro Nome</label>
+                            <input required type="text" name="text" autocomplete="off" class="input nome" placeholder="Nome">
+                            <label class="user-label"></label>
+                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required type="text" name="text" autocomplete="off" class="input nome" placeholder="Sobrenome">
+                            <label class="user-label"></label>
                             <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
                         </div>
                         <div class="input-group">
-                            <input  type="text" name="ultimo_nome" autocomplete="off" class="input nome">
-                            <label class="user-label">Sobrenome</label>
+                            <input required type="email" name="email" autocomplete="off" class="input email" placeholder="Email">
+                            <label class="user-label"></label>
+                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required type="tel" name="telefone" autocomplete="off" class="input telefone" placeholder="Telefone">
+                            <label class="user-label"></label>
                             <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
                         </div>
                         <div class="input-group">
-                            <input  type="email" name="email" autocomplete="off" class="input email">
-                            <label class="user-label">Email</label>
+                            <input required="" type="password" name="text" autocomplete="off" class="input-senha" placeholder="Senha">
+                            <label class="user-label"></label>
                             <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
                         </div>
                         <div class="input-group">
-                            <input  type="tel" name="telefone" autocomplete="off" class="input telefone">
-                            <label class="user-label">Telefone</label>
+                            <input required="" type="password" name="text" autocomplete="off" class="input-senha" placeholder="Confirma senha">
+                            <label class="user-label"></label>
                             <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
                         </div>
                         <div class="input-group">
-                            <input type="password" name="senha" autocomplete="off" class="input senha">
-                            <label class="user-label">Senha</label>
+                            <input required type="text" name="text" autocomplete="off" class="input CEP" placeholder="CEP">
+                            <label class="user-label"></label>
+                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required type="text" name="text" autocomplete="off" class="input cidade" placeholder="cidade">
+                            <label class="user-label"></label>
+                        </div>
+                        <div class="input-group">
+                            <input required type="text" name="text" autocomplete="off" class="input rua" placeholder="Rua">
+                            <label class="user-label"></label>
+                            <input required type="text" name="text" autocomplete="off" class="input numero" placeholder="Número">
+                            <label class="user-label"></label>
                             <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
                         </div>
                         <div class="input-group">
-                            <input type="password" name="text" autocomplete="off" class="input senha">
-                            <label class="user-label">Repetir Senha</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
-                        </div>  
-                        <div class="input-group">
-                            <input type="tel" name="celular" autocomplete="off" class="input celular">
-                            <label class="user-label">Celular</label>
-                            <h4 class="errorMessage errorMessageCelular hidden">Preencha corretamente este campo!</h4>
+                            <input required="" type="text" name="text" autocomplete="off" class="input-complem" placeholder="Bairro">
+                            <label class="user-label"></label>
                         </div>
                         <div class="input-group">
-                            <input type="tel" name="whatsapp" autocomplete="off" class="input whatsapp">
-                            <label class="user-label">WhatsApp</label>
-                            <h4 class="errorMessage errorMessageWhatsapp hidden">Preencha corretamente este campo!</h4>
-                        </div>                        
-                        <div class="input-group">
-                            <input  type="text" name="cpf" autocomplete="off" class="input cpf">
-                            <label class="user-label">CPF</label>
-                            <h4 class="errorMessage errorMessageCpf hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input  type="text" name="cep" autocomplete="off" class="input cep">
-                            <label class="user-label">CEP</label>
-                            <h4 class="errorMessage errorMessageCep hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input  type="text" name="rua" autocomplete="off" class="input rua" disabled>
-                            <label class="user-label user-label-disabled">Rua</label>
-                            <h4 class="errorMessage errorMessageRua hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input  type="text" name="bairro" autocomplete="off" class="input bairro" disabled>
-                            <label class="user-label user-label-disabled">Bairro</label>
-                            <h4 class="errorMessage errorMessageBairro hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input  type="number" name="numero" autocomplete="off" class="input numero">
-                            <label class="user-label">Número</label>
-                            <h4 class="errorMessage errorMessageNumero hidden">Preencha corretamente este campo!</h4>
-                        </div>
-                        <div class="input-group">
-                            <input  type="text" name="complemento" autocomplete="off" class="input complemento">
-                            <label class="user-label">Complemento</label>
-                            <h4 class="errorMessage errorMessageComplemento hidden">Preencha corretamente este campo!</h4>
+                            <input required="" type="text" name="text" autocomplete="off" class="input-complem" placeholder="Complemento(opcional)">
+                            <label class="user-label"></label>
                         </div>
                     </section>
                     <div class="row">
@@ -129,7 +105,8 @@
                                 <input type="checkbox">
                                 <div class="checkmark"></div>
                             </label>
-                            <p>Eu aceito <strong style="color: #FF8682;">Termos</strong> e <strong style="color: #FF8682;">Politicas de Privicidade</strong></p>
+                            <p>Eu aceito <strong style="color: #FF8682;">Termos</strong> e <strong
+                                    style="color: #FF8682;">Politicas de Privicidade</strong></p>
                         </div>
                     </div>
                     <div class="rowBtn">
@@ -139,13 +116,16 @@
                         <h2 class="titulo">Ou faça login com</h2>
                         <div class="flexSocial">
                             <div class="box-social">
-                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Facebook.png" alt="Icone de Login">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Facebook.png"
+                                    alt="Icone de Login">
                             </div>
                             <div class="box-social">
-                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Google.png" alt="Icone de Login">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Google.png"
+                                    alt="Icone de Login">
                             </div>
                             <div class="box-social">
-                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Apple.png" alt="Icone de Login">
+                                <img src="../../../../public/img/EntrarUsuario/Icon-Social-Apple.png"
+                                    alt="Icone de Login">
                             </div>
                         </div>
 

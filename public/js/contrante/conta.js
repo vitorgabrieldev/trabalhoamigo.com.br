@@ -1,229 +1,202 @@
-$(document).ready(function () {
-    $('#FormCriarUsuario').on('submit', function (e) {
-        e.preventDefault(); // Impede o envio do formulário
+// Funções de validação modular
 
-        // Captura dos dados dos campos
-        let primeiroNome = $('.input.nome').eq(0).val().trim();
-        let sobrenome = $('.input.nome').eq(1).val().trim();
-        let email = $('.input.email').val().trim();
-        let telefone = $('.input.telefone').val().trim();
-        let senha = $('.input.senha').eq(0).val().trim();
-        let repetirSenha = $('.input.senha').eq(1).val().trim();
-        let celular = $('.input.celular').val().trim();
-        let whatsapp = $('.input.whatsapp').val().trim();
-        let cpf = $('.input.cpf').val().trim();
-        let cep = $('.input.cep').val().trim();
-        let rua = $('.input.rua').val().trim();
-        let bairro = $('.input.bairro').val().trim();
-        let numero = $('.input.numero').val().trim();
-        let complemento = $('.input.complemento').val().trim();
-        let aceitouTermos = $('#checkTerms input[type="checkbox"]').is(':checked');
+/**
+ * Valida se o nome não está vazio.
+ * @param {string} nome - O nome a ser validado.
+ * @return {boolean} - Retorna true se o nome for válido.
+ */
+ function validarNome(nome) {
+    return nome.length > 0;
+}
 
-        // Validações
-        if (primeiroNome === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Primeiro Nome".'
-            });
-            return;
-        }
+/**
+ * Valida se o email está no formato correto.
+ * @param {string} email - O email a ser validado.
+ * @return {boolean} - Retorna true se o email for válido.
+ */
+function validarEmail(email) {
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regexEmail.test(email);
+}
 
-        if (sobrenome === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Sobrenome".'
-            });
-            return;
-        }
+/**
+ * Valida se o telefone está no formato correto (10 ou 11 dígitos).
+ * @param {string} telefone - O telefone a ser validado.
+ * @return {boolean} - Retorna true se o telefone for válido.
+ */
+function validarTelefone(telefone) {
+    const regexTelefone = /^\d{10,11}$/; // Exemplo para telefones brasileiros
+    return regexTelefone.test(telefone);
+}
 
-        if (email === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Email".'
-            });
-            return;
-        } else if (!validateEmail(email)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Email Inválido',
-                text: 'Por favor, insira um email válido.'
-            });
-            return;
-        }
+/**
+ * Valida se a senha tem pelo menos 6 caracteres.
+ * @param {string} senha - A senha a ser validada.
+ * @return {boolean} - Retorna true se a senha for válida.
+ */
+function validarSenha(senha) {
+    return senha.length >= 6;
+}
 
-        if (telefone === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Telefone".'
-            });
-            return;
-        }
+/**
+ * Valida se a senha e a confirmação de senha são iguais.
+ * @param {string} senha - A senha original.
+ * @param {string} repetirSenha - A senha de confirmação.
+ * @return {boolean} - Retorna true se as senhas coincidirem.
+ */
+function validarRepetirSenha(senha, repetirSenha) {
+    return senha === repetirSenha;
+}
 
-        if (senha === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Senha".'
-            });
-            return;
-        } else if (senha.length < 6) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Senha Curta',
-                text: 'A senha deve ter pelo menos 6 caracteres.'
-            });
-            return;
-        }
+/**
+ * Valida se o CEP está no formato correto (XXXXX-XXX).
+ * @param {string} cep - O CEP a ser validado.
+ * @return {boolean} - Retorna true se o CEP for válido.
+ */
+function validarCep(cep) {
+    const regexCep = /^\d{5}-?\d{3}$/;
+    return regexCep.test(cep);
+}
 
-        if (repetirSenha === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Repetir Senha".'
-            });
-            return;
-        } else if (senha !== repetirSenha) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Senhas Não Coincidem',
-                text: 'As senhas inseridas não são iguais.'
-            });
-            return;
-        }
+/**
+ * Valida se o número da residência não está vazio.
+ * @param {string} numero - O número da residência a ser validado.
+ * @return {boolean} - Retorna true se o número for válido.
+ */
+function validarNumero(numero) {
+    return numero.length > 0;
+}
 
-        if (celular === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Celular".'
-            });
-            return;
-        }
+/**
+ * Valida se a caixa de seleção foi marcada.
+ * @param {boolean} checkbox - O estado da caixa de seleção.
+ * @return {boolean} - Retorna true se a caixa de seleção estiver marcada.
+ */
+function validarCheckbox(checkbox) {
+    return checkbox === true;
+}
 
-        if (whatsapp === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "WhatsApp".'
-            });
-            return;
-        }
+// Função principal de validação
 
-        if (cpf === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "CPF".'
-            });
-            return;
-        }
+/**
+ * Função que valida todos os dados do formulário.
+ * @param {object} formData - Um objeto contendo os dados do formulário.
+ * @return {Array} - Retorna um array de mensagens de erro, se houver.
+ */
+function validarDados(formData) {
+    let erros = [];
 
-        if (cep === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "CEP".'
-            });
-            return;
-        }
+    if (!validarNome(formData.primeiroNome)) erros.push("Primeiro nome inválido");
+    if (!validarNome(formData.sobrenome)) erros.push("Sobrenome inválido");
+    if (!validarEmail(formData.email)) erros.push("Email inválido");
+    if (!validarTelefone(formData.telefone)) erros.push("Telefone inválido");
+    if (!validarSenha(formData.senha)) erros.push("Senha deve ter pelo menos 6 caracteres");
+    if (!validarRepetirSenha(formData.senha, formData.repetirSenha)) erros.push("As senhas não coincidem");
+    if (!validarCep(formData.cep)) erros.push("CEP inválido");
+    if (!validarNome(formData.rua)) erros.push("Rua inválida");
+    if (!validarNome(formData.bairro)) erros.push("Bairro inválido");
+    if (!validarNumero(formData.numero)) erros.push("Número inválido");
+    if (!validarCheckbox(formData.aceitouTermos)) erros.push("Você deve aceitar os termos e condições");
 
-        if (rua === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Rua".'
-            });
-            return;
-        }
+    return erros;
+}
 
-        if (bairro === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Bairro".'
-            });
-            return;
-        }
+$('#FormCriarUsuario').on('submit', function (e) {
+    e.preventDefault(); // Previne o envio padrão do formulário
 
-        if (numero === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Campo Obrigatório',
-                text: 'Por favor, preencha o campo "Número".'
-            });
-            return;
-        }
-
-        if (!aceitouTermos) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Termos de Uso',
-                text: 'Você deve aceitar os Termos e Políticas de Privacidade.'
-            });
-            return;
-        }
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Sucesso!',
-            text: 'Cadastro realizado com sucesso!',
-            confirmButtonText: 'OK'
-        }).then(() => {
-            this.submit();
-        });
-    });
-
-    function validateEmail(email) {
-        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return re.test(email);
+    let formData = {
+        primeiroNome: $('.input.nome').eq(0).val().trim(), // Obtém o valor do primeiro nome
+        sobrenome: $('.input.nome').eq(1).val().trim(),    // Obtém o valor do sobrenome
+        email: $('.input.email').val().trim(),             // Obtém o valor do email
+        telefone: $('.input.telefone').val().trim(),       // Obtém o valor do telefone
+        celular: $('.input.celular').val().trim(),       // Obtém o valor do celular
+        whatsapp: $('.input.whatsapp').val().trim(),       // Obtém o valor do Whatsapp
+        cpf: $('.input.cpf').val().trim(),       // Obtém o valor do cpf
+        senha: $('.input.senha').val().trim(),             // Obtém o valor da senha
+        repetirSenha: $('.input.againsenha').val().trim(), // Obtém o valor da confirmação de senha
+        cep: $('.input.cep').val().trim(),                 // Obtém o valor do CEP
+        rua: $('.input.rua').val().trim(),                 // Obtém o valor da rua
+        bairro: $('.bairro').val().trim(),                 // Obtém o valor do bairro
+        numero: $('.input.numero').val().trim(),           // Obtém o valor do número da residência
+        complemento: $('.complemento').val().trim(),       // Obtém o valor do complemento (se houver)
+        aceitouTermos: $('#checkTerms input[type="checkbox"]').is(':checked') // Verifica se os termos foram aceitos
     };
 
-    $('.input.cep').on('blur', function () {
-        const cep = $(this).val().trim().replace(/\D/g, ''); // Remove caracteres não numéricos
+    let erros = validarDados(formData); // Valida os dados do formulário
 
-        if (cep.length === 8) {
-            $.ajax({
-                url: `https://viacep.com.br/ws/${cep}/json/`,
-                method: 'GET',
-                success: function (data) {
-                    if (data.erro) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'CEP Inválido',
-                            text: 'Não foi possível encontrar o CEP informado.'
-                        });
-                    } else {
-                        // Preenche os campos com os dados do CEP
-                        $('.input.rua').val(data.logradouro);
-                        $('.input.bairro').val(data.bairro);
-                        $('.input.cidade').val(data.localidade);
-                        $('.input.uf').val(data.uf);
-                        
-                        // Remove as labels dos campos preenchidos
-                        $('.input.rua').siblings('label').hide();
-                        $('.input.bairro').siblings('label').hide();
-                        $('.input.cidade').siblings('label').hide();
-                        $('.input.uf').siblings('label').hide();
-                    }
-                },
-                error: function () {
+    if (erros.length > 0) {
+        console.log("Erros de validação:", erros); // Exibe os erros no console
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro de Validação',
+            text: 'Verifique os campos e tente novamente.',
+            footer: erros.join('<br>') // Mostra todos os erros em uma linha
+        });
+    } else {
+
+        console.log();
+
+        $.ajax({
+            url: '../../../controllers/contratante/CreateAccount.php',
+            type: 'POST',
+            data: formData, 
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro na requisição AJAX:', status, error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Ocorreu um erro. Tente novamente.'
+                });
+            }
+        });
+        
+    }
+});
+
+$('.input.cep').on('blur', function () {
+    const cep = $(this).val().trim().replace(/\D/g, ''); // Remove caracteres não numéricos
+
+    if (cep.length === 8) {
+        $.ajax({
+            url: `https://viacep.com.br/ws/${cep}/json/`,
+            method: 'GET',
+            success: function (data) {
+                if (data.erro) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Erro',
-                        text: 'Erro ao consultar o CEP. Tente novamente mais tarde.'
+                        title: 'CEP Inválido',
+                        text: 'Não foi possível encontrar o CEP informado.'
                     });
+                } else {
+                    // Preenche os campos com os dados do CEP
+                    $('.input.rua').val(data.logradouro);
+                    $('.input.bairro').val(data.bairro);
+                    $('.input.cidade').val(data.localidade);
+                    $('.input.uf').val(data.uf);
+
+                    // Remove as labels dos campos preenchidos
+                    $('.input.rua').siblings('label').hide();
+                    $('.input.bairro').siblings('label').hide();
+                    $('.input.cidade').siblings('label').hide();
+                    $('.input.uf').siblings('label').hide();
                 }
-            });
-        } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'CEP Inválido',
-                text: 'O CEP deve ter 8 dígitos.'
-            });
-        }
-    });
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro ao consultar o CEP. Tente novamente mais tarde.'
+                });
+            }
+        });
+    } else {
+        Swal.fire({
+            icon: 'warning',
+            title: 'CEP Inválido',
+            text: 'O CEP deve ter 8 dígitos.'
+        });
+    }
 });

@@ -38,17 +38,6 @@
     color: rgb(249, 84, 84);
     font-size: 14px;
 }   
-/*.user-label {
-    position: absolute;
-    margin-bottom: 100px;
-    left: 15px;
-    color: black;
-    pointer-events: none;
-    transform: translateY(-2.3rem);
-    transition: 150ms cubic-bezier(0.4,0,0.2,1);
-    font-size: 16px;
-    font-weight: 500;
-}*/
 
 .input-senha {
     width: calc(100% - 10px);
@@ -152,6 +141,17 @@
 }
 .left .imagem img {
     width: 100%;
+}
+/* .left {
+    position: fixed;
+} */
+@media screen and (max-width: 1100px) {
+    .left {
+        display: none !important;
+    }
+    #CriarContaUsuario .right {
+        width: 100%;
+    }
 }
 #CriarContaUsuario .right .descricao {
     color: #645F60;

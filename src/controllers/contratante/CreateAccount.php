@@ -95,6 +95,24 @@ function processRegistration() {
 
             insertUser($conexao, $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $cpf);
 
+            // Resgata usuário criado
+            $query = "SELECT * FROM usuarios WHERE email = ?";
+            $stmt = $conexao->prepare($query);
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    // Inicializa a session
+                    sessionAction($row);
+                }
+            } else {
+                echo "Nenhum usuário encontrado com esse email.";
+            }
+
+            $stmt->close();
+
             echo json_encode([
                 'success' => true,
                 'message' => 'Cadastro realizado com sucesso'
@@ -115,5 +133,24 @@ function processRegistration() {
     }
 }
 
-// Chama a função principal
+function sessionAction($dados) {
+    if (!isset($_SESSION)) {
+        session_start();
+    };
+
+    $_SESSION['logado'] = true;
+    $_SESSION['id_usuario'] = $dados['id_usuario'];
+    $_SESSION['primeiro_nome'] = $dados['primeiro_nome'];
+    $_SESSION['ultimo_nome'] = $dados['ultimo_nome'];
+    $_SESSION['celular'] = $dados['celular'];
+    $_SESSION['whatsapp'] = $dados['whatsapp'];
+    $_SESSION['telefone'] = $dados['telefone'];
+    $_SESSION['email'] = $dados['email'];
+    $_SESSION['cpf'] = $dados['cpf'];
+    $_SESSION['cnpj'] = $dados['cnpj'];
+    $_SESSION['data_Criacao'] = $dados['data_Criacao'];
+    $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
+    $_SESSION['ativo'] = $dados['ativo'];
+};
+
 processRegistration();

@@ -141,7 +141,22 @@ $('#FormCriarUsuario').on('submit', function (e) {
             type: 'POST',
             data: formData, 
             success: function (response) {
-                console.log(response);
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: 'Login efetuado com sucesso!'
+                    });
+                    
+                    window.location.href = "../PaginaInicial/";
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Login não efetuado!.'
+                    });
+                };
             },
             error: function (xhr, status, error) {
                 console.error('Erro na requisição AJAX:', status, error);

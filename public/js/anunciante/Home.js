@@ -1,6 +1,6 @@
 const Logout = () => {
     $.ajax({
-        url: `../../../controllers/contratante/Logout.php`,
+        url: `../../../controllers/anunciante/Logout.php`,
         method: 'GET',
         success: function (data) {
             if (data == 'true') {

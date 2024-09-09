@@ -21,7 +21,7 @@
 
     <!-- Tags Especificas de cada página-->
     <link rel="stylesheet" href="../../../../public/css/contrante/PaginaInicial.css">
-    <script src="../../assets/js/HomeUsuario.js" defer></script>
+    <script src="../../../../public/js/contrante/Home.js" defer></script>
 
     <!-- Importação da bibliotecas -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -31,6 +31,27 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <body>
+
+    <script>
+        $.ajax({
+            url: `../../../controllers/contratante/Security.php`,
+            method: 'GET',
+            success: function (data) {
+                if (data == 'true') {
+                } else if (data == 'false') {
+                    window.location.href = "../CriarConta/";
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro na Autenticação.'
+                });
+            }
+        });
+    </script>
+
     <!-- =================================      TOPO      =================================-->
     <section id="popup-profile">
         <header class="topo-popup-profile">
@@ -59,7 +80,7 @@
             </a>
         </div>
         <hr class="small-line">
-        <a class="link link-child-logout" href="#">
+        <a onclick="Logout()" class="link link-child-logout" href="#">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
                 <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
             </svg>
@@ -121,15 +142,6 @@
 
 
     <main id="content">
-        
-        <section id="bloco-categorias">
-            <h1 class="titulo">CATEGORIAS</h1>
-            <div class="swiper-container">
-                <div id="swiper-row" class="swiper-wrapper"></div>
-                <div class="swiper-pagination"></div>
-              </div>
-        </section>
-
         <section id="bloco-banner">
             <div class="absolute-text">
                 <h3 class="descricaoBanner">

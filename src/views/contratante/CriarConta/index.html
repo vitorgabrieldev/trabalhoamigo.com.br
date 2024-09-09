@@ -13,15 +13,13 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
 
-    <!-- Importação do Icone do Projeto -->
-    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
-
     <!-- Tags Globais do projeto -->
     <script src="../../../../app.js" defer></script>
     <link rel="stylesheet" href="../../../../app.css">
 
     <!-- Tags Especificas de cada página-->
     <link rel="stylesheet" href="../../../../public/css/contrante/criar.css">
+    <script src="../../../../public/js/contrante/conta.js" defer></script>
 
     <!-- Importação da bibliotecas -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -31,10 +29,6 @@
 
 <body>
     <section id="CriarContaUsuario">
-        <header class="site-topo">
-            <img src="../../assets/images/EntrarUsuario/logo-trabalhoamigo.png" alt="">
-        </header>
-
         <div class="left">
             <div class="imagem">
                 <img src="../../../../public/img/CriarUsuario/imagen-criar-ususario.png" alt="Imagem Padrão Criar Usuário">
@@ -51,34 +45,64 @@
                 <form id="FormCriarUsuario">
                     <section class="inputGroup">
                         <div class="input-group">
-                            <input required type="text" name="text" autocomplete="off" class="input nome">
-                            <label class="user-label">Primeiro Nome</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required type="text" name="text" class="input nome" placeholder="Nome*">
+                            <label class="user-label"></label>
+
+                            <input required type="text" name="text" class="input nome" placeholder="Sobrenome*">
+                            <label class="user-label"></label>
+
                         </div>
                         <div class="input-group">
-                            <input required type="text" name="text" autocomplete="off" class="input nome">
-                            <label class="user-label">Sobrenome</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required type="email" name="email" class="input email" placeholder="Email*">
+                            <label class="user-label"></label>
+
+                            <input type="tel" name="telefone" class="input telefone" placeholder="Telefone (Opcional)">
+                            <label class="user-label"></label>
+
                         </div>
                         <div class="input-group">
-                            <input required type="email" name="email" autocomplete="off" class="input email">
-                            <label class="user-label">Email</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required type="tel" name="celular" class="input celular" placeholder="Celular*">
+                            <label class="user-label"></label>
+
+                            <input type="tel" name="whatsapp" class="input whatsapp" placeholder="WhatsApp (Opcional)">
+                            <label class="user-label"></label>
+
                         </div>
                         <div class="input-group">
-                            <input required type="tel" name="telefone" autocomplete="off" class="input telefone">
-                            <label class="user-label">Telefone</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required="" type="number" name="cpf" class="input-senha input cpf" placeholder="CPF*">
+                            <label class="user-label"></label>
                         </div>
                         <div class="input-group">
-                            <input required="" type="password" name="text" autocomplete="off" class="input senha">
-                            <label class="user-label">Senha</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required="" type="password" name="text" class="input-senha input senha" placeholder="Senha*">
+                            <label class="user-label"></label>
+
                         </div>
                         <div class="input-group">
-                            <input required="" type="password" name="text" autocomplete="off" class="input senha">
-                            <label class="user-label">Repetir Senha</label>
-                            <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
+                            <input required="" type="password" name="text" class="input-senha input againsenha" placeholder="Confirma senha*">
+                            <label class="user-label"></label>
+
+                        </div>
+                        <div class="input-group">
+                            <input required type="text" name="text" class="input cep" placeholder="CEP*">
+                            <label class="user-label"></label>
+
+                            <input disabled required type="text" name="text" class="input cidade disabled-campo" placeholder="cidade*">
+                            <label class="user-label"></label>
+                        </div>
+                        <div class="input-group">
+                            <input disabled required type="text" name="text" class="input rua disabled-campo" placeholder="Rua*">
+                            <label class="user-label"></label>
+                            <input required type="text" name="text" class="input numero" placeholder="Número">
+                            <label class="user-label"></label>
+
+                        </div>
+                        <div class="input-group">
+                            <input required="" type="text" name="text" class="input-complem bairro" placeholder="Bairro*">
+                            <label class="user-label"></label>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" name="text" class="input-complem complemento" placeholder="Complemento(opcional)">
+                            <label class="user-label"></label>
                         </div>
                     </section>
                     <div class="row">
@@ -90,6 +114,9 @@
                             <p>Eu aceito <strong style="color: #FF8682;">Termos</strong> e <strong
                                     style="color: #FF8682;">Politicas de Privicidade</strong></p>
                         </div>
+                    </div>
+                    <div class="rowBtn">
+                        <button type="submit" class="SendForm">Cadastrar</button>
                     </div>
                     <div class="rowOthersLogin">
                         <h2 class="titulo">Ou faça login com</h2>
@@ -108,13 +135,12 @@
                             </div>
                         </div>
 
-                        <div class="rowBtn">
-                            <button type="submit" class="SendForm">Acessar sua conta</button>
-                        </div>
+                        <section>
+                            <h2 class="titulo">Já possui uma conta? <a style="color: #FA511D;" href="../EntrarConta/" class="link">Entre em sua conta</a></h2>
+                        </section>
                 </form>
             </main>
         </div>
     </section>
 </body>
-
 </html>

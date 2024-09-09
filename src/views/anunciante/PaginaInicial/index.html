@@ -31,6 +31,27 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <body>
+
+    <script>
+        $.ajax({
+            url: `../../../controllers/anunciante/Security.php`,
+            method: 'GET',
+            success: function (data) {
+                if (data == 'true') {
+                } else if (data == 'false') {
+                    window.location.href = "../CriarConta/";
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro na Autenticação.'
+                });
+            }
+        });
+    </script>
+
     <!-- =================================      TOPO      =================================-->
     <section id="popup-profile">
         <header class="topo-popup-profile">
@@ -121,15 +142,6 @@
 
 
     <main id="content">
-        
-        <section id="bloco-categorias">
-            <h1 class="titulo">CATEGORIAS</h1>
-            <div class="swiper-container">
-                <div id="swiper-row" class="swiper-wrapper"></div>
-                <div class="swiper-pagination"></div>
-              </div>
-        </section>
-
         <section id="bloco-banner">
             <div class="absolute-text">
                 <h3 class="descricaoBanner">

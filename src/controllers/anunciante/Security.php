@@ -5,7 +5,7 @@ if (!isset($_SESSION)) {
 };
 
 if (isset($_SESSION['logado']) && isset($_SESSION['tipo_usuario'])) {
-    if ($_SESSION['tipo_usuario'] == 'contratante') {
+    if ($_SESSION['tipo_usuario'] == 'anunciante') {
         echo 'true';
     } else {
         echo 'false';

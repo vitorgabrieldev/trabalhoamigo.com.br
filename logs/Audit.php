@@ -3,7 +3,7 @@
 /* ---------------------------------------------------
 | Sistema de Registros de Logs
 | ----------------------------------------------------*/
-$isActiveLogs = 0;
+$isActiveLogs = 1;
 
 if ($isActiveLogs == 0) {
     return;

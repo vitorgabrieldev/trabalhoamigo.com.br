@@ -18,7 +18,7 @@ function getDatabaseConnection() {
 }
 
 function verificarUsuario($conexao, $email, $senha) {
-    $sql = "SELECT id_usuario, senha FROM usuarios WHERE email = ? and tipo_usuario = 'contratante'";
+    $sql = "SELECT id_usuario, senha FROM usuarios WHERE email = ? and tipo_usuario = 'anunciante'";
     $stmt = $conexao->prepare($sql);
 
     if (!$stmt) {

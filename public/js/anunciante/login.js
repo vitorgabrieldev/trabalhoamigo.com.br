@@ -36,7 +36,7 @@ function validarDadosLogin(formData) {
 }
 
 
-$('#FormLogin').on('submit', function (e) {
+$('#FormEntrarUsuario').on('submit', function (e) {
     e.preventDefault(); 
 
     let formData = {
@@ -56,7 +56,7 @@ $('#FormLogin').on('submit', function (e) {
         });
     } else {
         $.ajax({
-            url: '../../../controllers/usuario/Login.php',
+            url: '../../../controllers/anunciante/LoginAccount.php',
             type: 'POST',
             data: formData,
             success: function (response) {
@@ -67,8 +67,7 @@ $('#FormLogin').on('submit', function (e) {
                         title: 'Login bem-sucedido',
                         text: 'Você será redirecionado em breve.'
                     }).then(() => {
-                        // window.location.href = '/home'; 
-                        alert('LOGIN');
+                        window.location.href = '../PaginaInicial/'; 
                     });
                 } else {
                     Swal.fire({

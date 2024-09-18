@@ -21,7 +21,7 @@
 
     <!-- Tags Especificas de cada página-->
     <link rel="stylesheet" href="../../../../public/css/contrante/Acesso.css">
-    <script src="../../../../public/js/contrante/login.js" defer></script>
+    <script src="../../../../public/js/contratante/login.js" defer></script>
 
     <!-- Importação da bibliotecas -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -29,6 +29,28 @@
 
 
     <body>
+
+        <script>
+            $.ajax({
+                url: `../../../controllers/contratante/SecurityLogin.php`,
+                method: 'GET',
+                success: function (data) {
+                    if (data == 'contratante') {
+                        window.location.href = "../PaginaInicial/";
+                    } else if (data == 'anunciante') {
+                        window.location.href = "../PaginaInicial/";
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro na Autenticação.'
+                    });
+                }
+            });
+        </script>
+
         <section id="EntrarContaUsuario">
             <div class="left">
                 </header>

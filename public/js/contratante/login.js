@@ -55,12 +55,19 @@ $('#FormEntrarUsuario').on('submit', function (e) {
             footer: erros.join('<br>')
         });
     } else {
+
+        // Ativa animação de loading
+        $(".SendForm").html(`<section class="loading-container"><div class='loading-form-animation'></div></section>`);
+
         $.ajax({
             url: '../../../controllers/contratante/LoginAccount.php',
             type: 'POST',
             data: formData,
             success: function (response) {
-                console.log(response);
+                
+                // Desativa animação de loading
+                $(".SendForm").html("Acessar sua conta");
+
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
@@ -78,7 +85,10 @@ $('#FormEntrarUsuario').on('submit', function (e) {
                 }
             },
             error: function (xhr, status, error) {
-                console.error('Erro na requisição AJAX:', status, error);
+                
+                // Desativa animação de loading
+                $(".SendForm").html("Acessar sua conta");
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro',

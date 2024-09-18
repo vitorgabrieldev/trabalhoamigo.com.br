@@ -351,3 +351,26 @@ a {
 .disabled-campo {
     background: rgba(94, 94, 94, 0.116) !important;
 }
+
+.loading-form-animation {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    border-bottom-color: transparent;
+    animation: loading-animation-button infinite linear .4s;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+}
+
+@keyframes loading-animation-button {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

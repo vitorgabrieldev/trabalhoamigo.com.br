@@ -134,13 +134,18 @@ $('#FormCriarUsuario').on('submit', function (e) {
         });
     } else {
 
-        console.log();
+        // Ativa animação de loading
+        $(".SendForm").html(`<section class="loading-container"><div class='loading-form-animation'></div></section>`);
 
         $.ajax({
             url: '../../../controllers/contratante/CreateAccount.php',
             type: 'POST',
             data: formData, 
             success: function (response) {
+
+                // Desativa animação de loading
+                $(".SendForm").html("Cadastrar");
+
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
@@ -159,7 +164,10 @@ $('#FormCriarUsuario').on('submit', function (e) {
                 };
             },
             error: function (xhr, status, error) {
-                console.error('Erro na requisição AJAX:', status, error);
+                
+                // Desativa animação de loading
+                $(".SendForm").html("Cadastrar");
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro',

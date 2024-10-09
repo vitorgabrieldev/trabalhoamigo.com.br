@@ -181,7 +181,6 @@ $('#FormCriarUsuario').on('submit', function (e) {
 
 $('.input.cep').on('blur', function () {
     const cep = $(this).val().trim().replace(/\D/g, ''); // Remove caracteres não numéricos
-
     if (cep.length === 8) {
         $.ajax({
             url: `https://viacep.com.br/ws/${cep}/json/`,

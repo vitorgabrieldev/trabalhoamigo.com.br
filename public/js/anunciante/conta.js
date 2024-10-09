@@ -157,8 +157,8 @@ $('#FormCriarUsuario').on('submit', function (e) {
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Erro',
-                        text: 'Login não efetuado!.'
+                        title: 'Ocorreu um erro',
+                        text: response.message
                     });
                 };
             },

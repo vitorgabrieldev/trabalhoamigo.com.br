@@ -20,7 +20,9 @@
     <link rel="stylesheet" href="../../../../app.css">
 
     <!-- Tags Especificas de cada página-->
-    <link rel="stylesheet" href="../../../../public/css/contrante/ListagemServico.css">
+    <link rel="stylesheet" href="../../../../public/css/anunciante/ListagemPropostas.css">
+
+    <script src="../../../../public/js/contratante/Listagem.js" defer></script>
 
     <!-- Importação da bibliotecas -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -123,30 +125,6 @@
                         <button type="button" class="button_busca">Buscar</button>
                     </form>
                 </div>
-                <div class="row">
-                    <h2 id="qtdServicos" class="resultado">
-                        <div class="isLoading"></div>
-                        <span class="number">
-                            Carregando
-                        </span>
-                    </h2>
-                    <div class="d-flex">
-                        <div class="ordenar">
-                            <h2 class="titulo">Ordenar por</h2>
-                            <select class="selectOrdenacao" name="ordenar" id="ordenar_select">
-                                <option class="optionSelectOrdenacao" value="relevante">Mais relevante</option>
-                                <option class="optionSelectOrdenacao" value="menorpreco">Menor Preço</option>
-                                <option class="optionSelectOrdenacao" value="maiorpreco">Maior preço</option>
-                            </select>
-                        </div>
-                        <div class="ordenar">
-                            <h2 class="titulo">Filtrar por cidade</h2>
-                            <div class="ui-widget">
-                                <input id="tags">
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </section>
     
             <section id="bloco-servico">
@@ -157,9 +135,108 @@
                     </div>
                 </div>
                 <div id="listServicos" class="servicos">
-                    <div class="isLoadingServicos">
-                        <div class="circleLoading"></div>
-                    </div>
+                    <?php
+                        define('DB_SERVER', '185.173.111.184');
+                        define('DB_USERNAME', 'u858577505_trabalhoamigo');
+                        define('DB_PASSWORD', '@#Trabalhoamigo023@_');
+                        define('DB_NAME', 'u858577505_trabalhoamigo');
+
+                        // Função para criar a conexão com o banco de dados
+                        function getDatabaseConnection() {
+                            $conexao = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+                            
+                            if ($conexao->connect_error) {
+                                throw new Exception('Falha na conexão com o banco de dados: ' . $conexao->connect_error);
+                            }
+                            
+                            return $conexao;
+                        }
+
+                        // Função para buscar os serviços e categorias
+                        function getServicos($conexao) {
+                            // Consulta SQL para buscar serviços e suas respectivas categorias
+                            $sql = "
+                                SELECT 
+                                    s.id_servico, 
+                                    s.titulo, 
+                                    s.descricao, 
+                                    s.preco, 
+                                    s.aceita_oferta, 
+                                    s.comunitario, 
+                                    c.nome AS categoria_nome,
+                                    s.data_Criacao
+                                FROM 
+                                    servicos s
+                                INNER JOIN 
+                                    categorias c ON s.id_categoria_fk = c.id_categoria
+                                WHERE 
+                                    s.ativo = 1
+                                ORDER BY 
+                                    s.data_Criacao DESC
+                            ";
+                            
+                            $result = $conexao->query($sql);
+                            
+                            if ($result->num_rows > 0) {
+                                return $result->fetch_all(MYSQLI_ASSOC);  // Retorna os resultados como um array associativo
+                            } else {
+                                return [];
+                            }
+                        }
+
+                        // Renderizando a lista de serviços com um foreach
+                        function renderServicos($servicos) {
+                            if (empty($servicos)) {
+                                echo "<p>Nenhum serviço encontrado.</p>";
+                                return;
+                            }
+                            
+                            echo '<ul class="listagem-servico">';
+                            foreach ($servicos as $servico) {
+                                echo '<li class="listagem-item">';
+                                echo '<h2 class="listagem-titulo">' . htmlspecialchars($servico['titulo']) . '</h2>';
+                                echo '<p class="listagem-descricao">Descrição: ' . htmlspecialchars($servico['descricao']) . '</p>';
+                                echo '<p class="listagem-preco">Preço: R$ ' . number_format($servico['preco'], 2, ',', '.') . '</p>';
+                                echo '<p class="listagem-categoria">Categoria: ' . htmlspecialchars($servico['categoria_nome']) . '</p>';
+                                echo '<p class="listagem-data">Data de Criação: ' . date('d/m/Y H:i:s', strtotime($servico['data_Criacao'])) . '</p>';
+                                echo '<p class="listagem-oferta">Aceita Oferta: ' . ($servico['aceita_oferta'] ? 'Sim' : 'Não') . '</p>';
+                                echo '<p class="listagem-comunitario">Comunitário: ' . ($servico['comunitario'] ? 'Sim' : 'Não') . '</p>';
+                                echo '<button class="btn-modal" onclick="openModal(' . $servico['id_servico'] . ', \'' . addslashes(htmlspecialchars($servico['titulo'])) . '\', \'' . addslashes(htmlspecialchars($servico['descricao'])) . '\', ' . $servico['preco'] . ')">Ver Mais</button>';
+                                echo '</li>';
+                            }
+                            echo '</ul>';
+
+                            echo '
+                            <div id="modal" class="modal" style="display:none;">
+                                <div class="modal-content">
+                                    <span class="close" onclick="closeModal()">&times;</span>
+                                    <div class="content-container">
+                                        <h2 id="modal-titulo"></h2>
+                                        <p id="modal-descricao"></p>
+                                        <p id="modal-preco"></p>
+                                    </div>
+                                    <a id="contratar-btn" class="btn-contratar" href="#" onclick="contratarServico()">Contratar Serviço</a>
+                                </div>
+                            </div>';
+                        };
+
+                        // Processa a listagem dos serviços
+                        function processListServicos() {
+                            try {
+                                $conexao = getDatabaseConnection();
+                                $servicos = getServicos($conexao);
+                                renderServicos($servicos);
+                                $conexao->close();
+                            } catch (Exception $e) {
+                                echo "<p>Erro: " . $e->getMessage() . "</p>";
+                            }
+                        }
+
+                        // Chamando a função para processar e renderizar a listagem
+                        processListServicos();
+                        ?>
+
+
                 </div>
                 <section class="button-loadingMore">
                     <button id="LoadingMore" class="LoadingMore" type="button">
@@ -231,8 +308,6 @@
                 <h3 class="copy">Copyright 2023-2024 - Trabalhoamigo.com.br</h3>
             </div>
         </footer>
-    
-        <script src="../../library/swiper.js"></script>
         </section>
     </body>
 </html>

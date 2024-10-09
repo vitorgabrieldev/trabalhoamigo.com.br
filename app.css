@@ -374,3 +374,117 @@ a {
         transform: rotate(360deg);
     }
 }
+
+
+.listagem-servico {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.listagem-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.listagem-titulo {
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.listagem-descricao,
+.listagem-preco,
+.listagem-categoria,
+.listagem-data,
+.listagem-oferta,
+.listagem-comunitario {
+    font-weight: 500;
+}
+
+.btn-modal {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-modal:hover {
+    background-color: #0056b3;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-contratar {
+    display: inline-block;
+    background-color: #28a745; /* Verde */
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.btn-contratar:hover {
+    background-color: #218838;
+}
+
+.modal-content {
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+#modal-titulo,
+#modal-descricao,
+#modal-preco {
+    font-size: 18px;
+    font-weight: 500;
+}

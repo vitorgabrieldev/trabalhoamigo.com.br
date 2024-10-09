@@ -243,35 +243,67 @@ $(document).ready(function() {
 /* ------------------------------------------------------------
 | Sistema de broqueio para telas menores (Temporário)
 /-------------------------------------------------------------- */
-// setInterval(() => {
-//     const blurMediaScreen = document.querySelector('.blurMediaScreen');
+setInterval(() => {
+    const blurMediaScreen = document.querySelector('.blurMediaScreen');
 
-//     if (window.innerWidth < 1024) {
-//         if (!blurMediaScreen) {
-//             document.body.innerHTML += `
-//                 <div class="blurMediaScreen" style="
-//                     display: flex;
-//                     justify-content: center;
-//                     align-items: center;
-//                     height: 100vh;
-//                     background-color: black;
-//                     color: white;
-//                     font-family: Arial, sans-serif;
-//                     font-size: 24px;
-//                     text-align: center;
-//                     position: fixed;
-//                     top: 0;
-//                     left: 0;
-//                     width: 100%;
-//                     z-index: 1000;
-//                 ">
-//                     <p>Este site não está disponível para dispositivos móveis.</p>
-//                 </div>
-//             `;
-//         }
-//     } else {
-//         if (blurMediaScreen) {
-//             blurMediaScreen.remove();
-//         }
-//     }
-// }, 1000);
+    if (window.innerWidth < 1024) {
+        if (!blurMediaScreen) {
+            document.body.innerHTML += `
+                <div class="blurMediaScreen" style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    background-color: black;
+                    color: white;
+                    font-family: Arial, sans-serif;
+                    font-size: 24px;
+                    text-align: center;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    z-index: 1000;
+                ">
+                    <p>Este site não está disponível para dispositivos móveis.</p>
+                </div>
+            `;
+        }
+    } else {
+        if (blurMediaScreen) {
+            blurMediaScreen.remove();
+        }
+    }
+}, 1000);
+
+$(".DispathAlert").click(() => {
+    Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Em construção...",
+    });
+});
+
+
+let servicoId; // Variável global para armazenar o id do serviço
+
+function openModal(id, titulo, descricao, preco) {
+    servicoId = id; // Armazena o id do serviço na variável
+    document.getElementById('modal-titulo').innerText = titulo;
+    document.getElementById('modal-descricao').innerText = descricao;
+    document.getElementById('modal-preco').innerText = 'Preço: R$ ' + preco.toFixed(2).replace('.', ',');
+    document.getElementById('contratar-btn').setAttribute('href', 'contratar_servico.php?id=' + servicoId); // Atualiza o link do botão
+    document.getElementById('modal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+// Fecha o modal se o usuário clicar fora dele
+window.onclick = function(event) {
+    const modal = document.getElementById('modal');
+    if (event.target == modal) {
+        closeModal();
+    }
+}

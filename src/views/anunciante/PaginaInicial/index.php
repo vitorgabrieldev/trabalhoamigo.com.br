@@ -127,10 +127,6 @@ if (!isset($_SESSION)) {
                     <img src="../../../../public/img/Icon-document.png" alt="Icon Propostas">
                     Propostas
                 </a>
-                <a class="link-element" href="../ListagemProposta/">
-                    <img src="../../../../public/img/Icon-search.png" alt="Icon Procurar">
-                    Procurar
-                </a>
                 <a class="link-element" href="#">
                     <img src="../../../../public/img/Icon-notification.png" alt="Icon Notificações">
                     Notificações

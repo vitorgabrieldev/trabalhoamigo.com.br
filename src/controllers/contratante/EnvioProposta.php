@@ -1,4 +1,5 @@
 <?php
+
 // Iniciar a sessão
 session_start();
 
@@ -30,16 +31,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tempo = (int) $_POST['tempo'];
     $id_servico_fk = (int) $_POST['id_servico'];
     $id_usuario_contrante_fk = (int) $_SESSION['id_usuario'];
-    $id_usuario_prestador_fk = 1;
     $data_contrato = date('Y-m-d H:i:s');
-
     $prazo_estimado = date('Y-m-d H:i:s', strtotime("+$tempo days"));
 
     try {
+        // Criar a conexão
         $conexao = getDatabaseConnection();
 
-        // Preparar a instrução SQL
-        $stmt = $conexao->prepare("INSERT INTO proposta (id_servico_fk, id_usuario_contrante_fk, id_usuario_prestador_fk, data_contrato, prazo_estimado, valor_total) VALUES (?, ?, ?, ?, ?, ?)");
+        // Preparar a instrução SQL para buscar o ID do anunciante
+        $stmt = $conexao->prepare("SELECT id_usuario_fk FROM servicos WHERE id_usuario_fk = ?");
+        if (!$stmt) {
+            throw new Exception('Erro ao preparar a declaração: ' . $conexao->error);
+        }
+
+        $stmt->bind_param("i", $id_servico_fk);
+
+        if (!$stmt->execute()) {
+            throw new Exception('Erro ao buscar o ID do anunciante: ' . $stmt->error);
+        }
+
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $id_usuario_prestador_fk = (int) $row['id_usuario_fk'];
+        } else {
+            echo "Nenhum anunciante encontrado para o serviço.";
+            exit;
+        }
+
+        $stmt->close(); // Fecha a declaração
+
+        // Preparar a instrução SQL para inserir a proposta
+        $stmt = $conexao->prepare("INSERT INTO proposta (id_servico_fk, id_usuario_contrante_fk, id_usuario_prestador_fk, data_contrato, prazo_estimado, valor_total, descricao) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
         // Verifica se a preparação da declaração falhou
         if (!$stmt) {
@@ -47,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Vincula os parâmetros
-        $stmt->bind_param("iiissd", $id_servico_fk, $id_usuario_contrante_fk, $id_usuario_prestador_fk, $data_contrato, $prazo_estimado, $valor);
+        $stmt->bind_param("iiissds", $id_servico_fk, $id_usuario_contrante_fk, $id_usuario_prestador_fk, $data_contrato, $prazo_estimado, $valor, $descricao);
 
         // Executa a declaração
         if ($stmt->execute()) {
@@ -56,9 +80,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Erro ao enviar proposta: " . $stmt->error;
         }
 
-        // Fecha a declaração e a conexão
+        // Fecha a declaração
         $stmt->close();
+        // Fecha a conexão
         $conexao->close();
+
     } catch (Exception $e) {
         echo "Erro: " . $e->getMessage();
     }

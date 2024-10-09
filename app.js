@@ -285,14 +285,14 @@ $(".DispathAlert").click(() => {
 });
 
 
-let servicoId; // Variável global para armazenar o id do serviço
+let servicoId;
 
 function openModal(id, titulo, descricao, preco) {
-    servicoId = id; // Armazena o id do serviço na variável
+    servicoId = id;
     document.getElementById('modal-titulo').innerText = titulo;
     document.getElementById('modal-descricao').innerText = descricao;
     document.getElementById('modal-preco').innerText = 'Preço: R$ ' + preco.toFixed(2).replace('.', ',');
-    document.getElementById('contratar-btn').setAttribute('href', 'contratar_servico.php?id=' + servicoId); // Atualiza o link do botão
+    document.getElementById('contratar-btn').setAttribute('href', '../FormularioProposta/?id=' + servicoId); 
     document.getElementById('modal').style.display = 'block';
 }
 
@@ -300,7 +300,6 @@ function closeModal() {
     document.getElementById('modal').style.display = 'none';
 }
 
-// Fecha o modal se o usuário clicar fora dele
 window.onclick = function(event) {
     const modal = document.getElementById('modal');
     if (event.target == modal) {

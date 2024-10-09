@@ -30,6 +30,27 @@
 
 
     <body>
+
+        <script>
+            $.ajax({
+                url: `../../../controllers/contratante/Security.php`,
+                method: 'GET',
+                success: function (data) {
+                    if (data == 'true') {
+                    } else if (data == 'false') {
+                        window.location.href = "../CriarConta/";
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro na Autenticação.'
+                    });
+                }
+            });
+        </script>
+
         <section id="popup-profile">
             <header class="topo-popup-profile">
                 <img src="../../../../public/img/user_profile.png" alt="USER PROFILE">

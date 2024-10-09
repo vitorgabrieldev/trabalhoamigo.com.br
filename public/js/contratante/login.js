@@ -47,7 +47,6 @@ $('#FormEntrarUsuario').on('submit', function (e) {
     let erros = validarDadosLogin(formData); 
 
     if (erros.length > 0) {
-        console.log("Erros de validação:", erros); 
         Swal.fire({
             icon: 'error',
             title: 'Erro de Validação',

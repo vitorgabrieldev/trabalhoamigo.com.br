@@ -125,7 +125,6 @@ $('#FormCriarUsuario').on('submit', function (e) {
     let erros = validarDados(formData); // Valida os dados do formulário
 
     if (erros.length > 0) {
-        console.log("Erros de validação:", erros); // Exibe os erros no console
         Swal.fire({
             icon: 'error',
             title: 'Erro de Validação',

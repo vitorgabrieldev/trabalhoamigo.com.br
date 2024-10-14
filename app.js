@@ -211,36 +211,6 @@ addSEOData();
 // setContentSecurityPolicy();
 
 /* ------------------------------------------------------------
-| Sistema de Inserção de logs para auditoria
-/-------------------------------------------------------------- */
-function logUserAccess() {
-    var currentUrl = window.location.href;
-    var screenWidth = window.screen.width;
-    var screenHeight = window.screen.height;
-    
-    $.ajax({
-        url: '/trabalhoamigo.com.br/logs/Audit.php',
-        type: 'GET',
-        data: {
-            url: currentUrl,
-            screenWidth: screenWidth,
-            screenHeight: screenHeight 
-        },
-        success: function(response) {
-            // console.log('Log registrado com sucesso.');
-        },
-        error: function(xhr, status, error) {
-            console.error('Erro ao registrar o log:', status, error);
-        }
-    });
-}
-
-$(document).ready(function() {
-    logUserAccess();
-});
-
-
-/* ------------------------------------------------------------
 | Sistema de broqueio para telas menores (Temporário)
 /-------------------------------------------------------------- */
 setInterval(() => {

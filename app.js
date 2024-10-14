@@ -103,7 +103,7 @@ function createAccessibilityBar() {
     `;
     document.body.appendChild(accessibilityBar);
 
-    const styles = `#accessibility-bar {position: fixed;bottom: 10px;right: 10px;background-color: #222;color: #fff;padding: 15px;border-radius: 8px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);z-index: 1000;}.accessibility-bar-content {display: flex;flex-direction: column;gap: 10px;}.accessibility-bar-content button {background: #2B88F4;border: none;color: #fff;padding: 10px 15px;border-radius: 5px;cursor: pointer;font-size: 16px;transition: background 0.3s ease;}.accessibility-bar-content button:hover {background: #1a5ab0;}`;
+    const styles = `#accessibility-bar {position: fixed;bottom: 10px;left: 10px;background-color: #222;color: #fff;padding: 15px;border-radius: 8px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);z-index: 1000;}.accessibility-bar-content {display: flex;flex-direction: column;gap: 10px;}.accessibility-bar-content button {background: #2B88F4;border: none;color: #fff;padding: 10px 15px;border-radius: 5px;cursor: pointer;font-size: 16px;transition: background 0.3s ease;}.accessibility-bar-content button:hover {background: #1a5ab0;}`;
     const styleSheet = document.createElement('style');
     styleSheet.type = 'text/css';
     styleSheet.innerText = styles;

@@ -18,10 +18,12 @@ $(document).ready(function() {
             swal("Atenção!", "O tempo estimado deve ser maior que zero.", "warning");
             return false;
         }
-        if (!data_servico) {
-            swal("Atenção!", "Por favor, selecione uma data esperada para o serviço.", "warning");
+        var dataRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!data_servico || !dataRegex.test(data_servico)) {
+            swal("Atenção!", "Por favor, insira uma data válida no formato AAAA-MM-DD.", "warning");
             return false;
         }
+        
         return true;
     }
 

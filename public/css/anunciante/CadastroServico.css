@@ -1,0 +1,75 @@
+/* Estilos gerais do corpo */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Estilos da seção de cadastro */
+#CadastroServico {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+
+/* Estilo do título */
+#CadastroServico h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Estilo dos campos do formulário */
+form div {
+    margin-bottom: 15px;
+}
+
+/* Estilo dos rótulos */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Estilo dos campos de entrada */
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Inclui padding e bordas na largura total */
+}
+
+/* Estilo do botão de envio */
+button {
+    background-color: #28a745; /* Cor verde */
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%; /* Faz o botão ocupar toda a largura disponível */
+    font-size: 16px;
+}
+
+/* Estilo do botão de envio em hover */
+button:hover {
+    background-color: #218838; /* Cor verde escuro no hover */
+}
+
+/* Estilo do textarea */
+textarea {
+    resize: vertical; /* Permite redimensionar verticalmente */
+}
+
+/* Estilo das mensagens de alerta do SweetAlert */
+.swal2-popup {
+    font-size: 1.6em; /* Aumenta o tamanho da fonte das mensagens */
+}

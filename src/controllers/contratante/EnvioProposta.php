@@ -23,11 +23,11 @@ function getDatabaseConnection() {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $valor = (float) $_POST['valor'];
     $descricao = $_POST['descricao'];
-    $tempo = (int) $_POST['tempo'];
+    $prazo_estimado = (int) $_POST['tempo'];
     $id_servico_fk = (int) $_POST['id_servico'];
     $id_usuario_contrante_fk = (int) $_SESSION['id_usuario'];
     $data_contrato = date('Y-m-d H:i:s');
-    $prazo_estimado = date('Y-m-d H:i:s', strtotime("+$tempo days"));
+    $data_esperada = $_POST['data_servico'];
 
     try {
         // Criar a conexão
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close(); // Fecha a declaração
 
         // Preparar a instrução SQL para inserir a proposta
-        $stmt = $conexao->prepare("INSERT INTO proposta (id_servico_fk, id_usuario_contrante_fk, id_usuario_prestador_fk, data_contrato, prazo_estimado, valor_total, descricao) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conexao->prepare("INSERT INTO proposta (id_servico_fk, id_usuario_contrante_fk, id_usuario_prestador_fk, data_contrato, data_Esperada, prazo_estimado, valor_total, descricao) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
         // Verifica se a preparação da declaração falhou
         if (!$stmt) {
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Vincula os parâmetros
-        $stmt->bind_param("iiissds", $id_servico_fk, $id_usuario_contrante_fk, $id_usuario_prestador_fk, $data_contrato, $prazo_estimado, $valor, $descricao);
+        $stmt->bind_param("iiissids", $id_servico_fk, $id_usuario_contrante_fk, $id_usuario_prestador_fk, $data_contrato, $data_esperada, $prazo_estimado, $valor, $descricao);
 
         // Executa a declaração
         if ($stmt->execute()) {

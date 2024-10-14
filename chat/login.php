@@ -9,23 +9,23 @@
 <body>
   <div class="wrapper">
     <section class="form login">
-      <header>Realtime Chat App</header>
+      <header>Bate Papo | Trabalho amigo</header>
       <form action="#" method="POST" enctype="multipart/form-data" autocomplete="off">
         <div class="error-text"></div>
         <div class="field input">
-          <label>Email Address</label>
-          <input type="text" name="email" placeholder="Enter your email" required>
+          <label>Endereço de E-mail</label>
+          <input type="text" name="email" placeholder="Digite seu e-mail" required>
         </div>
         <div class="field input">
-          <label>Password</label>
-          <input type="password" name="password" placeholder="Enter your password" required>
+          <label>Senha</label>
+          <input type="password" name="password" placeholder="Digite sua senha" required>
           <i class="fas fa-eye"></i>
         </div>
         <div class="field button">
-          <input type="submit" name="submit" value="Continue to Chat">
+          <input type="submit" name="submit" value="Continuar para o bate-papo">
         </div>
       </form>
-      <div class="link">Not yet signed up? <a href="index.php">Signup now</a></div>
+      <div class="link">Não possuo conta? <a href="index.php">Criar nova conta</a></div>
     </section>
   </div>
   

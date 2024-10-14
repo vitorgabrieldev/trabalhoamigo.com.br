@@ -306,3 +306,41 @@ window.onclick = function(event) {
         closeModal();
     }
 }
+
+
+const Logout = () => {
+    // Adiciona a confirmação antes de continuar
+    Swal.fire({
+        title: 'Você tem certeza?',
+        text: "Você deseja sair da sua conta?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim, sair!',
+        cancelButtonText: 'Não, ficar!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Se o usuário confirmar, executa a requisição AJAX
+            $.ajax({
+                url: `../../../controllers/contratante/Logout.php`,
+                method: 'GET',
+                success: function (data) {
+                    if (data == 'true') {
+                        // Redirecionar para a página inicial ou outra ação
+                        window.location.href = "../Login/"; // Exemplo: redireciona para a página de login
+                    } else if (data == 'false') {
+                        window.location.href = "../CriarConta/";
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro na Autenticação.'
+                    });
+                }
+            });
+        }
+    });
+};

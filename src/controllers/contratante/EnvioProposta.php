@@ -21,11 +21,6 @@ function getDatabaseConnection() {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_SESSION['id_usuario'])) {
-        echo "Usuário não está autenticado.";
-        exit;
-    }
-
     $valor = (float) $_POST['valor'];
     $descricao = $_POST['descricao'];
     $tempo = (int) $_POST['tempo'];
@@ -39,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conexao = getDatabaseConnection();
 
         // Preparar a instrução SQL para buscar o ID do anunciante
-        $stmt = $conexao->prepare("SELECT id_usuario_fk FROM servicos WHERE id_usuario_fk = ?");
+        $stmt = $conexao->prepare("SELECT id_usuario_fk FROM servicos WHERE id_servico = ?");
         if (!$stmt) {
             throw new Exception('Erro ao preparar a declaração: ' . $conexao->error);
         }
@@ -75,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Executa a declaração
         if ($stmt->execute()) {
-            echo "Proposta enviada com sucesso!";
+            echo "true";
         } else {
             echo "Erro ao enviar proposta: " . $stmt->error;
         }

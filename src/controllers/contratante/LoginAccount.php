@@ -97,7 +97,7 @@ function processLogin() {
                 $_SESSION['data_Criacao'] = $dados['data_Criacao'];
                 $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
                 $_SESSION['ativo'] = $dados['ativo'];
-                $_SESSION['user_id'] = $usuarioId;
+                $_SESSION['id_usuario'] = $usuarioId;
 
                 echo json_encode([
                     'success' => true,

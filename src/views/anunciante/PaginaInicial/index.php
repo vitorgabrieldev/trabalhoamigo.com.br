@@ -119,7 +119,7 @@ if (!isset($_SESSION)) {
     </section>
     <header id="site-topo">
         <div class="logo-box">
-            <img class="logo" src="../../../../public/img/Topo-logo.png" alt="Logo Trabalho Amigo">
+            <img width="40px" height="40px" class="logo" src="../../../../public/img/logo/favicon.ico" alt="Logo Rodapé">
         </div>
         <nav class="navigation-box">
             <div class="links-box">
@@ -157,53 +157,10 @@ if (!isset($_SESSION)) {
             <img src="../../../../public/img/Bloco-banner2.png" alt="Banner">
         </section>
 
-        <section id="bloco-comoFunciona">
-            <div class="conteudo">
-                <h1 class="titulo">COMO FUNCIONA</h1>
-                <p class="descricao-bloco">Veja abaixo como é simples e rápido achar o serviço que melhor lhe atende na trabalho amigo</p>
-            </div>
-            <div class="steep">
-                <div class="item">
-                    <img src="../../../../public/img/Steep-1.png" alt="Passo a Passo">
-                    <h1 class="titulo-steep">Procure um serviço</h1>
-                    <p class="descricap-steep">Escolha o serviço que melhor atender suas necessidades</p>
-                </div>
-                <!-- <div class="arrowItem">
-                    <img src="../../../../public/img/Arrow-1.png" alt="Seta para Direita">
-                </div> -->
-                <div class="item">
-                    <img src="../../../../public/img/Steep-2.png" alt="Passo a Passo">
-                    <h1 class="titulo-steep">Envie sua proposta</h1>
-                    <p class="descricap-steep">Faça uma proposta para o anunciante e espere ele responder</p>
-                </div>
-                <!-- <div class="arrowItem">
-                    <img src="../../../../public/img/Arrow-2.png" alt="Seta para Direita">
-                </div> -->
-                <div class="item">
-                    <img src="../../../../public/img/Steep-3.png" alt="Passo a Passo">
-                    <h1 class="titulo-steep">Aguarde sua resposta</h1>
-                    <p class="descricap-steep">Aguarde até a proposta ser aceita e entre em contato com o anunciante pelos contatos liberados.</p>
-                </div>  
-            </div>
-        </section>
-
-        <section class="scrollSmoth" id="bloco-video">
-            <div class="conteudo">
-                <h1 class="titulo">SAIBA MAIS</h1>
-                <p class="descricao-bloco">Venha conhecer mais sobre nossa plataforma!</p>
-            </div>
-            <div class="iframeVideo">
-                <div id="play_button" class="play-button">
-                    <img src="../../../../public/img/Bloco-video-play.png" alt="Play Button">
-                </div>
-                <img src="../../../../public/img/Bloco-video-image.png" alt="Imagem Default Video">
-            </div>
-        </section>
-
         <section id="bloco-chamadaServico">
-            <h1 class="titulo">VENHA CONFERIR OS <br> SERVIÇOS DISPONÍVEIS</h1>
-            <a class="button" href="../ListagemServicos/">
-                SERVIÇOS
+            <h1 class="titulo">VENHA CONFERIR OS <br> PROPOSTAS RECEBIDAS</h1>
+            <a class="button" href="../ListagemProposta/">
+                PROPOSTAS
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
                 </svg>
@@ -215,7 +172,7 @@ if (!isset($_SESSION)) {
     <!-- =================================      RODAPÉ      =================================-->
     <footer id="site-rodape">
         <section class="topo-rodape">
-            <img class="logo" src="../../../../public/img/Topo-logo.png" alt="Logo Rodapé">
+            <img width="40px" height="40px" class="logo" src="../../../../public/img/logo/favicon.ico" alt="Logo Rodapé">
             <nav class="navigation-social">
                 <img src="../../../../public/img/instagram.png" alt="Icone Instagram">
                 <img src="../../../../public/img/whatsapp.png" alt="Icone Whatsapp">

@@ -40,8 +40,10 @@ $(document).ready(function() {
                     id_servico: $('#idservico').val() // Altere para id_servico para corresponder ao PHP
                 },
                 success: function(response) {
-                    $('#mensagem').html('<p>' + response + '</p>');
-                    swal("Sucesso!", "Proposta enviada com sucesso!", "success");
+                    if (response === 'true') {
+                        swal("Sucesso!", "Proposta enviada com sucesso!", "success");
+                        location.href = '../ListagemServico/'
+                    };
                 },
                 error: function(xhr, status, error) {
                     $('#mensagem').html('<p>Ocorreu um erro: ' + error + '</p>');

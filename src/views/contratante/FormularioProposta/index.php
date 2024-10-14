@@ -75,6 +75,27 @@ try {
 </head>
 
 <body>
+
+    <script>
+        $.ajax({
+            url: `../../../controllers/contratante/Security.php`,
+            method: 'GET',
+            success: function (data) {
+                if (data == 'true') {
+                } else if (data == 'false') {
+                    window.location.href = "../CriarConta/";
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro na Autenticação.'
+                });
+            }
+        });
+    </script>
+
     <section id="ListagemServico">
         <div class="d-flex-swap">
             <a href="../ListagemServico/">

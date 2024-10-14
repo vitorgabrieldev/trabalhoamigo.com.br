@@ -1,72 +1,181 @@
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
 }
 
-table {
-    /* width: 100%; */
-    border-collapse: collapse;
+h3 {
+    font-size: 24px;
+    color: #4CAF50;
+    margin-bottom: 20px;
+}
+
+#ListagemServico {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 colunas com larguras iguais */
+    gap: 15px;
+    align-items: center;
     margin-top: 20px;
 }
 
-th{
-    text-align: left;
-    padding: 8px;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-/*teste de estilização de elemento
-td{
-    border: solid 1px black;
-    width: 800px;
-}
-/*Fim*/
-
-th {
+.grid-header {
+    font-weight: bold;
     background-color: #4CAF50;
     color: white;
+    padding: 10px;
+    text-align: left;
+    border-radius: 6px;
+}
+
+.grid-item {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 6px;
+    color: #555;
+    font-size: 15px;
+    text-align: left;
+    transition: background-color 0.2s ease;
+}
+
+.grid-item:hover {
+    background-color: #f0f0f0;
+}
+
+.button, .button-finalizado, .button-espera {
+    border-radius: 20px;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .button {
     background-color: #4CAF50;
-    /* Green */
-    border: none;
     color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #45a049;
 }
 
 .button-finalizado {
     background-color: #ddd;
-    /* Gray */
-    border: none;
     color: black;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    cursor: pointer;
+    cursor: no-drop;
+}
+
+.button-finalizado:hover {
+    background-color: #ccc;
 }
 
 .button-espera {
     background-color: #ffb8b8;
-    /* Light red */
-    border: none;
     color: black;
-    padding: 10px 20px;
-    text-align: center;
+    cursor: no-drop;
+}
+
+.button-espera:hover {
+    background-color: #ffa8a8;
+}
+
+.modal {
+    display: none; /* Esconder o modal por padrão */
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro com transparência */
+}
+
+.modal-content {
+    background-color: #fff; /* Fundo branco */
+    margin: 10% auto; /* Margem no topo e centralização */
+    padding: 20px;
+    border-radius: 8px; /* Cantos arredondados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra do modal */
+    width: 80%; /* Largura do modal */
+    max-width: 500px; /* Largura máxima do modal */
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    transition: color 0.3s; /* Transição suave para a cor */
+    margin-left: -10px;
+    margin-top: -10px;
+}
+
+.close:hover,
+.close:focus {
+    color: #000; /* Cor do 'x' ao passar o mouse */
     text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
     cursor: pointer;
+}
+
+.modal-content div h2 {
+    margin-top: 0; /* Remove a margem do topo do título */
+    color: #333;
+}
+
+.titulo-modal {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-content p {
+    margin: 10px 0; /* Margem entre os parágrafos */
+    font-size: 16px; /* Tamanho da fonte */
+}
+
+.modal-content p strong {
+    font-weight: bold; /* Negrito para as informações */
+    color: #333; /* Cor do texto em negrito */
+}
+
+.flex-modal {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    opacity: 0.9;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 999;
+}
+
+.toast-body {
+    margin: 0;
 }

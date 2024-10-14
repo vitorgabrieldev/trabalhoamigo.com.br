@@ -1,14 +1,14 @@
 <?php
-// Iniciar a sessão
-session_start();
 
-// Definir as constantes de conexão ao banco de dados
+header('Content-Type: application/json');
+
+// Defina as constantes para a conexão com o banco de dados
 define('DB_SERVER', '185.173.111.184');
 define('DB_USERNAME', 'u858577505_trabalhoamigo');
 define('DB_PASSWORD', '@#Trabalhoamigo023@_');
 define('DB_NAME', 'u858577505_trabalhoamigo');
 
-// Função para criar a conexão com o banco de dados
+// Função para criar uma conexão com o banco de dados
 function getDatabaseConnection() {
     $conexao = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
     
@@ -19,49 +19,138 @@ function getDatabaseConnection() {
     return $conexao;
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_SESSION['id_usuario'])) {
-        echo "Usuário não está autenticado.";
-        exit;
+// Função para verificar se o CPF, e-mail ou telefone já estão registrados
+function isDuplicate($conexao, $cpf, $email, $telefone) {
+    $sql = "SELECT COUNT(*) AS count FROM usuarios WHERE cpf = ? OR email = ? OR telefone = ?";
+    $stmt = $conexao->prepare($sql);
+    $stmt->bind_param('sss', $cpf, $email, $telefone);
+    $stmt->execute();
+    $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
+    
+    return $count > 0;
+}
+
+// Função para inserir um novo usuário no banco de dados
+function insertUser($conexao, $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $cpf) {
+    $sql = "INSERT INTO usuarios (primeiro_nome, ultimo_nome, celular, whatsapp, telefone, email, senha, tipo_usuario, cpf)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conexao->prepare($sql);
+    
+    if (!$stmt) {
+        throw new Exception('Erro ao preparar a consulta: ' . $conexao->error);
     }
+    
+    $tipo_usuario = 'contratante';
+    $stmt->bind_param('sssssssss', $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $tipo_usuario, $cpf);
+    
+    if (!$stmt->execute()) {
+        throw new Exception('Erro ao inserir dados no banco de dados: ' . $stmt->error);
+    }
+    
+    $stmt->close();
+}
 
-    $valor = (float) $_POST['valor'];
-    $descricao = $_POST['descricao'];
-    $tempo = (int) $_POST['tempo'];
-    $id_servico_fk = (int) $_POST['id_servico'];
-    $id_usuario_contrante_fk = (int) $_SESSION['id_usuario'];
-    $id_usuario_prestador_fk = 1;
-    $data_contrato = date('Y-m-d H:i:s');
-
-    $prazo_estimado = date('Y-m-d H:i:s', strtotime("+$tempo days"));
-
+// Função principal para processar o cadastro
+function processRegistration() {
     try {
         $conexao = getDatabaseConnection();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $primeiroNome = $_POST['primeiroNome'] ?? null;
+            $sobrenome = $_POST['sobrenome'] ?? null;
+            $email = $_POST['email'] ?? null;
+            $telefone = $_POST['telefone'] ?? null;
+            $celular = $_POST['celular'] ?? null;
+            $whatsapp = $_POST['whatsapp'] ?? null;
+            $cpf = $_POST['cpf'] ?? null;
+            $senha = $_POST['senha'] ?? null;
+            $repetirSenha = $_POST['repetirSenha'] ?? null;
+            $cep = $_POST['cep'] ?? null;
+            $rua = $_POST['rua'] ?? null;
+            $bairro = $_POST['bairro'] ?? null;
+            $numero = $_POST['numero'] ?? null;
+            $complemento = $_POST['complemento'] ?? null;
+            $aceitouTermos = $_POST['aceitouTermos'] ?? null;
 
-        // Preparar a instrução SQL
-        $stmt = $conexao->prepare("INSERT INTO proposta (id_servico_fk, id_usuario_contrante_fk, id_usuario_prestador_fk, data_contrato, prazo_estimado, valor_total) VALUES (?, ?, ?, ?, ?, ?)");
+            if ($senha !== $repetirSenha) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'As senhas não coincidem'
+                ]);
+                exit;
+            }
 
-        // Verifica se a preparação da declaração falhou
-        if (!$stmt) {
-            throw new Exception('Erro ao preparar a declaração: ' . $conexao->error);
-        }
+            // Criptografa a senha
+            $senhaHash = password_hash($senha, PASSWORD_BCRYPT);
 
-        // Vincula os parâmetros
-        $stmt->bind_param("iiissd", $id_servico_fk, $id_usuario_contrante_fk, $id_usuario_prestador_fk, $data_contrato, $prazo_estimado, $valor);
+            if (isDuplicate($conexao, $cpf, $email, $telefone)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'CPF, e-mail ou telefone já estão registrados'
+                ]);
+                exit;
+            }
 
-        // Executa a declaração
-        if ($stmt->execute()) {
-            echo "Proposta enviada com sucesso!";
+            insertUser($conexao, $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $cpf);
+
+            // Resgata usuário criado
+            $query = "SELECT * FROM usuarios WHERE email = ?";
+            $stmt = $conexao->prepare($query);
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    // Inicializa a session
+                    sessionAction($row);
+                }
+            } else {
+                echo "Nenhum usuário encontrado com esse email.";
+            }
+
+            $stmt->close();
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Cadastro realizado com sucesso'
+            ]);
         } else {
-            echo "Erro ao enviar proposta: " . $stmt->error;
+            echo json_encode([
+                'success' => false,
+                'message' => 'Método de requisição inválido'
+            ]);
         }
 
-        // Fecha a declaração e a conexão
-        $stmt->close();
         $conexao->close();
     } catch (Exception $e) {
-        echo "Erro: " . $e->getMessage();
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
     }
-} else {
-    echo "Método de requisição não suportado.";
 }
+
+function sessionAction($dados) {
+    if (!isset($_SESSION)) {
+        session_start();
+    };
+
+    $_SESSION['logado'] = true;
+    $_SESSION['id_usuario'] = $dados['id_usuario'];
+    $_SESSION['primeiro_nome'] = $dados['primeiro_nome'];
+    $_SESSION['ultimo_nome'] = $dados['ultimo_nome'];
+    $_SESSION['celular'] = $dados['celular'];
+    $_SESSION['whatsapp'] = $dados['whatsapp'];
+    $_SESSION['telefone'] = $dados['telefone'];
+    $_SESSION['email'] = $dados['email'];
+    $_SESSION['cpf'] = $dados['cpf'];
+    $_SESSION['cnpj'] = $dados['cnpj'];
+    $_SESSION['data_Criacao'] = $dados['data_Criacao'];
+    $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
+    $_SESSION['ativo'] = $dados['ativo'];
+};
+
+processRegistration();

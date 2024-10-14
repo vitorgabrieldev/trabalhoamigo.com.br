@@ -276,6 +276,9 @@ setInterval(() => {
     }
 }, 1000);
 
+/* ------------------------------------------------------------
+| Sistema de disparo de alerta de construção ativa
+/-------------------------------------------------------------- */
 $(".DispathAlert").click(() => {
     Swal.fire({
         icon: "error",
@@ -285,6 +288,9 @@ $(".DispathAlert").click(() => {
 });
 
 
+/* ------------------------------------------------------------
+| Sistema de modal dos serviços
+/-------------------------------------------------------------- */
 let servicoId;
 
 function openModal(id, titulo, descricao, preco) {
@@ -296,10 +302,16 @@ function openModal(id, titulo, descricao, preco) {
     document.getElementById('modal').style.display = 'block';
 }
 
+/* ------------------------------------------------------------
+| Sistema de fechamento do modal de serviços
+/-------------------------------------------------------------- */
 function closeModal() {
     document.getElementById('modal').style.display = 'none';
 }
 
+/* ------------------------------------------------------------
+| Sistema de fechamento de modal quando clique fora da caixa
+/-------------------------------------------------------------- */
 window.onclick = function(event) {
     const modal = document.getElementById('modal');
     if (event.target == modal) {
@@ -307,7 +319,9 @@ window.onclick = function(event) {
     }
 }
 
-
+/* ------------------------------------------------------------
+| Sistema de deslogar geral
+/-------------------------------------------------------------- */
 const Logout = () => {
     // Adiciona a confirmação antes de continuar
     Swal.fire({
@@ -326,12 +340,7 @@ const Logout = () => {
                 url: `../../../controllers/contratante/Logout.php`,
                 method: 'GET',
                 success: function (data) {
-                    if (data == 'true') {
-                        // Redirecionar para a página inicial ou outra ação
-                        window.location.href = "../Login/"; // Exemplo: redireciona para a página de login
-                    } else if (data == 'false') {
-                        window.location.href = "../CriarConta/";
-                    }
+                   // Redirecionamento gerenciado dentro do controller
                 },
                 error: function () {
                     Swal.fire({
@@ -344,3 +353,87 @@ const Logout = () => {
         }
     });
 };
+
+/*------------------------------------------------------
+*  Sistema de aplicação de máscaras
+* ----------------------------------------------------- */
+function aplicarMascara(input, mascara) {
+    let valor = input.value.replace(/\D/g, '');
+    let valorMascarado = '';
+    let i = 0;
+
+    valorMascarado = mascara.replace(/#/g, () => valor[i++] || '');
+    input.value = valorMascarado;
+}
+
+function definirMascaras() {
+    const inputsComMascara = document.querySelectorAll('input[class*="mascara"]');
+
+    inputsComMascara.forEach(input => {
+        input.addEventListener('input', () => {
+            // CPF
+            if (input.classList.contains('mascara-cpf')) {
+                aplicarMascara(input, '###.###.###-##');
+            }
+
+            // CNPJ
+            if (input.classList.contains('mascara-cnpj')) {
+                aplicarMascara(input, '##.###.###/####-##');
+            }
+
+            // Telefone (com DDD)
+            if (input.classList.contains('mascara-telefone')) {
+                let valor = input.value.replace(/\D/g, '');
+                let mascara = valor.length > 10 ? '(##) #####-####' : '(##) ####-####';
+                aplicarMascara(input, mascara);
+            }
+
+            // Data
+            if (input.classList.contains('mascara-data')) {
+                aplicarMascara(input, '##/##/####');
+            }
+
+            // CEP
+            if (input.classList.contains('mascara-cep')) {
+                aplicarMascara(input, '#####-###');
+            }
+
+            // RG
+            if (input.classList.contains('mascara-rg')) {
+                aplicarMascara(input, '##.###.###-#');
+            }
+
+            // Cartão de crédito
+            if (input.classList.contains('mascara-cartao')) {
+                aplicarMascara(input, '#### #### #### ####');
+            }
+
+            // Vencimento do cartão (MM/AA)
+            if (input.classList.contains('mascara-cartao-vencimento')) {
+                aplicarMascara(input, '##/##');
+            }
+
+            // Código de segurança do cartão (CVV)
+            if (input.classList.contains('mascara-cartao-cvv')) {
+                aplicarMascara(input, '###');
+            }
+
+            // Dinheiro (formato R$)
+            if (input.classList.contains('mascara-dinheiro')) {
+                aplicarMascara(input, 'R$ #.##0,00', { reverse: true });
+            }
+
+            // Porcentagem
+            if (input.classList.contains('mascara-porcentagem')) {
+                aplicarMascara(input, '##0,00%');
+            }
+
+            // Número inteiro
+            if (input.classList.contains('mascara-numero')) {
+                aplicarMascara(input, '####');
+            }
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', definirMascaras);

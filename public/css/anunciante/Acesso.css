@@ -2,6 +2,13 @@
 /*   Estilização da Página de "Criar Conta do Usuário" e "Entrar Conta do Usuário" */
 /* =============================================================================== */
 
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
 .input-group {
     position: relative;
 }
@@ -29,6 +36,7 @@
     transition: 150ms cubic-bezier(0.4,0,0.2,1);
     font-size: 16px;
     font-weight: 500;
+    font-family: monospace;
 }
    
 .input:focus, input:valid {
@@ -109,7 +117,7 @@
     align-items: center;
 }
 #EntrarContaUsuario .right .imagem {
-    width: 100%;
+    width: 600px;
     height: auto;
 }
 #EntrarContaUsuario .right .imagem img {
@@ -149,6 +157,7 @@
     display: flex;
     flex-direction: column;
     row-gap: 16px;
+    white-space: nowrap;
 }
 #EntrarContaUsuario .left .corpo .content-titulo .titulo {
     color: #FA511D;
@@ -254,15 +263,6 @@
     padding: 0 20px;
     z-index: 2;
 }
-#EntrarContaUsuario .rowOthersLogin::before {
-    content: '';
-    width: 35%;
-    height: 1px;
-    background: rgb(217, 217, 217);
-    margin-top: 10px;
-    position: absolute;
-    z-index: 1;
-}
 #EntrarContaUsuario .rowOthersLogin .flexSocial {
     display: flex;
     justify-content: space-between;
@@ -279,6 +279,7 @@
     border-radius: 4px;
     cursor: pointer;
     transition: .33s;
+    user-select: none;
 }
 #EntrarContaUsuario .rowOthersLogin .flexSocial .box-social:hover {
     border-color: #3b3b3d;
@@ -303,15 +304,6 @@
     background: #fff;
     padding: 0 20px;
     z-index: 2;
-}
-#EntrarContaUsuario .SouAnunciante::before {
-    content: '';
-    width: 35%;
-    height: 1px;
-    background: rgb(217, 217, 217);
-    margin-top: 9spx;
-    position: absolute;
-    z-index: 1;
 }
 #EntrarContaUsuario .SouAnunciante .buttonLinkAnunciante {
     width: 100%;
@@ -355,12 +347,6 @@
     }
     #FormEntrarUsuario {
         margin-top: 10px;
-    }
-    #EntrarContaUsuario .rowOthersLogin::before {
-        width: 100% !important;
-    }
-    #EntrarContaUsuario .SouAnunciante::before {
-        width: 100% !important;
     }
 }
 @media screen and (max-width: 400px) {

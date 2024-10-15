@@ -3,6 +3,14 @@
   if(isset($_SESSION['unique_id'])){
     header("location: users.php");
   }
+
+  // Verifica se o usuário já está logado
+  if (isset($_SESSION['logado'])) {
+    header("Location: ./login.php");
+    exit();
+  }
+
+
 ?>
 
 <?php include_once "header.php"; ?>

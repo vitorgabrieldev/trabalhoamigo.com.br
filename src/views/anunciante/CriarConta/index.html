@@ -32,18 +32,6 @@
 
 <body>
     <section id="CriarContaUsuario">
-        <header class="site-topo">
-            <img src="../../assets/images/EntrarUsuario/logo-trabalhoamigo.png" alt="">
-        </header>
-
-        <div class="left">
-            <div class="imagem">
-                <img src="../../../../public/img/CriarUsuario/imagen-criar-ususario.png"
-                    alt="Imagem Padrão Criar Usuário">
-            </div>
-            <p class="descricao">Encontre milhares de serviços a sua disposição de forma simples e rápida!</p>
-        </div>
-
         <div class="right">
             <main class="corpo">
                 <section class="content-titulo">
@@ -64,20 +52,20 @@
                             <input required type="email" name="email" class="input email" placeholder="Email*">
                             <label class="user-label"></label>
 
-                            <input type="tel" name="telefone" class="input telefone" placeholder="Telefone*">
+                            <input type="tel" name="telefone" class="input telefone mascara-telefone" placeholder="Telefone*">
                             <label class="user-label"></label>
 
                         </div>
                         <div class="input-group">
-                            <input type="tel" name="celular" class="input celular" placeholder="Celular (Opcional)">
+                            <input type="tel" name="celular" class="input celular mascara-telefone" placeholder="Celular (Opcional)">
                             <label class="user-label"></label>
 
-                            <input type="tel" name="whatsapp" class="input whatsapp" placeholder="WhatsApp (Opcional)">
+                            <input type="tel" name="whatsapp" class="input whatsapp mascara-telefone" placeholder="WhatsApp (Opcional)">
                             <label class="user-label"></label>
 
                         </div>
                         <div class="input-group">
-                            <input required="" type="number" name="cpf" class="input-senha input cpf"
+                            <input required="" type="text" name="cpf" class="mascara-cpf input-senha input cpf"
                                 placeholder="CPF*">
                             <label class="user-label"></label>
                         </div>
@@ -94,7 +82,7 @@
 
                         </div>
                         <div class="input-group">
-                            <input required type="text" name="text" class="input cep" placeholder="CEP*">
+                            <input required type="text" name="text" class="input cep mascara-cep" placeholder="CEP*">
                             <label class="user-label"></label>
 
                             <input disabled required type="text" name="text" class="input cidade disabled-campo"

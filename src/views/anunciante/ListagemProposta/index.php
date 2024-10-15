@@ -20,14 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idServico = $_POST['idServico'];
 
     if ($action === 'accept') {
-        acceptService($idServico);
+        $idContrato = $_POST['idContrato']; // Novo parâmetro
+        $qtdServico = $_POST['qtdServico']; // Novo parâmetro
+        $valorFinal = $_POST['valorFinal']; // Novo parâmetro
+        acceptService($idServico, $idContrato, $qtdServico, $valorFinal);
     } elseif ($action === 'reject') {
         rejectService($idServico);
     }
     exit; // Encerrar após processar a requisição AJAX
 }
 
-function acceptService($idServico) {
+function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
     global $conn;
 
     $sql = "UPDATE proposta SET status = '2' WHERE id_contrato = ?";
@@ -35,9 +38,22 @@ function acceptService($idServico) {
     $stmt->bind_param("i", $idServico);
 
     if ($stmt->execute()) {
-        echo json_encode(['message' => 'Serviço aceito com sucesso.']);
+        $stmt->close(); // Fecha o primeiro statement
+
+        // Prepare a inserção na tabela contratos
+        $sqlInsert = "INSERT INTO contratos (id_servico_fk, id_contrato_fk, qtd_servico, valor_final) VALUES (?, ?, ?, ?)";
+        $stmtInsert = $conn->prepare($sqlInsert);
+        $stmtInsert->bind_param("iiis", $idServico, $idContrato, $qtdServico, $valorFinal);
+
+        if ($stmtInsert->execute()) {
+            echo json_encode(['message' => 'Serviço aceito e contrato cadastrado com sucesso.']);
+        } else {
+            echo json_encode(['error' => 'Erro ao cadastrar contrato: ' . $stmtInsert->error]);
+        }
+
+        $stmtInsert->close(); // Fecha o statement da inserção
     } else {
-        echo json_encode(['message' => 'Erro ao aceitar serviço: ' . $stmt->error]);
+        echo json_encode(['error' => 'Erro ao aceitar serviço: ' . $stmt->error]);
     }
 
     $stmt->close();
@@ -96,7 +112,6 @@ $conn->close();
 </head>
 
 <body>
-
     <script>
         $.ajax({
             url: `../../../controllers/anunciante/Security.php`,
@@ -175,7 +190,6 @@ $conn->close();
     }
 
     function showServiceDetails(idServico, tituloServico, valorTotal, primeiroNome, telefone, celular, whatsapp, email, prazo_estimado, data_esperada) {
-        
         Swal.fire({
             title: 'Detalhes da proposta',
             html: `
@@ -201,22 +215,30 @@ $conn->close();
             },
         }).then((result) => {
             if (result.isConfirmed) {
-                acceptService(idServico);
+                acceptService(idServico, tituloServico, valorTotal);
             } else if (result.isDismissed) {
                 rejectService(idServico);
             }
         });
     }
 
-    function acceptService(idServico) {
+    function acceptService(idServico, tituloServico, valorTotal) {
+        const idContrato = idServico; // Supondo que idServico é igual a idContrato
+        const qtdServico = 1; // Ajuste conforme necessário
+        const valorFinal = valorTotal.toFixed(2).replace('.', ','); // Ajuste conforme necessário
+
         $.ajax({
             type: 'POST',
             url: '', // Mantém o mesmo arquivo para processar a requisição
             data: {
                 action: 'accept',
-                idServico: idServico
+                idServico: idServico,
+                idContrato: idContrato,
+                qtdServico: qtdServico,
+                valorFinal: valorFinal
             },
             success: function(response) {
+                console.log(response)
                 const res = JSON.parse(response);
                 Swal.fire('Serviço Aceito!', res.message, 'success');
                 location.reload(); // Recarrega a página para atualizar a lista
@@ -265,25 +287,34 @@ $conn->close();
 
     function showContractorInfo(primeiroNome, telefone, celular, whatsapp, email) {
         Swal.fire({
-            title: 'Informações do Contratante',
-            html: `
-                <div style="text-align: left;">
-                    <p><strong>Nome:</strong> ${primeiroNome}</p><br>
-                    <p><strong>Telefone:</strong> ${telefone}</p><br>
-                    <p><strong>Celular:</strong> ${celular}</p><br>
-                    <p><strong>WhatsApp:</strong> ${whatsapp}</p><br>
-                    <p><strong>Email:</strong> ${email}</p><br>
-                </div>
-            `,
-            confirmButtonText: 'Fechar',
-            width: '500px',
-            padding: '1.5rem',
-            customClass: {
-                popup: 'swal-custom-popup',
-                title: 'swal-custom-title',
-                htmlContainer: 'swal-custom-html'
-            },
-        });
+        title: 'Informações do Contratante',
+        html: `
+            <div style="text-align: left;">
+                <p><strong>Nome:</strong> ${primeiroNome}</p><br>
+                <p><strong>Telefone:</strong> ${telefone}</p><br>
+                <p><strong>Celular:</strong> ${celular}</p><br>
+                <p><strong>WhatsApp:</strong> ${whatsapp}</p><br>
+                <p><strong>Email:</strong> ${email}</p><br>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Fechar',
+        cancelButtonText: 'Abrir Chat',
+        width: '500px',
+        padding: '1.5rem',
+        customClass: {
+            popup: 'swal-custom-popup',
+            title: 'swal-custom-title',
+            htmlContainer: 'swal-custom-html'
+        },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // O usuário clicou em "Fechar"
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // O usuário clicou em "Abrir Chat"
+            window.location.href = '../../../../chat/';
+        }
+    });
     }
 
     </script>

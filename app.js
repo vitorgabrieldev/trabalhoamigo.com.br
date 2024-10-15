@@ -310,7 +310,9 @@ const Logout = () => {
                 url: `../../../controllers/contratante/Logout.php`,
                 method: 'GET',
                 success: function (data) {
-                   // Redirecionamento gerenciado dentro do controller
+                   if (data === 'false') {
+                    location.href = "../EntrarConta/";
+                   }
                 },
                 error: function () {
                     Swal.fire({
@@ -328,7 +330,7 @@ const Logout = () => {
 *  Sistema de aplicação de máscaras
 * ----------------------------------------------------- */
 function aplicarMascara(input, mascara) {
-    let valor = input.value.replace(/\D/g, '');
+    let valor = input.value.replace(/\D/g, ''); // Remove caracteres não numéricos
     let valorMascarado = '';
     let i = 0;
 
@@ -390,12 +392,18 @@ function definirMascaras() {
 
             // Dinheiro (formato R$)
             if (input.classList.contains('mascara-dinheiro')) {
-                aplicarMascara(input, 'R$ #.##0,00', { reverse: true });
+                let valor = input.value.replace(/[^0-9]/g, ''); // Remove caracteres não numéricos
+                valor = (valor / 100).toFixed(2).replace('.', ','); // Formata como decimal
+                aplicarMascara(input, 'R$ #.##0,00');
+                // A máscara não é ideal para formatação reversa, você pode precisar de uma lógica separada se quiser algo mais avançado
+                input.value = input.value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Adiciona os pontos
             }
 
             // Porcentagem
             if (input.classList.contains('mascara-porcentagem')) {
+                let valor = input.value.replace(/[^0-9]/g, ''); // Remove caracteres não numéricos
                 aplicarMascara(input, '##0,00%');
+                input.value = valor.slice(0, 5) + '%'; // Limita a 5 caracteres para a porcentagem
             }
 
             // Número inteiro

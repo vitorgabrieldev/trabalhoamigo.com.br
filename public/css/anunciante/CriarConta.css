@@ -134,13 +134,19 @@
     gap: 50px;
 }
 #CriarContaUsuario .right {
-    width: 50%;
+    width: 100%;
     text-align: center;
     display: flex;
     flex-direction: column;
     row-gap: 20px;
     justify-content: center;
     align-items: center;
+}
+.bairro {
+    width: 100%;
+}
+* {
+    user-select: none;
 }
 .right .imagem {
     width: 100%;

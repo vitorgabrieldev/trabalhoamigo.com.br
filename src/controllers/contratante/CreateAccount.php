@@ -33,9 +33,10 @@ function isDuplicate($conexao, $cpf, $email, $telefone) {
 }
 
 // Função para inserir um novo usuário no banco de dados
-function insertUser($conexao, $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $cpf) {
-    $sql = "INSERT INTO usuarios (primeiro_nome, ultimo_nome, celular, whatsapp, telefone, email, senha, tipo_usuario, cpf)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+function insertUser($conexao, $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $cpf, $cep, $rua, $bairro, $numero, $complemento, $unique_id) {
+    // Inserindo o usuário
+    $sql = "INSERT INTO usuarios (primeiro_nome, ultimo_nome, celular, whatsapp, telefone, email, senha, tipo_usuario, cpf, unique_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conexao->prepare($sql);
     
     if (!$stmt) {
@@ -43,13 +44,31 @@ function insertUser($conexao, $primeiroNome, $sobrenome, $celular, $whatsapp, $t
     }
     
     $tipo_usuario = 'contratante';
-    $stmt->bind_param('sssssssss', $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $tipo_usuario, $cpf);
+    $stmt->bind_param('ssssssssss', $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $tipo_usuario, $cpf, $unique_id);
     
     if (!$stmt->execute()) {
         throw new Exception('Erro ao inserir dados no banco de dados: ' . $stmt->error);
     }
-    
+
+    // Obtendo o ID do usuário recém-inserido
+    $id_usuario = $stmt->insert_id;
     $stmt->close();
+
+    // Inserindo o endereço
+    $sqlEndereco = "INSERT INTO enderecos (id_usuario, cep, rua, bairro, numero, complemento) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmtEndereco = $conexao->prepare($sqlEndereco);
+    
+    if (!$stmtEndereco) {
+        throw new Exception('Erro ao preparar a consulta de endereço: ' . $conexao->error);
+    }
+    
+    $stmtEndereco->bind_param('isssis', $id_usuario, $cep, $rua, $bairro, $numero, $complemento);
+    
+    if (!$stmtEndereco->execute()) {
+        throw new Exception('Erro ao inserir dados de endereço no banco de dados: ' . $stmtEndereco->error);
+    }
+    
+    $stmtEndereco->close();
 }
 
 // Função principal para processar o cadastro
@@ -73,6 +92,7 @@ function processRegistration() {
             $numero = $_POST['numero'] ?? null;
             $complemento = $_POST['complemento'] ?? null;
             $aceitouTermos = $_POST['aceitouTermos'] ?? null;
+            $unique_id = rand(time(), 100000000);
 
             if ($senha !== $repetirSenha) {
                 echo json_encode([
@@ -93,7 +113,7 @@ function processRegistration() {
                 exit;
             }
 
-            insertUser($conexao, $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $cpf);
+            insertUser($conexao, $primeiroNome, $sobrenome, $celular, $whatsapp, $telefone, $email, $senhaHash, $cpf, $cep, $rua, $bairro, $numero, $complemento, $unique_id);
 
             // Resgata usuário criado
             $query = "SELECT * FROM usuarios WHERE email = ?";
@@ -104,7 +124,7 @@ function processRegistration() {
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    // Inicializa a session
+                    // Inicializa a sessão
                     sessionAction($row);
                 }
             } else {
@@ -151,6 +171,7 @@ function sessionAction($dados) {
     $_SESSION['data_Criacao'] = $dados['data_Criacao'];
     $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
     $_SESSION['ativo'] = $dados['ativo'];
+    $_SESSION['unique_id'] = $dados['unique_id'];
 };
 
 processRegistration();

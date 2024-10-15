@@ -5,7 +5,7 @@
  * @param {string} nome - O nome a ser validado.
  * @return {boolean} - Retorna true se o nome for válido.
  */
- function validarNome(nome) {
+function validarNome(nome) {
     return nome.length > 0;
 }
 
@@ -108,10 +108,10 @@ $('#FormCriarUsuario').on('submit', function (e) {
         primeiroNome: $('.input.nome').eq(0).val().trim(), // Obtém o valor do primeiro nome
         sobrenome: $('.input.nome').eq(1).val().trim(),    // Obtém o valor do sobrenome
         email: $('.input.email').val().trim(),             // Obtém o valor do email
-        telefone: $('.input.telefone').val().trim(),       // Obtém o valor do telefone
-        celular: $('.input.celular').val().trim(),       // Obtém o valor do celular
-        whatsapp: $('.input.whatsapp').val().trim(),       // Obtém o valor do Whatsapp
-        cpf: $('.input.cpf').val().trim(),       // Obtém o valor do cpf
+        telefone: $('.input.telefone').val().trim().replace(/\D/g, ''), // Remove a pontuação do telefone
+        celular: $('.input.celular').val().trim().replace(/\D/g, ''), // Remove a pontuação do celular
+        whatsapp: $('.input.whatsapp').val().trim().replace(/\D/g, ''), // Remove a pontuação do WhatsApp
+        cpf: $('.input.cpf').val().trim().replace(/\D/g, ''), // Remove a pontuação do CPF
         senha: $('.input.senha').val().trim(),             // Obtém o valor da senha
         repetirSenha: $('.input.againsenha').val().trim(), // Obtém o valor da confirmação de senha
         cep: $('.input.cep').val().trim(),                 // Obtém o valor do CEP
@@ -132,7 +132,6 @@ $('#FormCriarUsuario').on('submit', function (e) {
             footer: erros.join('<br>') // Mostra todos os erros em uma linha
         });
     } else {
-
         // Ativa animação de loading
         $(".SendForm").html(`<section class="loading-container"><div class='loading-form-animation'></div></section>`);
 
@@ -141,7 +140,6 @@ $('#FormCriarUsuario').on('submit', function (e) {
             type: 'POST',
             data: formData, 
             success: function (response) {
-
                 // Desativa animação de loading
                 $(".SendForm").html("Cadastrar");
 
@@ -153,17 +151,15 @@ $('#FormCriarUsuario').on('submit', function (e) {
                     });
                     
                     window.location.href = "../PaginaInicial/";
-
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Ocorreu um erro',
                         text: response.message
                     });
-                };
+                }
             },
             error: function (xhr, status, error) {
-                
                 // Desativa animação de loading
                 $(".SendForm").html("Cadastrar");
 
@@ -174,10 +170,10 @@ $('#FormCriarUsuario').on('submit', function (e) {
                 });
             }
         });
-        
     }
 });
 
+// Consulta de CEP
 $('.input.cep').on('blur', function () {
     const cep = $(this).val().trim().replace(/\D/g, ''); // Remove caracteres não numéricos
     if (cep.length === 8) {
@@ -221,3 +217,4 @@ $('.input.cep').on('blur', function () {
         });
     }
 });
+``

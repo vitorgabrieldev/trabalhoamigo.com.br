@@ -98,6 +98,7 @@ function processLogin() {
                 $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
                 $_SESSION['ativo'] = $dados['ativo'];
                 $_SESSION['id_usuario'] = $usuarioId;
+                $_SESSION['unique_id'] = $dados['unique_id'];
 
                 echo json_encode([
                     'success' => true,

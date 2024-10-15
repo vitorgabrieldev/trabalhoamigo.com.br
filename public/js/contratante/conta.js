@@ -1,102 +1,63 @@
-// Funções de validação modular
-
-/**
- * Valida se o nome não está vazio.
- * @param {string} nome - O nome a ser validado.
- * @return {boolean} - Retorna true se o nome for válido.
- */
- function validarNome(nome) {
+function validarNome(nome) {
     return nome.length > 0;
 }
 
-/**
- * Valida se o email está no formato correto.
- * @param {string} email - O email a ser validado.
- * @return {boolean} - Retorna true se o email for válido.
- */
 function validarEmail(email) {
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regexEmail.test(email);
 }
 
-/**
- * Valida se o telefone está no formato correto (10 ou 11 dígitos).
- * @param {string} telefone - O telefone a ser validado.
- * @return {boolean} - Retorna true se o telefone for válido.
- */
 function validarTelefone(telefone) {
     const regexTelefone = /^\d{10,11}$/; // Exemplo para telefones brasileiros
     return regexTelefone.test(telefone);
 }
 
-/**
- * Valida se a senha tem pelo menos 6 caracteres.
- * @param {string} senha - A senha a ser validada.
- * @return {boolean} - Retorna true se a senha for válida.
- */
+function validarCpf(cpf) {
+    const regexCpf = /^\d{11}$/; // CPF deve ter 11 dígitos
+    // Aqui você pode adicionar a lógica de validação do CPF se necessário
+    return regexCpf.test(cpf);
+}
+
 function validarSenha(senha) {
     return senha.length >= 6;
 }
 
-/**
- * Valida se a senha e a confirmação de senha são iguais.
- * @param {string} senha - A senha original.
- * @param {string} repetirSenha - A senha de confirmação.
- * @return {boolean} - Retorna true se as senhas coincidirem.
- */
 function validarRepetirSenha(senha, repetirSenha) {
     return senha === repetirSenha;
 }
 
-/**
- * Valida se o CEP está no formato correto (XXXXX-XXX).
- * @param {string} cep - O CEP a ser validado.
- * @return {boolean} - Retorna true se o CEP for válido.
- */
 function validarCep(cep) {
     const regexCep = /^\d{5}-?\d{3}$/;
     return regexCep.test(cep);
 }
 
-/**
- * Valida se o número da residência não está vazio.
- * @param {string} numero - O número da residência a ser validado.
- * @return {boolean} - Retorna true se o número for válido.
- */
 function validarNumero(numero) {
     return numero.length > 0;
 }
 
-/**
- * Valida se a caixa de seleção foi marcada.
- * @param {boolean} checkbox - O estado da caixa de seleção.
- * @return {boolean} - Retorna true se a caixa de seleção estiver marcada.
- */
 function validarCheckbox(checkbox) {
     return checkbox === true;
 }
 
-// Função principal de validação
+function adicionarErro(erros, mensagem) {
+    erros.push(mensagem);
+}
 
-/**
- * Função que valida todos os dados do formulário.
- * @param {object} formData - Um objeto contendo os dados do formulário.
- * @return {Array} - Retorna um array de mensagens de erro, se houver.
- */
 function validarDados(formData) {
     let erros = [];
 
-    if (!validarNome(formData.primeiroNome)) erros.push("Primeiro nome inválido");
-    if (!validarNome(formData.sobrenome)) erros.push("Sobrenome inválido");
-    if (!validarEmail(formData.email)) erros.push("Email inválido");
-    if (!validarTelefone(formData.telefone)) erros.push("Telefone inválido");
-    if (!validarSenha(formData.senha)) erros.push("Senha deve ter pelo menos 6 caracteres");
-    if (!validarRepetirSenha(formData.senha, formData.repetirSenha)) erros.push("As senhas não coincidem");
-    if (!validarCep(formData.cep)) erros.push("CEP inválido");
-    if (!validarNome(formData.rua)) erros.push("Rua inválida");
-    if (!validarNome(formData.bairro)) erros.push("Bairro inválido");
-    if (!validarNumero(formData.numero)) erros.push("Número inválido");
-    if (!validarCheckbox(formData.aceitouTermos)) erros.push("Você deve aceitar os termos e condições");
+    if (!validarNome(formData.primeiroNome)) adicionarErro(erros, "Primeiro nome inválido");
+    if (!validarNome(formData.sobrenome)) adicionarErro(erros, "Sobrenome inválido");
+    if (!validarEmail(formData.email)) adicionarErro(erros, "Email inválido");
+    if (!validarTelefone(formData.telefone)) adicionarErro(erros, "Telefone inválido");
+    if (!validarCpf(formData.cpf)) adicionarErro(erros, "CPF inválido");
+    if (!validarSenha(formData.senha)) adicionarErro(erros, "Senha deve ter pelo menos 6 caracteres");
+    if (!validarRepetirSenha(formData.senha, formData.repetirSenha)) adicionarErro(erros, "As senhas não coincidem");
+    if (!validarCep(formData.cep)) adicionarErro(erros, "CEP inválido");
+    if (!validarNome(formData.rua)) adicionarErro(erros, "Rua inválida");
+    if (!validarNome(formData.bairro)) adicionarErro(erros, "Bairro inválido");
+    if (!validarNumero(formData.numero)) adicionarErro(erros, "Número inválido");
+    if (!validarCheckbox(formData.aceitouTermos)) adicionarErro(erros, "Você deve aceitar os termos e condições");
 
     return erros;
 }
@@ -105,35 +66,33 @@ $('#FormCriarUsuario').on('submit', function (e) {
     e.preventDefault(); // Previne o envio padrão do formulário
 
     let formData = {
-        primeiroNome: $('.input.nome').eq(0).val().trim(), // Obtém o valor do primeiro nome
-        sobrenome: $('.input.nome').eq(1).val().trim(),    // Obtém o valor do sobrenome
-        email: $('.input.email').val().trim(),             // Obtém o valor do email
-        telefone: $('.input.telefone').val().trim(),       // Obtém o valor do telefone
-        celular: $('.input.celular').val().trim(),       // Obtém o valor do celular
-        whatsapp: $('.input.whatsapp').val().trim(),       // Obtém o valor do Whatsapp
-        cpf: $('.input.cpf').val().trim(),       // Obtém o valor do cpf
-        senha: $('.input.senha').val().trim(),             // Obtém o valor da senha
-        repetirSenha: $('.input.againsenha').val().trim(), // Obtém o valor da confirmação de senha
-        cep: $('.input.cep').val().trim(),                 // Obtém o valor do CEP
-        rua: $('.input.rua').val().trim(),                 // Obtém o valor da rua
-        bairro: $('.bairro').val().trim(),                 // Obtém o valor do bairro
-        numero: $('.input.numero').val().trim(),           // Obtém o valor do número da residência
-        complemento: $('.complemento').val().trim(),       // Obtém o valor do complemento (se houver)
-        aceitouTermos: $('#checkTerms input[type="checkbox"]').is(':checked') // Verifica se os termos foram aceitos
+        primeiroNome: $('.input.nome').eq(0).val().trim(),
+        sobrenome: $('.input.nome').eq(1).val().trim(),
+        email: $('.input.email').val().trim(),
+        telefone: $('.input.telefone').val().trim().replace(/\D/g, ''),
+        celular: $('.input.celular').val().trim().replace(/\D/g, ''),
+        whatsapp: $('.input.whatsapp').val().trim().replace(/\D/g, ''),
+        cpf: $('.input.cpf').val().trim().replace(/\D/g, ''),
+        senha: $('.input.senha').val().trim(),
+        repetirSenha: $('.input.againsenha').val().trim(),
+        cep: $('.input.cep').val().trim().replace(/\D/g, ''),
+        rua: $('.input.rua').val().trim(),
+        bairro: $('.bairro').val().trim(),
+        numero: $('.input.numero').val().trim(),
+        complemento: $('.complemento').val().trim(),
+        aceitouTermos: $('#checkTerms input[type="checkbox"]').is(':checked')
     };
 
-    let erros = validarDados(formData); // Valida os dados do formulário
+    let erros = validarDados(formData);
 
     if (erros.length > 0) {
         Swal.fire({
             icon: 'error',
             title: 'Erro de Validação',
             text: 'Verifique os campos e tente novamente.',
-            footer: erros.join('<br>') // Mostra todos os erros em uma linha
+            footer: erros.join('<br>')
         });
     } else {
-
-        // Ativa animação de loading
         $(".SendForm").html(`<section class="loading-container"><div class='loading-form-animation'></div></section>`);
 
         $.ajax({
@@ -141,8 +100,6 @@ $('#FormCriarUsuario').on('submit', function (e) {
             type: 'POST',
             data: formData, 
             success: function (response) {
-
-                // Desativa animação de loading
                 $(".SendForm").html("Cadastrar");
 
                 if (response.success) {
@@ -151,22 +108,17 @@ $('#FormCriarUsuario').on('submit', function (e) {
                         title: 'Sucesso!',
                         text: 'Login efetuado com sucesso!'
                     });
-                    
                     window.location.href = "../PaginaInicial/";
-
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro',
-                        text: 'Login não efetuado!.'
+                        text: 'Login não efetuado!'
                     });
-                };
+                }
             },
             error: function (xhr, status, error) {
-                
-                // Desativa animação de loading
                 $(".SendForm").html("Cadastrar");
-
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro',
@@ -174,13 +126,12 @@ $('#FormCriarUsuario').on('submit', function (e) {
                 });
             }
         });
-        
     }
 });
 
+// Consulta de CEP
 $('.input.cep').on('blur', function () {
     const cep = $(this).val().trim().replace(/\D/g, ''); // Remove caracteres não numéricos
-
     if (cep.length === 8) {
         $.ajax({
             url: `https://viacep.com.br/ws/${cep}/json/`,

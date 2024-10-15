@@ -4,8 +4,11 @@ const form = document.querySelector(".typing-area"),
     sendBtn = form.querySelector("button"),
     chatBox = document.querySelector(".chat-box");
 
+let lastMessageId = 0; // Guardar o ID da última mensagem
+
+// Evita o envio padrão do formulário
 form.onsubmit = (e) => {
-    e.preventDefault(); // Evita o envio padrão do formulário
+    e.preventDefault();
 }
 
 inputField.focus();
@@ -17,6 +20,13 @@ inputField.onkeyup = (e) => {
     }
 }
 
+// Envia a mensagem ao clicar no botão ou pressionar Enter
+inputField.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && inputField.value != "") {
+        sendMessage();
+    }
+});
+
 sendBtn.onclick = () => {
     if (sendBtn.classList.contains("active")) {
         sendMessage();
@@ -26,19 +36,18 @@ sendBtn.onclick = () => {
 function sendMessage() {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "php/insert-chat.php", true);
-    
-    // Adiciona um indicador de carregamento
-    sendBtn.innerHTML = "Enviando..."; // Pode ser um ícone ou texto indicando que está enviando
-    sendBtn.disabled = true; // Desabilita o botão enquanto a mensagem está sendo enviada
+
+    // Indicador de carregamento
+    sendBtn.innerHTML = "Enviando...";
+    sendBtn.disabled = true;
 
     xhr.onload = () => {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                inputField.value = ""; // Limpa o campo de entrada
-                sendBtn.innerHTML = "<i class='fab fa-telegram-plane'></i>"; // Restaura o texto do botão
-                sendBtn.disabled = false; // Habilita o botão novamente
-                scrollToBottom(); // Rolagem para o fundo
-            }
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            inputField.value = ""; // Limpa o campo de entrada
+            sendBtn.innerHTML = "<i class='fab fa-telegram-plane'></i>"; // Restaura o botão
+            sendBtn.disabled = false;
+            scrollToBottom(); // Rola para baixo
+            fetchMessages(); // Busca novas mensagens após o envio
         }
     }
 
@@ -46,6 +55,24 @@ function sendMessage() {
     xhr.send(formData);
 }
 
+// Função para buscar novas mensagens a partir da última mensagem carregada
+function fetchMessages() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "php/get-chat.php", true);
+    xhr.onload = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            let data = xhr.responseText;
+            if (data.trim() !== "") {
+                chatBox.innerHTML = data; // Atualiza a caixa de chat
+                scrollToBottom(); // Rolagem automática para o final do chat
+            }
+        }
+    }
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.send("incoming_id=" + incoming_id + "&last_message_id=" + lastMessageId);
+}
+
+// Monitora se a caixa de chat está ativa
 chatBox.onmouseenter = () => {
     chatBox.classList.add("active");
 }
@@ -54,24 +81,14 @@ chatBox.onmouseleave = () => {
     chatBox.classList.remove("active");
 }
 
-setInterval(() => {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "php/get-chat.php", true);
-    xhr.onload = () => {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                let data = xhr.response;
-                chatBox.innerHTML = data;
-                if (!chatBox.classList.contains("active")) {
-                    scrollToBottom();
-                }
-            }
-        }
-    }
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhr.send("incoming_id=" + incoming_id);
-}, 1000);
-
+// Função para rolar a barra de chat para o fundo
 function scrollToBottom() {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+// Busque novas mensagens a cada 5 segundos apenas se a caixa de chat não estiver ativa
+setInterval(() => {
+    if (!chatBox.classList.contains("active")) {
+        fetchMessages();
+    }
+}, 5000);

@@ -1,8 +1,5 @@
 <?php
-
-if (!isset($_SESSION)) {
-    session_start();
-}
+session_start();
 
 // Conexão com o banco de dados
 define('DB_SERVER', '185.173.111.184');
@@ -17,45 +14,95 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$id_usuario = $_SESSION['id_usuario'];
+// Lógica para aceitar ou recusar serviço
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'];
+    $idServico = $_POST['idServico'];
 
-// Consulta SQL para buscar propostas e dados do prestador
-$sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS titulo_servico, p.valor_total, p.status, 
-               u.primeiro_nome, u.telefone, u.celular, u.whatsapp, u.email
-        FROM proposta p 
-        JOIN servicos s ON p.id_servico_fk = s.id_servico 
-        JOIN usuarios u ON p.id_usuario_prestador_fk = u.id_usuario 
-        WHERE p.id_usuario_contrante_fk = ?";
-
-
-$stmt = $conn->prepare($sql);
-
-// Adiciona verificação de erro
-if ($stmt === false) {
-    die("Erro na preparação da consulta: " . $conn->error);
+    if ($action === 'accept') {
+        $idContrato = $_POST['idContrato'];
+        $qtdServico = $_POST['qtdServico'];
+        $valorFinal = $_POST['valorFinal'];
+        acceptService($idServico, $idContrato, $qtdServico, $valorFinal);
+    } elseif ($action === 'reject') {
+        rejectService($idServico);
+    }
+    exit; // Encerrar após processar a requisição AJAX
 }
 
-$stmt->bind_param("i", $id_usuario);
+function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
+    global $conn;
 
-// Executa a consulta
-$stmt->execute();
-$result = $stmt->get_result();
+    // Atualiza o status da proposta para '2' (aceito)
+    $sql = "UPDATE proposta SET status = '2' WHERE id_contrato = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $idContrato);
 
-// Busca os dados
-$propostas = $result->fetch_all(MYSQLI_ASSOC);
+    if ($stmt->execute()) {
+        $stmt->close(); // Fecha o statement do UPDATE
 
-// Libera os recursos
-$stmt->close();
+        // Inserção na tabela contratos
+        $sqlInsert = "INSERT INTO contratos (id_servico_fk, id_contrato_fk, qtd_servico, valor_final) VALUES (?, ?, ?, ?)";
+        $stmtInsert = $conn->prepare($sqlInsert);
+        $stmtInsert->bind_param("iiid", $idServico, $idContrato, $qtdServico, $valorFinal);
+
+        if ($stmtInsert->execute()) {
+            echo json_encode(['message' => 'Serviço aceito e contrato cadastrado com sucesso.']);
+        } else {
+            echo json_encode(['error' => 'Erro ao cadastrar contrato: ' . $stmtInsert->error]);
+        }
+
+        $stmtInsert->close(); // Fecha o statement da inserção
+    } else {
+        echo json_encode(['error' => 'Erro ao aceitar serviço: ' . $stmt->error]);
+    }
+}
+
+function rejectService($idServico) {
+    global $conn;
+
+    $sql = "UPDATE proposta SET status = '4' WHERE id_contrato = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $idServico);
+
+    if ($stmt->execute()) {
+        echo json_encode(['message' => 'Serviço recusado com sucesso.']);
+    } else {
+        echo json_encode(['error' => 'Erro ao recusar serviço: ' . $stmt->error]);
+    }
+
+    $stmt->close();
+}
+
+// Buscar propostas
+$id_usuario = $_SESSION['id_usuario'] ?? null; // Garante que não seja nulo
+if ($id_usuario) {
+    $sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS titulo_servico, 
+                   p.valor_total, u.primeiro_nome, u.telefone, u.celular, u.whatsapp, u.email, u.unique_id,
+                   p.prazo_estimado, p.data_esperada, p.status
+            FROM proposta p 
+            JOIN servicos s ON p.id_servico_fk = s.id_servico 
+            JOIN usuarios u ON p.id_usuario_prestador_fk = u.id_usuario 
+            WHERE p.id_usuario_contrante_fk = ? AND p.status != 4";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $propostas = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+} else {
+    $propostas = []; // Inicializa como array vazio se não houver id_usuario
+}
+
 $conn->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <!-- Tituloda Página - SEO -->
     <title>Histórico de Propostas | Trabalho Amigo</title>
-    <!-- Descrição da Página - SEO -->
-    <meta name="description" content="Crie sua Conta">
+    <meta name="description" content="Histórico de Propostas do Anunciante">
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
@@ -69,6 +116,25 @@ $conn->close();
 </head>
 
 <body>
+    <script>
+        $.ajax({
+            url: `../../../controllers/contratante/Security.php`,
+            method: 'GET',
+            success: function (data) {
+                if (data !== 'true') {
+                    window.location.href = "../EntrarConta/";
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro na Autenticação.'
+                });
+            }
+        });
+    </script>
+
     <section id="ListagemServico">
         <h3><a href="../PaginaInicial/">←</a> Histórico de propostas</h3>
         <div class="grid-container">
@@ -76,53 +142,39 @@ $conn->close();
             <div class="grid-header">Data de envio</div>
             <div class="grid-header">Título do Serviço</div>
             <div class="grid-header">Valor</div>
-            <div class="grid-header">Status</div>
+            <div class="grid-header">Ações</div>
 
             <?php foreach ($propostas as $proposta): ?>
-                <div class="grid-item"><?= $proposta['id_contrato'] ?></div>
-                <div class="grid-item"><?= $proposta['data_envio'] ?></div>
-                <div class="grid-item"><?= $proposta['titulo_servico'] ?></div>
+                <div class="grid-item"><?= htmlspecialchars($proposta['id_contrato']) ?></div>
+                <div class="grid-item"><?= htmlspecialchars($proposta['data_envio']) ?></div>
+                <div class="grid-item"><?= htmlspecialchars($proposta['titulo_servico']) ?></div>
                 <div class="grid-item">R$ <?= number_format($proposta['valor_total'], 2, ',', '.') ?></div>
                 <div class="grid-item">
-                    <?php
-                    switch ($proposta['status']) {
-                        case 1:
-                            echo '<button class="button-espera">Em espera</button>';
-                            break;
-                        case 2:
-                            // Use o id do contrato para o modal
-                            $idServico = $proposta['id_contrato']; 
-                            
-                            // Renderiza o botão
-                            echo '<button class="button" onclick="openModalAceito(' . $idServico . ')">Aceito <i class="bi bi-arrow-right-short"></i></button>';
-                            
-                            // Renderiza o modal
-                            echo '
-                            <div id="modalServico' . $idServico . '" class="modal">
-                                <div class="modal-content">
-                                    <div class="flex-modal">
-                                        <h2 class="titulo-modal">Informações de Contato do Prestador</h2>
-                                        <span class="close" onclick="closeModalAceito(' . $idServico . ')">&times;</span>
-                                    </div>
-                                    <p><strong>Nome:</strong> ' . $proposta['primeiro_nome'] . '</p>
-                                    <p class="cursor-pointer" onclick="copyToClipboard(\'' . $proposta['telefone'] . '\')"><strong>Telefone:</strong> ' . $proposta['telefone'] . '</p>
-                                    <p class="cursor-pointer" onclick="copyToClipboard(\'' . $proposta['celular'] . '\')"><strong>Celular:</strong> ' . $proposta['celular'] . '</p>
-                                    <p class="cursor-pointer" onclick="copyToClipboard(\'' . $proposta['whatsapp'] . '\')"><strong>WhatsApp:</strong> ' . $proposta['whatsapp'] . '</p>
-                                    <p class="cursor-pointer" onclick="copyToClipboard(\'' . $proposta['email'] . '\')"><strong>Email:</strong> ' . $proposta['email'] . '</p>
-                                </div>
-                            </div>
-                            ';
-                            break;
-                        case 3:
-                            echo '<button class="button-finalizado">Finalizado</button>';
-                            break;
-                        case 4:
-                            echo '<button class="button-finalizado">Cancelado</button>';
-                            break;
-                        default:
-                            echo '<button class="button">ERROR</button>';
-                    }
-                    ?>
+                    <?php if ($proposta['status'] == 2): ?>
+                        <button class="button" onclick="showContractorInfo(
+                            '<?= addslashes($proposta['primeiro_nome']) ?>',
+                            '<?= addslashes($proposta['telefone']) ?>',
+                            '<?= addslashes($proposta['celular']) ?>',
+                            '<?= addslashes($proposta['whatsapp']) ?>',
+                            '<?= addslashes($proposta['unique_id']) ?>',
+                            '<?= addslashes($proposta['email']) ?>'
+                        )">
+                            Aceito <i class="bi bi-arrow-right"></i>
+                        </button>
+                    <?php else: ?>
+                        <button class="button button-vermais" onclick="showServiceDetails(
+                            <?= $proposta['id_contrato'] ?>,
+                            '<?= addslashes($proposta['titulo_servico']) ?>',
+                            <?= $proposta['valor_total'] ?>,
+                            '<?= addslashes($proposta['primeiro_nome']) ?>',
+                            '<?= addslashes($proposta['telefone']) ?>',
+                            '<?= addslashes($proposta['celular']) ?>',
+                            '<?= addslashes($proposta['whatsapp']) ?>',
+                            '<?= addslashes($proposta['email']) ?>',
+                            '<?= addslashes($proposta['prazo_estimado']) ?>',
+                            '<?= addslashes($proposta['data_esperada']) ?>'
+                        )">Ver Mais</button>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -134,32 +186,135 @@ $conn->close();
         </div>
     </div>
 
+    <script>
+    function formatDate(dataString) {
+        const [year, month, day] = dataString.split('-');
+        return `${day}/${month}/${year}`;
+    }
+
+    function showServiceDetails(idServico, tituloServico, valorTotal, primeiroNome, telefone, celular, whatsapp, email, prazo_estimado, data_esperada) {
+        Swal.fire({
+            title: 'Detalhes da proposta',
+            html: `
+                <div style="text-align: left;">
+                    <p><strong>Serviço:</strong> ${tituloServico}</p><br>
+                    <p><strong>Valor proposto:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p><br>
+                    <p><strong>Nome do contratante:</strong> ${primeiroNome}</p><br>
+                    <p><strong>Tempo estimado:</strong> ${prazo_estimado} Dias</p><br>
+                    <p><strong>Data estimada:</strong> ${data_esperada}</p><br>
+                </div>
+            `,
+            showCloseButton: false,
+            showCancelButton: true,
+            confirmButtonText: `Aceitar`,
+            cancelButtonText: `Recusar`,
+            focusConfirm: false,
+            width: '700px',
+            padding: '1.5rem',
+            customClass: {
+                popup: 'swal-custom-popup',
+                title: 'swal-custom-title',
+                htmlContainer: 'swal-custom-html'
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                acceptService(idServico);
+            } else if (result.isDismissed) {
+                rejectService(idServico);
+            }
+        });
+    }
+
+    function acceptService(idServico) {
+        const idContrato = idServico; // Supondo que idServico é igual a idContrato
+        const qtdServico = 1; // Ajuste conforme necessário
+        const valorFinal = $('#valor').val(); // Pegar valor do input
+
+        $.ajax({
+            type: 'POST',
+            url: '', // Mantém o mesmo arquivo para processar a requisição
+            data: {
+                action: 'accept',
+                idServico: idServico,
+                idContrato: idContrato,
+                qtdServico: qtdServico,
+                valorFinal: valorFinal
+            },
+            success: function(response) {
+                const res = JSON.parse(response);
+                Swal.fire('Serviço Aceito!', res.message, 'success');
+                location.reload(); // Recarrega a página para atualizar a lista
+            },
+            error: function() {
+                Swal.fire('Erro!', 'Não foi possível aceitar o serviço.', 'error');
+            }
+        });
+    }
+
+    function rejectService(idServico) {
+        $.ajax({
+            type: 'POST',
+            url: '', // Mantém o mesmo arquivo para processar a requisição
+            data: {
+                action: 'reject',
+                idServico: idServico
+            },
+            success: function(response) {
+                const res = JSON.parse(response);
+                Swal.fire('Serviço Recusado!', res.message, 'info');
+                location.reload(); // Recarrega a página para atualizar a lista
+            },
+            error: function() {
+                Swal.fire('Erro!', 'Não foi possível recusar o serviço.', 'error');
+            }
+        });
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            showToast();
+        }, function(err) {
+            console.error('Erro ao copiar: ', err);
+        });
+    }
+
+    function showToast() {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    function showContractorInfo(primeiroNome, telefone, celular, whatsapp, unique_id, email) {
+        Swal.fire({
+            title: 'Informações do Contratante',
+            html: `
+                <div style="text-align: left;">
+                    <p><strong>Nome:</strong> ${primeiroNome}</p><br>
+                    <p><strong>Telefone:</strong> ${telefone}</p><br>
+                    <p><strong>Celular:</strong> ${celular}</p><br>
+                    <p><strong>WhatsApp:</strong> ${whatsapp}</p><br>
+                    <p><strong>Email:</strong> ${email}</p><br>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Fechar',
+            cancelButtonText: 'Abrir Chat',
+            width: '500px',
+            padding: '1.5rem',
+            customClass: {
+                popup: 'swal-custom-popup',
+                title: 'swal-custom-title',
+                htmlContainer: 'swal-custom-html'
+            },
+        }).then((result) => {
+            if (result.isDismissed) {
+                window.open(`../../../../chat/chat.php?user_id=${unique_id}`, "_blank");
+            }
+        });
+    }
+    </script>
 </body>
 </html>
-
-<script>
-function openModalAceito(idServico) {
-    document.getElementById('modalServico' + idServico).style.display = 'block';
-}
-
-function closeModalAceito(idServico) {
-    document.getElementById('modalServico' + idServico).style.display = 'none';
-}
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(function() {
-        showToast();
-    }, function(err) {
-        console.error('Erro ao copiar: ', err);
-    });
-}
-
-function showToast() {
-    const toast = document.getElementById('toast');
-    toast.style.display = 'block';
-
-    setTimeout(() => {
-        toast.style.display = 'none';
-    }, 3000);
-}
-</script>
-

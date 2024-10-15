@@ -91,6 +91,7 @@ $result = $stmt->get_result();
 $propostas = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 $conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -311,8 +312,7 @@ $conn->close();
         if (result.isConfirmed) {
             // O usuário clicou em "Fechar"
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            // O usuário clicou em "Abrir Chat"
-            window.location.href = `../../../../chat/chat.php?user_id=${unique_id}`;
+            window.open(`../../../../chat/chat.php?user_id=${unique_id}`, "_blank");
         }
     });
     }

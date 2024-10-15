@@ -19,7 +19,6 @@
             header("location: usuarios.php");
           }
         ?>
-        <a href="usuarios.php" class="back-icon"><i class="fas fa-arrow-left"></i></a>
         <div class="details">
           <span><?php echo $row['primeiro_nome']. " " . $row['ultimo_nome'] ?></span>
           <p><?php echo $row['status']; ?></p>

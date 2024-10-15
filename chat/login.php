@@ -22,7 +22,7 @@
         </div>
         <div class="field input">
           <label>Senha</label>
-          <input type="password" name="password" placeholder="Digite sua senha" required>
+          <input type="senha" name="senha" placeholder="Digite sua senha" required>
           <i class="fas fa-eye"></i>
         </div>
         <div class="field button">

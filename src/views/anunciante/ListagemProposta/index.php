@@ -33,17 +33,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
     global $conn;
 
+    // Atualiza o status da proposta para '2' (aceito)
     $sql = "UPDATE proposta SET status = '2' WHERE id_contrato = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $idServico);
+    $stmt->bind_param("i", $idContrato);  // Corrigido para usar $idContrato
 
     if ($stmt->execute()) {
-        $stmt->close(); // Fecha o primeiro statement
+        $stmt->close(); // Fecha o statement do UPDATE
 
-        // Prepare a inserção na tabela contratos
+        // Agora faz a inserção na tabela contratos
         $sqlInsert = "INSERT INTO contratos (id_servico_fk, id_contrato_fk, qtd_servico, valor_final) VALUES (?, ?, ?, ?)";
         $stmtInsert = $conn->prepare($sqlInsert);
-        $stmtInsert->bind_param("iiis", $idServico, $idContrato, $qtdServico, $valorFinal);
+        $stmtInsert->bind_param("iiid", $idServico, $idContrato, $qtdServico, $valorFinal); // Ajustado para "d" (double) em valor_final
 
         if ($stmtInsert->execute()) {
             echo json_encode(['message' => 'Serviço aceito e contrato cadastrado com sucesso.']);
@@ -55,8 +56,6 @@ function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
     } else {
         echo json_encode(['error' => 'Erro ao aceitar serviço: ' . $stmt->error]);
     }
-
-    $stmt->close();
 }
 
 function rejectService($idServico) {
@@ -78,7 +77,7 @@ function rejectService($idServico) {
 // Buscar propostas
 $id_usuario = $_SESSION['id_usuario'];
 $sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS titulo_servico, 
-               p.valor_total, u.primeiro_nome, u.telefone, u.celular, u.whatsapp, u.email,
+               p.valor_total, u.primeiro_nome, u.telefone, u.celular, u.whatsapp, u.email, u.unique_id,
                p.prazo_estimado, p.data_esperada, p.status
         FROM proposta p 
         JOIN servicos s ON p.id_servico_fk = s.id_servico 
@@ -153,6 +152,7 @@ $conn->close();
                             '<?= addslashes($proposta['telefone']) ?>',
                             '<?= addslashes($proposta['celular']) ?>',
                             '<?= addslashes($proposta['whatsapp']) ?>',
+                            '<?= addslashes($proposta['unique_id']) ?>',
                             '<?= addslashes($proposta['email']) ?>'
                         )">
                             Aceito <i class="bi bi-arrow-right"></i>
@@ -285,7 +285,7 @@ $conn->close();
         }, 3000);
     }
 
-    function showContractorInfo(primeiroNome, telefone, celular, whatsapp, email) {
+    function showContractorInfo(primeiroNome, telefone, celular, whatsapp, unique_id, email) {
         Swal.fire({
         title: 'Informações do Contratante',
         html: `
@@ -312,7 +312,7 @@ $conn->close();
             // O usuário clicou em "Fechar"
         } else if (result.dismiss === Swal.DismissReason.cancel) {
             // O usuário clicou em "Abrir Chat"
-            window.location.href = '../../../../chat/';
+            window.location.href = `../../../../chat/chat.php?user_id=${unique_id}`;
         }
     });
     }

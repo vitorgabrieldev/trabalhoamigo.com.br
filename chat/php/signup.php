@@ -4,8 +4,8 @@
     $primeiro_nome = mysqli_real_escape_string($conn, $_POST['primeiro_nome']);
     $ultimo_nome = mysqli_real_escape_string($conn, $_POST['ultimo_nome']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-    if(!empty($primeiro_nome) && !empty($ultimo_nome) && !empty($email) && !empty($password)){
+    $senha = mysqli_real_escape_string($conn, $_POST['senha']);
+    if(!empty($primeiro_nome) && !empty($ultimo_nome) && !empty($email) && !empty($senha)){
         if(filter_var($email, FILTER_VALIDATE_EMAIL)){
             $sql = mysqli_query($conn, "SELECT * FROM usuarios WHERE email = '{$email}'");
             if(mysqli_num_rows($sql) > 0){
@@ -28,8 +28,8 @@
                             if(move_uploaded_file($tmp_name,"images/".$new_img_name)){
                                 $ran_id = rand(time(), 100000000);
                                 $status = "Active now";
-                                $encrypt_pass = md5($password);
-                                $insert_query = mysqli_query($conn, "INSERT INTO usuarios (unique_id, primeiro_nome, ultimo_nome, email, password, img, status)
+                                $encrypt_pass = md5($senha);
+                                $insert_query = mysqli_query($conn, "INSERT INTO usuarios (unique_id, primeiro_nome, ultimo_nome, email, senha, img, status)
                                 VALUES ({$ran_id}, '{$primeiro_nome}','{$ultimo_nome}', '{$email}', '{$encrypt_pass}', '{$new_img_name}', '{$status}')");
                                 if($insert_query){
                                     $select_sql2 = mysqli_query($conn, "SELECT * FROM usuarios WHERE email = '{$email}'");

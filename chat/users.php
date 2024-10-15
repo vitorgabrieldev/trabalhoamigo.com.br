@@ -24,7 +24,7 @@
         </div>
       </header>
       <div class="search">
-        <span class="text">Select an user to start chat</span>
+        <span class="text">Selecione um contratante para iniciar uma conversa</span>
         <input type="text" placeholder="Enter name to search...">
         <button><i class="fas fa-search"></i></button>
       </div>

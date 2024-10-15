@@ -37,14 +37,14 @@ CREATE TABLE `messages` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Table structure for table `usuarios`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE `usuarios` (
   `user_id` int(11) NOT NULL,
   `unique_id` int(255) NOT NULL,
-  `fname` varchar(255) NOT NULL,
-  `lname` varchar(255) NOT NULL,
+  `primeiro_nome` varchar(255) NOT NULL,
+  `ultimo_nome` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `img` varchar(255) NOT NULL,
@@ -62,9 +62,9 @@ ALTER TABLE `messages`
   ADD PRIMARY KEY (`msg_id`);
 
 --
--- Indexes for table `users`
+-- Indexes for table `usuarios`
 --
-ALTER TABLE `users`
+ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`user_id`);
 
 --
@@ -78,9 +78,9 @@ ALTER TABLE `messages`
   MODIFY `msg_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT for table `usuarios`
 --
-ALTER TABLE `users`
+ALTER TABLE `usuarios`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 

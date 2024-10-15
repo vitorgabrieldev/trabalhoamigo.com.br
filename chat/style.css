@@ -123,12 +123,12 @@ body{
 }
 
 
-/* Users List CSS Start */
-.users{
+/* usuarios List CSS Start */
+.usuarios{
   padding: 25px 30px;
 }
-.users header,
-.users-list a{
+.usuarios header,
+.usuarios-list a{
   display: flex;
   align-items: center;
   padding-bottom: 20px;
@@ -139,23 +139,23 @@ body{
   object-fit: cover;
   border-radius: 50%;
 }
-.users header img{
+.usuarios header img{
   height: 50px;
   width: 50px;
 }
-:is(.users, .users-list) .content{
+:is(.usuarios, .usuarios-list) .content{
   display: flex;
   align-items: center;
 }
-:is(.users, .users-list) .content .details{
+:is(.usuarios, .usuarios-list) .content .details{
   color: #000;
   margin-left: 20px;
 }
-:is(.users, .users-list) .details span{
+:is(.usuarios, .usuarios-list) .details span{
   font-size: 18px;
   font-weight: 500;
 }
-.users header .logout{
+.usuarios header .logout{
   display: block;
   background: #333;
   color: #fff;
@@ -166,17 +166,17 @@ body{
   border-radius: 5px;
   font-size: 17px;
 }
-.users .search{
+.usuarios .search{
   margin: 20px 0;
   display: flex;
   position: relative;
   align-items: center;
   justify-content: space-between;
 }
-.users .search .text{
+.usuarios .search .text{
   font-size: 18px;
 }
-.users .search input{
+.usuarios .search input{
   position: absolute;
   height: 42px;
   width: calc(100% - 50px);
@@ -189,11 +189,11 @@ body{
   pointer-events: none;
   transition: all 0.2s ease;
 }
-.users .search input.show{
+.usuarios .search input.show{
   opacity: 1;
   pointer-events: auto;
 }
-.users .search button{
+.usuarios .search button{
   position: relative;
   z-index: 1;
   width: 47px;
@@ -207,43 +207,43 @@ body{
   border-radius: 0 5px 5px 0;
   transition: all 0.2s ease;
 }
-.users .search button.active{
+.usuarios .search button.active{
   background: #333;
   color: #fff;
 }
 .search button.active i::before{
   content: '\f00d';
 }
-.users-list{
+.usuarios-list{
   max-height: 350px;
   overflow-y: auto;
 }
-:is(.users-list, .chat-box)::-webkit-scrollbar{
+:is(.usuarios-list, .chat-box)::-webkit-scrollbar{
   width: 0px;
 }
-.users-list a{
+.usuarios-list a{
   padding-bottom: 10px;
   margin-bottom: 15px;
   padding-right: 15px;
   border-bottom-color: #f1f1f1;
 }
-.users-list a:last-child{
+.usuarios-list a:last-child{
   margin-bottom: 0px;
   border-bottom: none;
 }
-.users-list a img{
+.usuarios-list a img{
   height: 40px;
   width: 40px;
 }
-.users-list a .details p{
+.usuarios-list a .details p{
   color: #67676a;
 }
-.users-list a .status-dot{
+.usuarios-list a .status-dot{
   font-size: 12px;
   color: #468669;
   padding-left: 10px;
 }
-.users-list a .status-dot.offline{
+.usuarios-list a .status-dot.offline{
   color: #ccc;
 }
 
@@ -357,7 +357,7 @@ body{
 
 /* Responive media query */
 @media screen and (max-width: 450px) {
-  .form, .users{
+  .form, .usuarios{
     padding: 20px;
   }
   .form header{
@@ -373,19 +373,19 @@ body{
     margin-left: 0px;
   }
 
-  .users header img{
+  .usuarios header img{
     height: 45px;
     width: 45px;
   }
-  .users header .logout{
+  .usuarios header .logout{
     padding: 6px 10px;
     font-size: 16px;
   }
-  :is(.users, .users-list) .content .details{
+  :is(.usuarios, .usuarios-list) .content .details{
     margin-left: 15px;
   }
 
-  .users-list a{
+  .usuarios-list a{
     padding-right: 10px;
   }
 

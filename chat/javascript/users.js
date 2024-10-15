@@ -1,6 +1,6 @@
 const searchBar = document.querySelector(".search input"),
 searchIcon = document.querySelector(".search button"),
-usersList = document.querySelector(".users-list");
+usuariosList = document.querySelector(".usuarios-list");
 
 searchIcon.onclick = ()=>{
   searchBar.classList.toggle("show");
@@ -25,7 +25,7 @@ searchBar.onkeyup = ()=>{
     if(xhr.readyState === XMLHttpRequest.DONE){
         if(xhr.status === 200){
           let data = xhr.response;
-          usersList.innerHTML = data;
+          usuariosList.innerHTML = data;
         }
     }
   }
@@ -35,13 +35,13 @@ searchBar.onkeyup = ()=>{
 
 setInterval(() =>{
   let xhr = new XMLHttpRequest();
-  xhr.open("GET", "php/users.php", true);
+  xhr.open("GET", "php/usuarios.php", true);
   xhr.onload = ()=>{
     if(xhr.readyState === XMLHttpRequest.DONE){
         if(xhr.status === 200){
           let data = xhr.response;
           if(!searchBar.classList.contains("active")){
-            usersList.innerHTML = data;
+            usuariosList.innerHTML = data;
           }
         }
     }

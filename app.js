@@ -199,18 +199,6 @@ function addSEOData() {
 addSEOData();
 
 /* ------------------------------------------------------------
-| Sistema de Inserção de política de Segurança de Conteúdo (CSP)
-/-------------------------------------------------------------- */
-// function setContentSecurityPolicy() {
-//     const meta = document.createElement('meta');
-//     meta.httpEquiv = 'Content-Security-Policy';
-//     meta.content = "default-src 'self'; img-src * data:; script-src 'self' https://trusted.cdn.com; style-src 'self' 'unsafe-inline';";
-//     document.head.appendChild(meta);
-// }
-
-// setContentSecurityPolicy();
-
-/* ------------------------------------------------------------
 | Sistema de broqueio para telas menores (Temporário)
 /-------------------------------------------------------------- */
 setInterval(() => {
@@ -392,18 +380,17 @@ function definirMascaras() {
 
             // Dinheiro (formato R$)
             if (input.classList.contains('mascara-dinheiro')) {
-                let valor = input.value.replace(/[^0-9]/g, ''); // Remove caracteres não numéricos
-                valor = (valor / 100).toFixed(2).replace('.', ','); // Formata como decimal
+                let valor = input.value.replace(/[^0-9]/g, '');
+                valor = (valor / 100).toFixed(2).replace('.', ',');
                 aplicarMascara(input, 'R$ #.##0,00');
-                // A máscara não é ideal para formatação reversa, você pode precisar de uma lógica separada se quiser algo mais avançado
-                input.value = input.value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Adiciona os pontos
+                input.value = input.value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); 
             }
 
             // Porcentagem
             if (input.classList.contains('mascara-porcentagem')) {
-                let valor = input.value.replace(/[^0-9]/g, ''); // Remove caracteres não numéricos
+                let valor = input.value.replace(/[^0-9]/g, ''); 
                 aplicarMascara(input, '##0,00%');
-                input.value = valor.slice(0, 5) + '%'; // Limita a 5 caracteres para a porcentagem
+                input.value = valor.slice(0, 5) + '%';
             }
 
             // Número inteiro

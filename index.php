@@ -1,55 +1,71 @@
 <?php
-    /*----------------------------------------
-    | Inicia o buffer de saída para controlar quando os dados serão enviados ao navegador
-    |-----------------------------------------*/
-    ob_start();
+/*
+|--------------------------------------------------------------------------
+| Corrige URL de redirecionamento
+|--------------------------------------------------------------------------
+|
+| Isso remove a referência "index.php" da URL para evitar que apareça na 
+| navegação e garanta que as URLs não fiquem com "/index.php".
+|
+*/
+$_SERVER["REQUEST_URI"] = str_replace('index.php', '', $_SERVER["REQUEST_URI"]);
 
-    /*----------------------------------------
-    | Verifica se a sessão ainda não foi iniciada, e caso não tenha sido, inicia uma nova sessão
-    |-----------------------------------------*/
-    if (session_status() === PHP_SESSION_NONE) { 
-        session_start();
-    }
+/*
+|--------------------------------------------------------------------------
+| Configuração de Localização e Fuso Horário
+|--------------------------------------------------------------------------
+|
+| Define as configurações regionais para datas e formatação de caracteres,
+| além de configurar o fuso horário correto.
+|
+*/
+setlocale(LC_TIME, 'ptb', 'pt_BR', 'portuguese-brazil', 'bra', 'brazil', 'pt_BR.utf-8', 'pt_BR.iso-8859-1', 'br');
+setlocale(LC_CTYPE, 'pt_BR');
+date_default_timezone_set('America/Sao_Paulo');
 
-    /*----------------------------------------
-    | Define as URLs de redirecionamento para diferentes tipos de usuários
-    |-----------------------------------------*/
-    $REDIRECT_LOGIN               = 'src/views/contratante/EntrarConta/'; 
-    $REDIRECT_CONTRATANTE         = 'src/views/contratante/PaginaInicial';
-    $REDIRECT_ANUNCIANTE          = 'src/views/anunciante/PaginaInicial'; 
+/*
+|--------------------------------------------------------------------------
+| Configurações de Cabeçalhos e Sessões
+|--------------------------------------------------------------------------
+|
+| Define o tipo de conteúdo como UTF-8 e ajusta a duração das sessões
+| para 10 horas (36000 segundos), garantindo maior longevidade da sessão.
+|
+*/
+header("Content-Type: text/html; charset=utf-8");
+ini_set('session.gc_maxlifetime', 36000);
+session_set_cookie_params(36000);
 
-    /*----------------------------------------
-    | Verifica se o usuário está logado
-    |-----------------------------------------*/
-    if (isset($_SESSION['logado'])) {
-        /*----------------------------------------
-        | Verifica o tipo de usuário e redireciona conforme apropriado
-        |-----------------------------------------*/
-        if ($_SESSION['tipo_usuario'] == 'contratante') {
-            // Redireciona para a página inicial do contratante
-            header('location: ' . $REDIRECT_CONTRATANTE);
-            exit();
-        } else {
-            // Redireciona para a página inicial do anunciante
-            header('location: ' . $REDIRECT_ANUNCIANTE);
-            exit();
-        }
-    } else {
-        /*----------------------------------------
-        | Se o usuário não estiver logado, redireciona para a página de login
-        |-----------------------------------------*/
-        header('location: ' . $REDIRECT_LOGIN);
-        exit(); 
-    }
+/*
+|--------------------------------------------------------------------------
+| Configuração de Exibição de Erros
+|--------------------------------------------------------------------------
+|
+| Configura os tipos de erros a serem exibidos, removendo avisos e notificações
+| que podem atrapalhar a exibição no ambiente de produção.
+|
+*/
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_STRICT);
 
-    /*----------------------------------------
-    | Envia todo o conteúdo armazenado no buffer de saída e finaliza o buffering
-    |-----------------------------------------*/
-    ob_end_flush(); 
+/*
+|--------------------------------------------------------------------------
+| Carregamento da Aplicação
+|--------------------------------------------------------------------------
+|
+| Ponto de carregamento das bibliotecas principais e helpers (funções auxiliares),
+| que são necessárias para o funcionamento da aplicação.
+|
+*/
+require_once 'src/bootstrap.php';
 
-?>
-
-<!-- ------------------------------------------------------------------------- 
-| Representação visual do carregamento do servidor
-| ------------------------------------------------------------------------ -->
-<!DOCTYPE html><html lang="en"><head><title>Redirecionando...</title><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="./app.css"><script src="./app.js"></script><style>body,html{margin:0;padding:0;box-sizing:border-box;display:flex;justify-content:center;align-items:center;height:100vh;background:#f0f0f0}.loader{width:108px;height:60px;color:#269af2;--style-current:radial-gradient(farthest-side,currentColor 96%,#0000);background:var(--style-current) 100% 100% /30% 60%,var(--style-current) 70% 0 /50% 100%,var(--style-current) 0 100% /36% 68%,var(--style-current) 27% 18% /26% 40%,linear-gradient(currentColor 0 0) bottom/67% 58%;background-repeat:no-repeat;position:relative}.loader:after{content:"";position:absolute;inset:0;background:inherit;opacity:.4;animation:AFTER_ANIMATION 1s infinite}@keyframes AFTER_ANIMATION{to{transform:scale(1.8);opacity:0}}section{display:flex;flex-direction:column;align-items:center}.descricao{font-weight:500;color:#3b3939;margin:40px 0 0 0}.subDescricao{font-weight:600;font-size:16px;color:#686868}</style></head><body><section><div class="loader"></div><h3 class="descricao">ACESSANDO O SERVIDOR</h3><p class="subDescricao">AGUARDE...</p></section></body></html>
+/*
+|--------------------------------------------------------------------------
+| Inicialização da Aplicação
+|--------------------------------------------------------------------------
+|
+| Cria uma nova instância da aplicação e chama os métodos de bootstrap
+| e execução. O arquivo de configuração (application.ini) é lido e as
+| configurações são aplicadas.
+|
+*/
+Init();

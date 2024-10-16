@@ -214,7 +214,7 @@ body {
     margin-bottom: 20px;
 }
 #FormEntrarUsuario .rowBtn .SendForm {
-    background: #515DEF;
+    background: #FA511D;
     width: 100%;
     border: none;
     border-radius: 4px;
@@ -229,7 +229,7 @@ body {
     cursor: no-drop;
 }
 #FormEntrarUsuario .rowBtn .SendForm:hover {
-    background: #6a76f7;
+    background: #fc6335;
 }
 #FormEntrarUsuario .NoLogin {
     width: 100%;
@@ -246,7 +246,7 @@ body {
     color: #FF8682;
     font-size: 16px;
     font-weight: 600;
-    text-decoration: none;
+    text-decoration: underline;
 }
 #EntrarContaUsuario .rowOthersLogin {
     display: flex;
@@ -308,7 +308,7 @@ body {
 #EntrarContaUsuario .SouAnunciante .buttonLinkAnunciante {
     width: 100%;
     padding: 10px 0;
-    background:#FA511D;
+    background:#fa7045;
     display: flex;
     justify-content: center;
     align-items: center;

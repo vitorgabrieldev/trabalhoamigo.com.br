@@ -160,7 +160,7 @@ body {
     white-space: nowrap;
 }
 #EntrarContaUsuario .left .corpo .content-titulo .titulo {
-    color: #FA511D;
+    color: #515def;
     font-size: 40px;
     font-weight: 600;
     line-height: auto;
@@ -243,10 +243,10 @@ body {
     line-height: auto;
 }
 #FormEntrarUsuario .NoLogin .titulo .link {
-    color: #FF8682;
+    color: #6a76f7;
     font-size: 16px;
     font-weight: 600;
-    text-decoration: none;
+    text-decoration: underline;
 }
 #EntrarContaUsuario .rowOthersLogin {
     display: flex;
@@ -308,7 +308,7 @@ body {
 #EntrarContaUsuario .SouAnunciante .buttonLinkAnunciante {
     width: 100%;
     padding: 10px 0;
-    background:#FA511D;
+    background:#6974f7;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -320,7 +320,7 @@ body {
     border-radius: 4px;
 }
 #EntrarContaUsuario .SouAnunciante .buttonLinkAnunciante:hover {
-    background:#fc6a3e;   
+    background:#414aaf;   
 }
 
 @media screen and (max-width: 950px) {

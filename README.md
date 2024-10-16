@@ -105,7 +105,7 @@ graph TD;
   <tr>
     <td align="center">
       <a href="#" title="defina o título do link">
-        <img src="https://avatars.githubusercontent.com/u/124396164?v=4" width="100px;" alt="Foto do Iuri Silva no GitHub"/><br>
+        <img src="https://avatars.githubusercontent.com/u/124396164?v=4" width="100px;" alt="Vitor Gabriel de Oliveira"/><br>
         <sub>
           <b>Vitor Gabriel</b>
         </sub>
@@ -113,7 +113,7 @@ graph TD;
     </td>
     <td align="center">
       <a href="#" title="defina o título do link">
-        <img src="https://avatars.githubusercontent.com/u/164093262?v=4" width="100px;" alt="Foto do Mark Zuckerberg"/><br>
+        <img src="https://avatars.githubusercontent.com/u/164093262?v=4" width="100px;" alt="João Victor Farias da Silva"/><br>
         <sub>
           <b>João Victor</b>
         </sub>
@@ -121,7 +121,7 @@ graph TD;
     </td>
     <td align="center">
       <a href="#" title="defina o título do link">
-        <img src="https://avatars.githubusercontent.com/u/127868962?v=4" width="100px;" alt="Foto do Steve Jobs"/><br>
+        <img src="https://avatars.githubusercontent.com/u/127868962?v=4" width="100px;" alt="Maria Eduarda Mendes Galvão"/><br>
         <sub>
           <b>Maria Eduarda</b>
         </sub>
@@ -129,7 +129,7 @@ graph TD;
     </td>
     <td align="center">
       <a href="#" title="defina o título do link">
-        <img src="https://avatars.githubusercontent.com/u/127869448?v=4" width="100px;" alt="Foto do Steve Jobs"/><br>
+        <img src="https://avatars.githubusercontent.com/u/127869448?v=4" width="100px;" alt="Thaynna Carolliny Ribeiro dos Santos"/><br>
         <sub>
           <b>Thaynna Carolliny</b>
         </sub>
@@ -137,7 +137,7 @@ graph TD;
     </td>
     <td align="center">
       <a href="#" title="defina o título do link">
-        <img src="https://avatars.githubusercontent.com/u/127868872?v=4" width="100px;" alt="Foto do Steve Jobs"/><br>
+        <img src="https://avatars.githubusercontent.com/u/127868872?v=4" width="100px;" alt="Layla Beatrice"/><br>
         <sub>
           <b>Layla Beatrice</b>
         </sub>

@@ -14,68 +14,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Lógica para aceitar ou recusar serviço
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'];
-    $idServico = $_POST['idServico'];
-
-    if ($action === 'accept') {
-        $idContrato = $_POST['idContrato'];
-        $qtdServico = $_POST['qtdServico'];
-        $valorFinal = $_POST['valorFinal'];
-        acceptService($idServico, $idContrato, $qtdServico, $valorFinal);
-    } elseif ($action === 'reject') {
-        rejectService($idServico);
-    }
-    exit; // Encerrar após processar a requisição AJAX
-}
-
-function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
-    global $conn;
-
-    // Atualiza o status da proposta para '2' (aceito)
-    $sql = "UPDATE proposta SET status = '2' WHERE id_contrato = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $idContrato);
-
-    if ($stmt->execute()) {
-        $stmt->close(); // Fecha o statement do UPDATE
-
-        // Inserção na tabela contratos
-        $sqlInsert = "INSERT INTO contratos (id_servico_fk, id_contrato_fk, qtd_servico, valor_final) VALUES (?, ?, ?, ?)";
-        $stmtInsert = $conn->prepare($sqlInsert);
-        $stmtInsert->bind_param("iiid", $idServico, $idContrato, $qtdServico, $valorFinal);
-
-        if ($stmtInsert->execute()) {
-            echo json_encode(['message' => 'Serviço aceito e contrato cadastrado com sucesso.']);
-        } else {
-            echo json_encode(['error' => 'Erro ao cadastrar contrato: ' . $stmtInsert->error]);
-        }
-
-        $stmtInsert->close(); // Fecha o statement da inserção
-    } else {
-        echo json_encode(['error' => 'Erro ao aceitar serviço: ' . $stmt->error]);
-    }
-}
-
-function rejectService($idServico) {
-    global $conn;
-
-    $sql = "UPDATE proposta SET status = '4' WHERE id_contrato = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $idServico);
-
-    if ($stmt->execute()) {
-        echo json_encode(['message' => 'Serviço recusado com sucesso.']);
-    } else {
-        echo json_encode(['error' => 'Erro ao recusar serviço: ' . $stmt->error]);
-    }
-
-    $stmt->close();
-}
-
 // Buscar propostas
-$id_usuario = $_SESSION['id_usuario'] ?? null; // Garante que não seja nulo
+$id_usuario = $_SESSION['id_usuario'] ?? null;
 if ($id_usuario) {
     $sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS titulo_servico, 
                    p.valor_total, u.primeiro_nome, u.telefone, u.celular, u.whatsapp, u.email, u.unique_id,
@@ -83,7 +23,7 @@ if ($id_usuario) {
             FROM proposta p 
             JOIN servicos s ON p.id_servico_fk = s.id_servico 
             JOIN usuarios u ON p.id_usuario_prestador_fk = u.id_usuario 
-            WHERE p.id_usuario_contrante_fk = ? AND p.status != 4";
+            WHERE p.id_usuario_contrante_fk = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id_usuario);
@@ -92,7 +32,7 @@ if ($id_usuario) {
     $propostas = $result->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 } else {
-    $propostas = []; // Inicializa como array vazio se não houver id_usuario
+    $propostas = []; // Array vazio se não houver usuário logado
 }
 
 $conn->close();
@@ -114,33 +54,34 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-
 <body>
-    <script>
-        $.ajax({
-            url: `../../../controllers/contratante/Security.php`,
-            method: 'GET',
-            success: function (data) {
-                if (data !== 'true') {
-                    window.location.href = "../EntrarConta/";
+
+        <script>
+            $.ajax({
+                url: `../../../controllers/contratante/Security.php`,
+                method: 'GET',
+                success: function (data) {
+                    if (data == 'true') {
+                    } else if (data == 'false') {
+                        window.location.href = "../CriarConta/";
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro na Autenticação.'
+                    });
                 }
-            },
-            error: function () {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro',
-                    text: 'Erro na Autenticação.'
-                });
-            }
-        });
-    </script>
+            });
+        </script>
 
     <?php include '../layouts/Header.php'; ?>
 
     <section id="ListagemServico">
-        <h3><a href="../PaginaInicial/">←</a> Histórico de propostas</h3>
+        <h3><a href="../PaginaInicial/">←</a> Histórico de Propostas</h3>
         <div class="grid-container">
-            <div class="grid-header">Data de envio</div>
+            <div class="grid-header">Data de Envio</div>
             <div class="grid-header">Título do Serviço</div>
             <div class="grid-header">Valor</div>
             <div class="grid-header">Ações</div>
@@ -150,7 +91,34 @@ $conn->close();
                 <div class="grid-item"><?= htmlspecialchars($proposta['titulo_servico']) ?></div>
                 <div class="grid-item">R$ <?= number_format($proposta['valor_total'], 2, ',', '.') ?></div>
                 <div class="grid-item">
-                    <?php if ($proposta['status'] == 2): ?>
+                    <?php
+                    // Definir a classe de status com base no valor
+                    $statusClass = '';
+                    $statusText = '';
+                    switch ($proposta['status']) {
+                        case 1:
+                            $statusClass = 'status-aguardando';
+                            $statusText = 'Aguardando';
+                            break;
+                        case 3:
+                            $statusClass = 'status-finalizado';
+                            $statusText = 'Finalizado';
+                            break;
+                        case 4:
+                            $statusClass = 'status-recusado';
+                            $statusText = 'Recusado';
+                            break;
+                        default:
+                            $statusText = 'Desconhecido';
+                            break;
+                    }
+                    ?>
+
+                    <?php if ($proposta['status'] != 2): ?>
+                        <span class="<?= $statusClass ?>">Status: <?= $statusText ?></span>
+                    <?php endif; ?>
+
+                    <?php if ($proposta['status'] == 2): // Mostrar botão apenas se status for aceito ?>
                         <button class="button" onclick="showContractorInfo(
                             '<?= addslashes($proposta['primeiro_nome']) ?>',
                             '<?= addslashes($proposta['telefone']) ?>',
@@ -158,22 +126,7 @@ $conn->close();
                             '<?= addslashes($proposta['whatsapp']) ?>',
                             '<?= addslashes($proposta['unique_id']) ?>',
                             '<?= addslashes($proposta['email']) ?>'
-                        )">
-                            Entrar em contato<i class="bi bi-arrow-right"></i>
-                        </button>
-                    <?php else: ?>
-                        <button class="button button-vermais" onclick="showServiceDetails(
-                            <?= $proposta['id_contrato'] ?>,
-                            '<?= addslashes($proposta['titulo_servico']) ?>',
-                            <?= $proposta['valor_total'] ?>,
-                            '<?= addslashes($proposta['primeiro_nome']) ?>',
-                            '<?= addslashes($proposta['telefone']) ?>',
-                            '<?= addslashes($proposta['celular']) ?>',
-                            '<?= addslashes($proposta['whatsapp']) ?>',
-                            '<?= addslashes($proposta['email']) ?>',
-                            '<?= addslashes($proposta['prazo_estimado']) ?>',
-                            '<?= addslashes($proposta['data_esperada']) ?>'
-                        )">Ver Mais</button>
+                        )">Entrar em Contato <i class="bi bi-arrow-right"></i></button>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -182,141 +135,31 @@ $conn->close();
 
     <?php include '../layouts/Footer.php'; ?>
 
-    <div id="toast" class="toast" style="display: none;">
-        <div class="toast-body">
-            Copiado para a área de transferência!
-        </div>
-    </div>
-
     <script>
-    function formatDate(dataString) {
-        const [year, month, day] = dataString.split('-');
-        return `${day}/${month}/${year}`;
-    }
-
-    function showServiceDetails(idServico, tituloServico, valorTotal, primeiroNome, telefone, celular, whatsapp, email, prazo_estimado, data_esperada) {
-        Swal.fire({
-            title: 'Detalhes da proposta',
-            html: `
-                <div style="text-align: left;">
-                    <p><strong>Serviço:</strong> ${tituloServico}</p><br>
-                    <p><strong>Valor proposto:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p><br>
-                    <p><strong>Nome do contratante:</strong> ${primeiroNome}</p><br>
-                    <p><strong>Tempo estimado:</strong> ${prazo_estimado} Dias</p><br>
-                    <p><strong>Data estimada:</strong> ${data_esperada}</p><br>
-                </div>
-            `,
-            showCloseButton: false,
-            showCancelButton: true,
-            confirmButtonText: `Aceitar`,
-            cancelButtonText: `Recusar`,
-            focusConfirm: false,
-            width: '700px',
-            padding: '1.5rem',
-            customClass: {
-                popup: 'swal-custom-popup',
-                title: 'swal-custom-title',
-                htmlContainer: 'swal-custom-html'
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                acceptService(idServico);
-            } else if (result.isDismissed) {
-                rejectService(idServico);
-            }
-        });
-    }
-
-    function acceptService(idServico) {
-        const idContrato = idServico; // Supondo que idServico é igual a idContrato
-        const qtdServico = 1; // Ajuste conforme necessário
-        const valorFinal = $('#valor').val(); // Pegar valor do input
-
-        $.ajax({
-            type: 'POST',
-            url: '', // Mantém o mesmo arquivo para processar a requisição
-            data: {
-                action: 'accept',
-                idServico: idServico,
-                idContrato: idContrato,
-                qtdServico: qtdServico,
-                valorFinal: valorFinal
-            },
-            success: function(response) {
-                const res = JSON.parse(response);
-                Swal.fire('Serviço Aceito!', res.message, 'success');
-                location.reload(); // Recarrega a página para atualizar a lista
-            },
-            error: function() {
-                Swal.fire('Erro!', 'Não foi possível aceitar o serviço.', 'error');
-            }
-        });
-    }
-
-    function rejectService(idServico) {
-        $.ajax({
-            type: 'POST',
-            url: '', // Mantém o mesmo arquivo para processar a requisição
-            data: {
-                action: 'reject',
-                idServico: idServico
-            },
-            success: function(response) {
-                const res = JSON.parse(response);
-                Swal.fire('Serviço Recusado!', res.message, 'info');
-                location.reload(); // Recarrega a página para atualizar a lista
-            },
-            error: function() {
-                Swal.fire('Erro!', 'Não foi possível recusar o serviço.', 'error');
-            }
-        });
-    }
-
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
-            showToast();
-        }, function(err) {
-            console.error('Erro ao copiar: ', err);
-        });
-    }
-
-    function showToast() {
-        const toast = document.getElementById('toast');
-        toast.style.display = 'block';
-
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
-    }
-
-    function showContractorInfo(primeiroNome, telefone, celular, whatsapp, unique_id, email) {
-        Swal.fire({
-            title: 'Informações do Contratante',
-            html: `
-                <div style="text-align: left;">
-                    <p><strong>Nome:</strong> ${primeiroNome}</p><br>
-                    <p><strong>Telefone:</strong> ${telefone}</p><br>
-                    <p><strong>Celular:</strong> ${celular}</p><br>
-                    <p><strong>WhatsApp:</strong> ${whatsapp}</p><br>
-                    <p><strong>Email:</strong> ${email}</p><br>
-                </div>
-            `,
-            showCancelButton: true,
-            confirmButtonText: 'Fechar',
-            cancelButtonText: 'Abrir Chat',
-            width: '500px',
-            padding: '1.5rem',
-            customClass: {
-                popup: 'swal-custom-popup',
-                title: 'swal-custom-title',
-                htmlContainer: 'swal-custom-html'
-            },
-        }).then((result) => {
-            if (result.isDismissed) {
-                window.open(`../../../../chat/chat.php?user_id=${unique_id}`, "_blank");
-            }
-        });
-    }
+        function showContractorInfo(primeiroNome, telefone, celular, whatsapp, unique_id, email) {
+            Swal.fire({
+                title: 'Informações do Prestador',
+                html: `
+                    <div style="text-align: left;">
+                        <p><strong>Nome:</strong> ${primeiroNome}</p><br>
+                        <p><strong>Telefone:</strong> ${telefone}</p><br>
+                        <p><strong>Celular:</strong> ${celular}</p><br>
+                        <p><strong>WhatsApp:</strong> ${whatsapp}</p><br>
+                        <p><strong>Email:</strong> ${email}</p><br>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Fechar',
+                cancelButtonText: 'Abrir Chat',
+                width: '500px',
+                padding: '1.5rem',
+            }).then((result) => {
+                if (result.isDismissed) {
+                    window.open(`../../../../chat/chat.php?user_id=${unique_id}`, "_blank");
+                }
+            });
+        }
     </script>
+
 </body>
 </html>

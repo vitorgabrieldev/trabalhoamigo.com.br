@@ -151,7 +151,7 @@ function createAccessibilityBar() {
     });
 }
 
-createAccessibilityBar();
+// createAccessibilityBar();modal-titulo
 
 /* ------------------------------------------------------------
 | Sistema de inserção de loading="lazy" em todas as tag <img>
@@ -249,13 +249,16 @@ $(".DispathAlert").click(() => {
 /* ------------------------------------------------------------
 | Sistema de modal dos serviços
 /-------------------------------------------------------------- */
-let servicoId;
+let servicoId, isComunitario;
 
 function openModal(id, titulo, descricao, preco) {
-    servicoId = id;
-    document.getElementById('modal-titulo').innerText = titulo;
-    document.getElementById('modal-descricao').innerText = descricao;
-    document.getElementById('modal-preco').innerText = 'Preço: R$ ' + preco.toFixed(2).replace('.', ',');
+    servicoId = id; 
+
+    isComunitario = parseInt(preco) == 0 ? ' (Comunitário)' : '';
+
+    document.getElementById('modal-titulo').innerHTML = '<strong>Título:</strong> ' + titulo;
+    document.getElementById('modal-descricao').innerHTML = '<strong>Descrição:</strong> ' + descricao;
+    document.getElementById('modal-preco').innerHTML = '<strong>Preço:</strong> R$ ' + preco.toFixed(2).replace('.', ',') + isComunitario;
     document.getElementById('contratar-btn').setAttribute('href', '../FormularioProposta/?id=' + servicoId); 
     document.getElementById('modal').style.display = 'block';
 }
@@ -402,3 +405,15 @@ function definirMascaras() {
 }
 
 document.addEventListener('DOMContentLoaded', definirMascaras);
+
+
+function updateCharCount() {
+    const maxLength = 5000;
+    const currentLength = $("#descricao").val().length;
+    const remainingChars = maxLength - currentLength;
+    $(".count").text(remainingChars);
+}
+
+$("#descricao").on("input", updateCharCount);
+
+$(document).ready(updateCharCount);

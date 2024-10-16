@@ -5,11 +5,7 @@ $(document).ready(function() {
         var tempo = $('#tempo').val();
         var data_servico = $('#data_servico').val();
         var id = $('#idservico').val();
-        
-        if (valor <= 0) {
-            swal("Atenção!", "O valor da proposta deve ser maior que zero.", "warning");
-            return false;
-        }
+
         if (descricao.length < 10) {
             swal("Atenção!", "A descrição deve conter no mínimo 10 caracteres.", "warning");
             return false;
@@ -30,6 +26,8 @@ $(document).ready(function() {
     $('#FormProposta').on('submit', function(event) {
         event.preventDefault();
 
+        $(".background-loading-50").removeClass('hidden');
+
         if (validarFormulario()) {
             $.ajax({
                 url: '../../../controllers/contratante/EnvioProposta.php',
@@ -42,16 +40,20 @@ $(document).ready(function() {
                     id_servico: $('#idservico').val() // Altere para id_servico para corresponder ao PHP
                 },
                 success: function(response) {
+                    $(".background-loading-50").addClass('hidden');
                     if (response === 'true') {
                         swal("Sucesso!", "Proposta enviada com sucesso!", "success");
                         location.href = '../ListagemServico/'
                     };
                 },
                 error: function(xhr, status, error) {
+                    $(".background-loading-50").addClass('hidden');
                     $('#mensagem').html('<p>Ocorreu um erro: ' + error + '</p>');
                     swal("Erro!", "Ocorreu um erro ao enviar a proposta.", "error");
                 }
             });
-        }
+        } else {
+            $(".background-loading-50").addClass('hidden');  
+        };
     });
 });

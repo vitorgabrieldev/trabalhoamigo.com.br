@@ -69,11 +69,15 @@ $('#FormEntrarUsuario').on('submit', function (e) {
 
                 if (response.success) {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Login bem-sucedido',
-                        text: 'Você será redirecionado em breve.'
-                    }).then(() => {
-                        window.location.href = '../PaginaInicial/'; 
+                        position: "center",
+                        icon: "success",
+                        title: "Aguarde enquanto configuramos seu acesso...",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        willClose: () => {
+                          window.location.href = '../PaginaInicial/';
+                        }
                     });
                 } else {
                     Swal.fire({

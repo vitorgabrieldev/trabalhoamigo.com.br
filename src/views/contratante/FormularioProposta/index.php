@@ -26,7 +26,7 @@ try {
         $id = (int)$_GET['id'];
 
         // Buscar as informações do serviço baseado no ID
-        $sql = "SELECT s.titulo, s.descricao, s.preco, u.primeiro_nome, u.ultimo_nome, u.email, u.telefone
+        $sql = "SELECT s.titulo, s.descricao, s.preco, s.aceita_oferta, u.primeiro_nome, u.ultimo_nome, u.email, u.telefone
                 FROM servicos s
                 JOIN usuarios u ON s.id_usuario_fk = u.id_usuario
                 WHERE s.id_servico = ?";
@@ -69,6 +69,9 @@ try {
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel="stylesheet" href="../../../../public/css/contrante/FormularioProposta.css">
     <script src="../../../../public/js/contratante/Formularioproposta.js" defer></script>
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+    <script src="../../../../app.js" defer></script>
+    <link rel="stylesheet" href="../../../../app.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
@@ -96,6 +99,8 @@ try {
         });
     </script>
 
+    <?php include '../layouts/Header.php'; ?>
+
     <section id="ListagemServico">
         <div class="d-flex-swap">
             <a href="../ListagemServico/">
@@ -108,15 +113,17 @@ try {
         <div class="container">
             <div class="form-container">
             <form id="FormProposta" method="POST">
-                <div class="form-group">
-                    <label for="valor">Valor da Proposta:</label>
-                    <input type="number" id="valor" name="valor" required>
-                    <input type="hidden" id="idservico" value="<?php echo $_GET['id'] ?>" name="idservico">
-                </div>
+                <?php if ($servico['aceita_oferta']) : ?>
+                    <div class="form-group">
+                        <label for="valor">Valor da Proposta:</label>
+                        <input type="number" id="valor" name="valor">
+                    </div>
+                <?php endif; ?>
 
                 <div class="form-group">
                     <label for="descricao">Descrição da Proposta:</label>
                     <textarea id="descricao" name="descricao" rows="4" required></textarea>
+                    <input type="hidden" id="idservico" value="<?php echo $_GET['id'] ?>" name="idservico">
                 </div>
 
                 <div class="form-group">
@@ -139,13 +146,21 @@ try {
                 <h2>Informações do Serviço</h2>
                 <p class="text-style"><strong>Título:</strong> <?php echo htmlspecialchars($servico['titulo']); ?></p>
                 <p class="text-style"><strong>Descrição:</strong> <?php echo htmlspecialchars($servico['descricao']); ?></p>
-                <p class="text-style"><strong>Preço:</strong> R$ <?php echo number_format($servico['preco'], 2, ',', '.'); ?></p>
+                <p class="text-style"><strong>Preço:</strong> <?php echo $servico['preco'] == 0 ? '<b>Comunitário</b>' : 'R$ ' . number_format($servico['preco'], 2, ',', '.'); ?></p>
+                <p class="text-style"><strong>Este serviço não aceita propostas.</strong></p>
                 <p class="text-style"><strong>Anunciante:</strong> <?php echo htmlspecialchars($servico['primeiro_nome']) . ' ' . htmlspecialchars($servico['ultimo_nome']); ?></p>
                 <p class="text-style"><strong>Email:</strong> <?php echo htmlspecialchars($servico['email']); ?></p>
                 <p class="text-style"><strong>Telefone:</strong> <?php echo htmlspecialchars($servico['telefone']); ?></p>
             </div>
         </div>
     </section>
+
+    <div class="background-loading-50 hidden">
+        <div class="loading-icon"></div>
+    </div>
+
+    <?php include '../layouts/Footer.php'; ?>
+
 </body>
 
 </html>

@@ -21,7 +21,7 @@ function getDatabaseConnection() {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $valor = (float) $_POST['valor'];
+    $valor = (float) ($_POST['valor'] ?? 0);
     $descricao = $_POST['descricao'];
     $prazo_estimado = (int) $_POST['tempo'];
     $id_servico_fk = (int) $_POST['id_servico'];

@@ -7,10 +7,6 @@
 
 body {
     background-color: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
 
 .container {
@@ -74,6 +70,8 @@ textarea {
     border-radius: 4px;
     font-size: 16px;
     margin-bottom: 10px;
+    font-size: 18px;
+    font-family: monospace;
 }
 
 textarea {
@@ -83,16 +81,18 @@ textarea {
 button[type="submit"] {
     width: 100%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #FA511D;
     color: white;
     border: none;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: 18px;
+    font-family: monospace;
     cursor: pointer;
+    transition: .33s;
 }
 
 button[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #db3f10;
 }
 
 #ListagemServico {
@@ -100,6 +100,7 @@ button[type="submit"]:hover {
     flex-direction: column;
     align-items: center;
     width: 80%;
+    margin: 40px auto;
 }
 
 .d-flex-swap {
@@ -117,4 +118,38 @@ button[type="submit"]:hover {
     display: flex;
     gap: 10px;
     align-items: center;
+}
+
+.service-info {
+    background: #ffffff; /* Fundo branco para a área de informações */
+    border-radius: 12px; /* Bordas arredondadas */
+    padding: 20px; /* Espaçamento interno */
+    max-width: 500px; /* Largura máxima */
+    margin: 20px auto; /* Margem para centralizar */
+    position: relative; /* Necessário para a barra lateral */
+}
+
+.service-info h2 {
+    font-size: 1.8em; /* Tamanho do título */
+    color: #FA511D; /* Cor do título */
+    margin-bottom: 15px; /* Espaçamento abaixo do título */
+    text-align: center; /* Centraliza o título */
+    border-bottom: 2px solid #FA511D; /* Linha embaixo do título */
+    padding-bottom: 10px; /* Espaçamento abaixo da linha */
+}
+
+.text-style {
+    font-size: 1em; /* Tamanho padrão */
+    color: #444; /* Cor do texto */
+    margin: 10px 0; /* Margem em cima e embaixo */
+}
+
+.text-style strong {
+    color: #FA511D; /* Cor para os rótulos em negrito */
+}
+
+.text-style:hover {
+    background: #f8f8f8; /* Fundo levemente diferente ao passar o mouse */
+    border-radius: 5px; /* Bordas arredondadas */
+    transition: background 0.3s; /* Efeito suave de transição */
 }

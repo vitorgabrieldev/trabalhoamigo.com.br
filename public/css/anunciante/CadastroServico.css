@@ -4,7 +4,7 @@ body {
     background-color: #f9f9f9;
     color: #333;
     margin: 0;
-    padding: 20px;
+    padding: 0;
 }
 
 /* Estilos da seção de cadastro */
@@ -13,8 +13,9 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    max-width: 600px;
+    max-width: 90%;
     margin: auto;
+    margin: 40px auto;
 }
 
 /* Estilo do título */
@@ -44,12 +45,26 @@ select {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box; /* Inclui padding e bordas na largura total */
+    box-sizing: border-box;
+    font-size: 18px;
+    font-family: monospace;
+    resize: none;
+}
+
+textarea {
+    min-height: 200px;
+    overflow-y: scroll;
+}
+.count {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    padding-right: 10px;
 }
 
 /* Estilo do botão de envio */
 button {
-    background-color: #28a745; /* Cor verde */
+    background-color: #FA511D; /* Cor verde */
     color: white;
     padding: 10px;
     border: none;
@@ -61,15 +76,50 @@ button {
 
 /* Estilo do botão de envio em hover */
 button:hover {
-    background-color: #218838; /* Cor verde escuro no hover */
+    transition: .33s;
+    background-color: #c4360c; /* Cor verde escuro no hover */
 }
-
-/* Estilo do textarea */
-textarea {
-    resize: vertical; /* Permite redimensionar verticalmente */
-}
-
 /* Estilo das mensagens de alerta do SweetAlert */
 .swal2-popup {
     font-size: 1.6em; /* Aumenta o tamanho da fonte das mensagens */
+}
+
+.orange-back {
+    background: #FA511D !important; 
+}
+
+.info {
+    background-color: #f9f9f9; /* Cor de fundo suave */
+    border: 1px solid #ddd; /* Borda sutil */
+    border-radius: 8px; /* Cantos arredondados */
+    padding: 20px; /* Espaçamento interno */
+    margin: 20px auto; /* Centraliza na página */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+}
+
+.info h2 {
+    color: #333; /* Cor do título */
+    margin-bottom: 15px; /* Espaço abaixo do título */
+}
+
+.info ul {
+    list-style-type: none; /* Remove a lista padrão */
+    padding: 0; /* Remove espaçamento interno */
+}
+
+.info li {
+    margin-bottom: 10px; /* Espaço entre itens da lista */
+    padding: 10px; /* Espaçamento interno */
+    border-left: 4px solid #007BFF; /* Barra de destaque */
+    background-color: #fff; /* Fundo branco para cada item */
+    border-radius: 4px; /* Cantos arredondados */
+}
+
+.info li strong {
+    color: #007BFF; /* Cor dos textos em negrito */
+}
+
+.flex-content {
+    display: flex;
+    gap: 20px;
 }

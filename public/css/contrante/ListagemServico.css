@@ -1,409 +1,167 @@
-#bloco-busca {
-    padding: 30px 100px;
-    display: flex;
-    flex-direction: column;
-    row-gap: 15px;
-}
-#bloco-busca .row {
-    display: flex;
-    justify-content: space-between;
-}
-#bloco-busca .row .input-box {
-    border: 1px solid #ADB0B5;
-    border-radius: 6px;
-}
-#bloco-busca .row .input-box .input_element {
-    border: none;
-    outline: none;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 8px 10px;
-    border-radius: 6px;
-    min-width: 300px;
-}
-#bloco-busca .row .input-box .button_busca {
-    height: 100%;
-    border: none;
-    border-radius: 0 6px 6px 0;
-    outline: none;
-    background: #FA511D;
-    color: #fff;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: .33s;
-    border-left: 1px solid transparent;
-}
-#bloco-busca .row .input-box .button_busca:hover {
-    background: transparent;
-    color: #FA511D;
-    border-left: 1px solid #ADB0B5;
-}
-#bloco-busca .row .resultado {
-    color: #9E9E9E;
-    font-size: 15px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-#bloco-busca .row .resultado .isLoading {
-    width: 15px;
-    height: 15px;
-    border: 2px solid #1a1919;
-    border-bottom: 2px solid transparent;
-    border-radius: 50%;
-    animation: loadServicos infinite linear 1s;
-}
-@keyframes loadServicos {
-    0% {
-        transform: rotate(0);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-#bloco-busca .row .resultado .number {
-    color: #5B5B5B;
-    font-size: 15px;
-    font-weight: 700;
-}
-#bloco-busca .row .ordenar{
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-#bloco-busca .row .ordenar .titulo {
-    color: #797979;
-    font-size: 14px;
-    font-weight: 600;
-}
-#bloco-busca .row .ordenar .selectOrdenacao {
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 14px;
-    font-weight: 800;
-    color: #454444;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-}
-#bloco-busca .row .ordenar .optionSelectOrdenacao {
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 500;
-}
-@media screen and (max-width: 700px) {
-    #bloco-busca .row .input-box .input_element {
-        min-width: 200px;
-    }
-    #bloco-busca .row:last-child {
-        flex-direction: column;
-        row-gap: 20px;
-    }
-}
-@media screen and (max-width: 500px) {
-    #bloco-busca {
-        padding: 40px 15px;
-    }
-    #bloco-busca .resultado {
-        font-size: 12px !important;
-    }
-    #bloco-busca .input_element {
-        font-size: 15px !important;
-    }
-    #bloco-busca .titulo {
-        font-size: 14px;
-    }
-    #bloco-busca .selectOrdenacao {
-        font-size: 14px;
-    }
-}
-
-#bloco-servico {
-    padding: 10px 100px 20px 100px;
-}
-#bloco-servico .servicos {
-    display: flex;
-    flex-direction: column;
-    row-gap: 20px;
-}
-#bloco-servico .servicos .isLoadingServicos {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-#bloco-servico .servicos .isLoadingServicos .circleLoading{
-    width: 50px;
-    height: 50px;
-    border: 5px solid #292828;
-    border-radius: 50%;
-    border-bottom: 5px solid transparent;
-    animation: loadServicos infinite linear 1s;
-}
-@keyframes loadServicos {
-    0% {
-        transform: rotate(0);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-#bloco-servico .item {
-    display: flex;
-    gap: 25px;    
-    border: 1px solid #DEE2E7;
-    border-radius: 12px;
-    padding: 15px;
-}
-#bloco-servico .item:hover {
-    border: 1px solid #818181;
-    cursor: pointer;
-}
-#bloco-servico .item .image-box {
-    height: auto;
-    object-fit: cover;
-}
-@media screen and (max-width:800px) and (min-width: 500px){
-    #bloco-servico .item .image-box .imagem-servico {
-        width: 200px !important;
-    } 
-}
-@media screen and (max-width: 500px){
-    #bloco-servico .item .image-box .imagem-servico {
-        width: 100% !important;
-    } 
-    #bloco-servico .item .image-box {
-        width: 100% !important;
-    }
-}
-#bloco-servico .item .image-box .imagem-servico {
-    width: 350px;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 12px;
-}
-#bloco-servico .item .content-box {
-    display: flex;
-    flex-direction: column;
-    row-gap: 5px;
-}
-#bloco-servico .item .content-box .titulo {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1C1C1C;
-}
-#bloco-servico .item .content-box .preco {
-    font-size: 18px;
-    font-weight: 700;
-    color: #FA511D;
-}
-#bloco-servico .item .box-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-#bloco-servico .item .box-content .rating {
-    display: flex;
-    align-items: center;
-}
-#bloco-servico .item .box-content .rating-number {
-    font-size: 16px;
-    color: #FF9017;
-    font-weight: 500;
-}
-#bloco-servico .item .box-content .separator-circle {
-    background: #DEE2E7;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-}
-#bloco-servico .item .box-content .categoria {
-    color: #8B96A5;
-    font-size: 16px;
-    font-weight: 500;
-}
-#bloco-servico .item .box-content .comuntario {
-    color: #2B88F4;
-    font-size: 16px;
-    font-weight: 700;
-}
-#bloco-servico .item .descricao-servico {
-    color: #505050;
-    font-size: 16px;
-    font-weight: 500;
-}
-#bloco-servico .item .vermais-button {
-    font-size: 16px;
-    font-weight: 600;
-    color: #2B88F4;
-}
-@media screen and (max-width:650px) {
-    #bloco-servico {
-        padding: 10px 20px 50px 20px;
-    }
-    #bloco-servico .titulo {
-        font-size: 16px !important;
-    }
-    #bloco-servico .preco {
-        font-size: 16px !important;
-    }
-    #bloco-servico .descricao-servico {
-        font-size: 14px !important;
-    }
-    #bloco-servico .vermais-button {
-        font-size: 14px !important;
-    }
-    #bloco-servico .comuntario {
-        font-size: 14px !important;
-    }
-    #bloco-servico .categoria {
-        font-size: 14px !important;
-    }
-    #bloco-servico .rating img {
-        width: 15px !important;
-        height: 15px !important;
-    }
-}
-@media screen and (max-width:500px) {
-    .item {
-        flex-direction: column;
-    }
-    .image-box {
-        width: 100% !important;
-    }
-} 
-#bloco-servico .isComunitario {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-#bloco-servico .button-loadingMore {
-    width: 100%;
-    text-align: center;
-    padding: 50px 0 20px 0;
-}
-#bloco-servico .button-loadingMore .LoadingMore {
-    border: 2px solid #FA511D;
-    padding: 10px 70px;
-    border-radius: 4px;
-    background: transparent;
-    transition: .33s;
-    cursor: pointer;
-    display: flex;
-}
-#bloco-servico .button-loadingMore .LoadingMore:disabled {
-    cursor:no-drop;
-    border-color: rgba(255, 99, 71, 0.411);
-    filter: brightness(90%);
-}
-#bloco-servico .button-loadingMore .LoadingMore .titulo {
-    font-size: 18px;
-    font-weight: 700;
-    color: #FA511D;
-}
-#bloco-servico .button-loadingMore .LoadingMore:hover {
-    background: #FA511D;
-}
-#bloco-servico .button-loadingMore .LoadingMore:hover .titulo {
-    color: #fff;
-}
-#bloco-servico .button-loadingMore .LoadingMore .isLoading {
-    width: 20px;
-    height: 20px;
-    background: transparent;
-    border: 2px solid #FA511D;
-    border-radius: 50%;
-    border-bottom: 2px solid transparent;
-    animation: isLoading infinite .5s linear;
-}
-#bloco-servico .button-loadingMore .LoadingMore:hover .isLoading {
-    border: 2px solid #fff;
-    border-bottom: 2px solid transparent;
-}
-@keyframes isLoading {
-    0% {
-        transform: rotate(0);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-#bloco-servico .filtros-box {
-    width: 100%;
-    padding: 0 20px 20px 0;
-    display: flex;
-    gap: 10px;
-    justify-content: start;
-    align-items: center;
-}
-#bloco-servico .filtros-box .titulo-box {
-    font-weight: 700;
-    font-size: 14px;
-    color: #1414156b;
-}
-#bloco-servico .filtros-box .filtro-item {
-    padding: 5px 10px;
-    border-radius: 500px;
-    border: 2px solid #FA511D;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: .33s;
-}
-#bloco-servico .filtros-box .filtro-item:hover {
-    background: #FA511D;
-}
-#bloco-servico .filtros-box .filtro-item .titulo {
-    font-weight: 700;
-    font-size: 14px;
-    color: #FA511D;
-    transition: .33s;
+#content {
+    margin: 40px 120px;
     user-select: none;
 }
-#bloco-servico .filtros-box .filtro-item:hover .titulo {
-    color: #fff;
-}
-#bloco-chamada {
-    padding: 70px 100px;
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-#bloco-chamada .item {
-    width: 50%;
-    height: auto;
-}
-#bloco-chamada img {
-    width: 105%;
-    height: 105%;
-    margin-left: -5%;
-    margin-top: -5%;
-}
-@media screen and (max-width: 700px) {
-    #bloco-chamada {
-        flex-direction: column;
-        row-gap: 30px;
-    }
-    #bloco-chamada .item {
-        width: 100%;
-    }
-}
-@media screen and (max-width: 500px) {
-    #bloco-chamada {
-        padding: 20px 30px;
-    }
-    #bloco-chamada .item {
-        margin-left: 10px;
-    }
+
+.container {
+    padding: 20px; /* Espaço interno */
+    max-width: 1200px; /* Largura máxima do contêiner */
+    margin: 40px; /* Centraliza o contêiner */
 }
 
-.d-flex {
+.listagem-servico {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid; /* Usando grid para um layout responsivo */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Colunas responsivas */
+    gap: 20px; /* Espaço entre os cartões */
+}
+
+.listagem-item {
+    background: #ffffff; /* Cor de fundo branco */
+    border: 1px solid #e0e0e0; /* Borda leve */
+    border-radius: 12px; /* Bordas arredondadas */
+    padding: 20px; /* Espaçamento interno */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+    transition: transform 0.3s, box-shadow 0.3s; /* Efeito de transição */
+}
+
+.listagem-item:hover {
+    transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Sombra mais forte */
+}
+
+.item-conteudo {
     display: flex;
-    justify-content: end;
-    gap: 20px;
+    flex-direction: column;
+    gap: 10px; /* Espaço entre os elementos de conteúdo */
+}
+
+.listagem-titulo {
+    font-size: 1.5em; /* Tamanho maior para o título */
+    color: #333; /* Cor escura para o texto */
+    font-weight: bold; /* Negrito */
+    margin: 0; /* Remove a margem padrão */
+    text-overflow: ellipsis; /* Adiciona '...' quando o texto é cortado */
+    display: -webkit-box; /* Para permitir o uso de múltiplas linhas */
+    -webkit-box-orient: vertical; /* Orientação vertical */
+    -webkit-line-clamp: 1; /* Limita a 1 linha */
+    overflow: hidden; /* Esconde o texto que excede */
+    white-space: normal; /* Permite quebras de linha se necessário */
+}
+
+
+.listagem-descricao {
+    font-size: 1em; /* Tamanho padrão */
+    color: #666; /* Cor de descrição suave */
+    display: -webkit-box; /* Para permitir o uso de múltiplas linhas */
+    -webkit-box-orient: vertical; /* Orientação vertical */
+    -webkit-line-clamp: 1; /* Limita a 3 linhas */
+    overflow: hidden; /* Esconde o texto que excede */
+    text-overflow: ellipsis; /* Adiciona '...' quando o texto é cortado */
+}
+
+.listagem-preco {
+    font-size: 1.2em; /* Tamanho maior para o preço */
+    color: #FA511D; /* Cor destacada para preço */
+    font-weight: bold; /* Negrito */
+}
+
+.btn-modal {
+    background: #FA511D; /* Cor do botão */
+    color: #fff; /* Cor do texto do botão */
+    border: none; /* Remover bordas */
+    padding: 10px 15px; /* Espaçamento interno */
+    border-radius: 5px; /* Bordas arredondadas */
+    cursor: pointer; /* Cursor pointer ao passar o mouse */
+    transition: background 0.3s; /* Transição para o hover */
+    font-weight: bold; /* Negrito para o texto do botão */
+}
+
+.btn-modal:hover {
+    background: #e0481c; /* Cor do botão ao passar o mouse */
+}
+
+#bloco-chamada {
+    display: flex;
+    margin-top: 50px;
+    justify-content: space-between;
+}
+
+#bloco-chamada .item {
+    width: 100%;
+}
+
+#bloco-chamada .item a img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.modal {
+    display: flex; /* Usar flexbox para centralizar o modal */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    position: fixed; /* Fica fixo na tela */
+    top: 0; /* Alinha ao topo */
+    left: 0; /* Alinha à esquerda */
+    width: 100%; /* Largura total */
+    height: 100%; /* Altura total */
+    background: rgba(0, 0, 0, 0.7); /* Fundo escuro com opacidade */
+    z-index: 1000; /* Coloca o modal acima de outros elementos */
+}
+
+.modal-content {
+    background: #fff; /* Fundo branco */
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Sombra leve */
+    padding: 20px; /* Espaçamento interno */
+    max-width: 500px; /* Largura máxima */
+    width: 90%; /* Largura adaptável */
+    position: relative; /* Para posicionar o botão de fechar */
+}
+
+.close {
+    position: absolute; /* Posiciona o botão de fechar no canto */
+    top: 10px; /* Distância do topo */
+    right: 15px; /* Distância da direita */
+    font-size: 24px; /* Tamanho do ícone de fechar */
+    color: #FA511D; /* Cor do ícone de fechar */
+    cursor: pointer; /* Muda o cursor ao passar o mouse */
+}
+
+.modal-titulo {
+    font-size: 1.8em; /* Tamanho do título */
+    color: #333; /* Cor do título */
+    margin: 0; /* Remove margens padrão */
+}
+
+.modal-descricao {
+    font-size: 1em; /* Tamanho da descrição */
+    color: #666; /* Cor da descrição */
+    margin: 10px 0; /* Margem em cima e embaixo */
+}
+
+.modal-preco {
+    font-size: 1.2em; /* Tamanho do preço */
+    color: #FA511D; /* Cor do preço */
+    font-weight: bold; /* Negrito */
+    margin-bottom: 20px; /* Margem inferior */
+}
+
+.btn-contratar {
+    display: inline-block; /* Faz o botão ocupar o espaço adequado */
+    background: #FA511D; /* Cor do botão */
+    color: #fff; /* Cor do texto do botão */
+    padding: 10px 15px; /* Espaçamento interno */
+    border-radius: 5px; /* Bordas arredondadas */
+    text-align: center; /* Centraliza o texto */
+    text-decoration: none; /* Remove sublinhado */
+    font-weight: bold; /* Texto em negrito */
+    transition: background 0.3s; /* Transição suave para hover */
+}
+
+.btn-contratar:hover {
+    background: #e0481c; /* Cor ao passar o mouse */
 }

@@ -137,7 +137,7 @@ body {
     display: flex;
     flex-direction: column;
     row-gap: 30px;
-    width: 42%;
+    width: 100%;
 }
 #EntrarContaUsuario .left .topo {
     display: flex;

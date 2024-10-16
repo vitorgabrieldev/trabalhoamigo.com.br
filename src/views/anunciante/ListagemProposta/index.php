@@ -132,6 +132,8 @@ $conn->close();
         });
     </script>
 
+    <?php include '../layouts/Header.php'; ?>
+
     <section id="ListagemServico">
         <h3><a href="../PaginaInicial/">←</a> Histórico de propostas</h3>
         <div class="grid-container">
@@ -175,10 +177,16 @@ $conn->close();
         </div>
     </section>
 
+    <?php include '../layouts/Footer.php'; ?>
+
     <div id="toast" class="toast" style="display: none;">
         <div class="toast-body">
             Copiado para a área de transferência!
         </div>
+    </div>
+
+    <div class="background-loading hidden">
+        <div class="loading-icon"></div>
     </div>
 
     <script>
@@ -190,37 +198,37 @@ $conn->close();
 
     function showServiceDetails(idServico, tituloServico, valorTotal, primeiroNome, telefone, celular, whatsapp, email, prazo_estimado, data_esperada) {
         Swal.fire({
-        title: 'Detalhes da proposta',
-        html: `
-            <div style="text-align: left;">
-                <p><strong>Serviço:</strong> ${tituloServico}</p><br>
-                <p><strong>Valor proposto:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p><br>
-                <p><strong>Nome do contratante:</strong> ${primeiroNome}</p><br>
-                <p><strong>Tempo estimado:</strong> ${prazo_estimado} Dias</p><br>
-                <p><strong>Data estimada:</strong> ${data_esperada}</p><br>
-            </div>
-        `,
-        showCloseButton: true,
-        showCancelButton: true,
-        confirmButtonText: `Aceitar`,
-        cancelButtonText: `Recusar`,
-        focusConfirm: false,
-        width: '700px',
-        padding: '1.5rem',
-        customClass: {
-            popup: 'swal-custom-popup',
-            title: 'swal-custom-title',
-            htmlContainer: 'swal-custom-html'
-        },
-        allowOutsideClick: false // Desabilitar clique fora do modal
-    }).then((result) => {
-        if (result.isConfirmed) {
-            acceptService(idServico, tituloServico, valorTotal);
-        } else if (result.isDismissed) {
-            rejectService(idServico);
-        }
-    });
-
+                title: 'Detalhes da proposta',
+                html: `
+                    <div style="text-align: left;">
+                        <p><strong>Serviço:</strong> ${tituloServico}</p><br>
+                        <p><strong>Valor proposto:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p><br>
+                        <p><strong>Nome do contratante:</strong> ${primeiroNome}</p><br>
+                        <p><strong>Tempo estimado:</strong> ${prazo_estimado} Dias</p><br>
+                        <p><strong>Data estimada:</strong> ${data_esperada}</p><br>
+                    </div>
+                `,
+                showCloseButton: true,
+                showCancelButton: true,
+                confirmButtonText: `Aceitar`,
+                cancelButtonText: `Recusar`,
+                focusConfirm: false,
+                width: '700px',
+                padding: '1.5rem',
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    title: 'swal-custom-title',
+                    htmlContainer: 'swal-custom-html'
+                },
+                allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                acceptService(idServico, tituloServico, valorTotal);
+            } else if (result.isDismissed) {
+                rejectService(idServico);
+            }
+        });
+        
     }
 
     function acceptService(idServico, tituloServico, valorTotal) {
@@ -228,9 +236,11 @@ $conn->close();
         const qtdServico = 1; // Ajuste conforme necessário
         const valorFinal = valorTotal.toFixed(2).replace('.', ','); // Ajuste conforme necessário
 
+        $(".background-loading").removeClass("hidden");
+
         $.ajax({
             type: 'POST',
-            url: '', // Mantém o mesmo arquivo para processar a requisição
+            url: '', 
             data: {
                 action: 'accept',
                 idServico: idServico,
@@ -239,31 +249,37 @@ $conn->close();
                 valorFinal: valorFinal
             },
             success: function(response) {
-                console.log(response)
+                $(".background-loading").addClass("hidden");
                 const res = JSON.parse(response);
                 Swal.fire('Serviço Aceito!', res.message, 'success');
                 location.reload(); // Recarrega a página para atualizar a lista
             },
             error: function() {
+                $(".background-loading").addClass("hidden");
                 Swal.fire('Erro!', 'Não foi possível aceitar o serviço.', 'error');
             }
         });
     }
 
     function rejectService(idServico) {
+
+        $(".background-loading").removeClass("hidden");
+
         $.ajax({
             type: 'POST',
-            url: '', // Mantém o mesmo arquivo para processar a requisição
+            url: '',
             data: {
                 action: 'reject',
                 idServico: idServico
             },
             success: function(response) {
+                $(".background-loading").addClass("hidden");
                 const res = JSON.parse(response);
                 Swal.fire('Serviço Recusado!', res.message, 'info');
-                location.reload(); // Recarrega a página para atualizar a lista
+                location.reload();
             },
             error: function() {
+                $(".background-loading").addClass("hidden");
                 Swal.fire('Erro!', 'Não foi possível recusar o serviço.', 'error');
             }
         });

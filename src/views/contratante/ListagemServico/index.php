@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="../../../../app.css">
 
     <!-- Tags Especificas de cada página-->
-    <link rel="stylesheet" href="../../../../public/css/anunciante/ListagemPropostas.css">
+    <link rel="stylesheet" href="../../../../public/css/contrante/ListagemServico.css">
 
     <script src="../../../../public/js/contratante/Listagem.js" defer></script>
 
@@ -120,31 +120,35 @@
                             echo '<ul class="listagem-servico">';
                             foreach ($servicos as $servico) {
                                 echo '<li class="listagem-item">';
+                                echo '<div class="item-conteudo">';
                                 echo '<h2 class="listagem-titulo">' . htmlspecialchars($servico['titulo']) . '</h2>';
                                 echo '<p class="listagem-descricao">Descrição: ' . htmlspecialchars($servico['descricao']) . '</p>';
-                                echo '<p class="listagem-preco">Preço: R$ ' . number_format($servico['preco'], 2, ',', '.') . '</p>';
+                                echo '<p class="listagem-preco">' . ($servico['preco'] == 0 ? 'Comunitário' : 'Preço: R$ ' . number_format($servico['preco'], 2, ',', '.')) . '</p>';
                                 echo '<p class="listagem-categoria">Categoria: ' . htmlspecialchars($servico['categoria_nome']) . '</p>';
                                 echo '<p class="listagem-data">Data de Criação: ' . date('d/m/Y H:i:s', strtotime($servico['data_Criacao'])) . '</p>';
                                 echo '<p class="listagem-oferta">Aceita Oferta: ' . ($servico['aceita_oferta'] ? 'Sim' : 'Não') . '</p>';
                                 echo '<p class="listagem-comunitario">Comunitário: ' . ($servico['comunitario'] ? 'Sim' : 'Não') . '</p>';
-                                echo '<button class="btn-modal" onclick="openModal(' . $servico['id_servico'] . ', \'' . addslashes(htmlspecialchars($servico['titulo'])) . '\', \'' . addslashes(htmlspecialchars($servico['descricao'])) . '\', ' . $servico['preco'] . ')">Ver Mais</button>';
+                                echo '<button class="btn-modal" onclick="openModal(' . $servico['id_servico'] . ', \'' . addslashes(htmlspecialchars($servico['titulo'])) . '\', \'' . addslashes(htmlspecialchars($servico['descricao'])) . '\', ' . $servico['preco'] . ')">Fazer proposta</button>';
+                                echo '</div>';
                                 echo '</li>';
                             }
                             echo '</ul>';
 
                             echo '
-                            <div id="modal" class="modal" style="display:none;">
-                                <div class="modal-content">
-                                    <span class="close" onclick="closeModal()">&times;</span>
-                                    <div class="content-container">
-                                        <h2 id="modal-titulo"></h2>
-                                        <p id="modal-descricao"></p>
-                                        <p id="modal-preco"></p>
+                                <div id="modal" class="modal" style="display:none;">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="closeModal()">&times;</span>
+                                        <div class="content-container">
+                                            <h2 id="modal-titulo"></h2>
+                                            <p id="modal-descricao"></p>
+                                            <p id="modal-preco"></p>
+                                        </div>
+                                        <a id="contratar-btn" class="btn-contratar" href="#" onclick="contratarServico()">Deseja contratar esse serviço?</a>
                                     </div>
-                                    <a id="contratar-btn" class="btn-contratar" href="#" onclick="contratarServico()">Contratar Serviço</a>
                                 </div>
-                            </div>';
-                        };
+                            ';
+
+                        }
 
                         function processListServicos() {
                             try {
@@ -167,12 +171,12 @@
     
             <section id="bloco-chamada">
                 <div class="item">
-                    <a href="#">
+                    <a class="DispathAlert">
                         <img src="../../../../public/img/Bloco-chamada-listagem-1.png" alt="Imagem de Chamada">
                     </a>
                 </div>
                 <div class="item">
-                    <a href="#">
+                    <a class="DispathAlert">
                         <img src="../../../../public/img/Bloco-chamada-listagem-2.png" alt="Imagem de Chamada">
                     </a>
                 </div>

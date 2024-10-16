@@ -56,7 +56,7 @@ error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_STRICT);
 | que são necessárias para o funcionamento da aplicação.
 |
 */
-require_once '/src/Bootstrap.php';
+require_once 'src/Bootstrap.php';
 
 /*
 |--------------------------------------------------------------------------

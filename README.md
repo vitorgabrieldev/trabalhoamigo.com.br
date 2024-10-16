@@ -94,6 +94,11 @@ graph TD;
 
 #
 
+> [!WARNING]
+> **Decorrente de alguns problemas durante o desenvolvimento, não implementamos uma versão web responsiva, portanto, não é possível acessar o prótipo pelo celular no momento, queremos expandir essa experiência para um sistema de webview App e uma interface mais intuitiva e responsiva para que usuário mobile possam acessar**.
+
+#
+
 ## Colaboradores:
 
 <table>

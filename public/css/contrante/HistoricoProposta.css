@@ -8,7 +8,7 @@ body {
 
 h3 {
     font-size: 24px;
-    color: #4CAF50;
+    color: #FA511D;
     margin-bottom: 20px;
 }
 
@@ -23,7 +23,7 @@ h3 {
 
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 colunas com larguras iguais */
+    grid-template-columns: repeat(4, 1fr); /* 5 colunas com larguras iguais */
     gap: 15px;
     align-items: center;
     margin-top: 20px;
@@ -31,7 +31,7 @@ h3 {
 
 .grid-header {
     font-weight: bold;
-    background-color: #4CAF50;
+    background-color: #FA511D;
     color: white;
     padding: 10px;
     text-align: left;
@@ -62,12 +62,12 @@ h3 {
 }
 
 .button {
-    background-color: #4CAF50;
+    background-color: #FA511D;
     color: white;
 }
 
 .button:hover {
-    background-color: #45a049;
+    background-color: #FA511D;
 }
 
 .button-finalizado {

@@ -135,14 +135,12 @@ $conn->close();
     <section id="ListagemServico">
         <h3><a href="../PaginaInicial/">←</a> Histórico de propostas</h3>
         <div class="grid-container">
-            <div class="grid-header">ID</div>
             <div class="grid-header">Data de envio</div>
             <div class="grid-header">Título do Serviço</div>
             <div class="grid-header">Valor</div>
             <div class="grid-header">Ações</div>
 
             <?php foreach ($propostas as $proposta): ?>
-                <div class="grid-item"><?= $proposta['id_contrato'] ?></div>
                 <div class="grid-item"><?= $proposta['data_envio'] ?></div>
                 <div class="grid-item"><?= $proposta['titulo_servico'] ?></div>
                 <div class="grid-item">R$ <?= number_format($proposta['valor_total'], 2, ',', '.') ?></div>
@@ -156,7 +154,7 @@ $conn->close();
                             '<?= addslashes($proposta['unique_id']) ?>',
                             '<?= addslashes($proposta['email']) ?>'
                         )">
-                            Aceito <i class="bi bi-arrow-right"></i>
+                            Entrar em contato <i class="bi bi-arrow-right"></i>
                         </button>
                     <?php else: ?>
                         <button class="button button-vermais" onclick="showServiceDetails(
@@ -170,7 +168,7 @@ $conn->close();
                             '<?= addslashes($proposta['email']) ?>',
                             '<?= addslashes($proposta['prazo_estimado']) ?>',
                             '<?= addslashes($proposta['data_esperada']) ?>'
-                        )">Ver Mais</button>
+                        )">Clique para ver proposta</button>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>

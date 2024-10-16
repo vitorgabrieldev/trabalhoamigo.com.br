@@ -76,7 +76,7 @@
         <script>
             var setVanta = () => {
                 if (window.VANTA) window.VANTA.GLOBE({
-                    el: "#vanta", // Use o ID correto
+                    el: "#vanta",
                     mouseControls: true,
                     touchControls: true,
                     gyroControls: false,
@@ -87,7 +87,6 @@
                 });
             };
     
-            // Executar a função após o carregamento da página
             window.onload = function() {
                 setVanta();
             };

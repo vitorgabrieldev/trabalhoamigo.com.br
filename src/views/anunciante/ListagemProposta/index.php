@@ -190,35 +190,37 @@ $conn->close();
 
     function showServiceDetails(idServico, tituloServico, valorTotal, primeiroNome, telefone, celular, whatsapp, email, prazo_estimado, data_esperada) {
         Swal.fire({
-            title: 'Detalhes da proposta',
-            html: `
-                <div style="text-align: left;">
-                    <p><strong>Serviço:</strong> ${tituloServico}</p><br>
-                    <p><strong>Valor proposto:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p><br>
-                    <p><strong>Nome do contratante:</strong> ${primeiroNome}</p><br>
-                    <p><strong>Tempo estimado:</strong> ${prazo_estimado} Dias</p><br>
-                    <p><strong>Data estimada:</strong> ${data_esperada}</p><br>
-                </div>
-            `,
-            showCloseButton: false,
-            showCancelButton: true,
-            confirmButtonText: `Aceitar`,
-            cancelButtonText: `Recusar`,
-            focusConfirm: false,
-            width: '700px',
-            padding: '1.5rem',
-            customClass: {
-                popup: 'swal-custom-popup',
-                title: 'swal-custom-title',
-                htmlContainer: 'swal-custom-html'
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                acceptService(idServico, tituloServico, valorTotal);
-            } else if (result.isDismissed) {
-                rejectService(idServico);
-            }
-        });
+        title: 'Detalhes da proposta',
+        html: `
+            <div style="text-align: left;">
+                <p><strong>Serviço:</strong> ${tituloServico}</p><br>
+                <p><strong>Valor proposto:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p><br>
+                <p><strong>Nome do contratante:</strong> ${primeiroNome}</p><br>
+                <p><strong>Tempo estimado:</strong> ${prazo_estimado} Dias</p><br>
+                <p><strong>Data estimada:</strong> ${data_esperada}</p><br>
+            </div>
+        `,
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonText: `Aceitar`,
+        cancelButtonText: `Recusar`,
+        focusConfirm: false,
+        width: '700px',
+        padding: '1.5rem',
+        customClass: {
+            popup: 'swal-custom-popup',
+            title: 'swal-custom-title',
+            htmlContainer: 'swal-custom-html'
+        },
+        allowOutsideClick: false // Desabilitar clique fora do modal
+    }).then((result) => {
+        if (result.isConfirmed) {
+            acceptService(idServico, tituloServico, valorTotal);
+        } else if (result.isDismissed) {
+            rejectService(idServico);
+        }
+    });
+
     }
 
     function acceptService(idServico, tituloServico, valorTotal) {

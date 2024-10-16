@@ -45,7 +45,7 @@ session_set_cookie_params(36000);
 | que podem atrapalhar a exibição no ambiente de produção.
 |
 */
-error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_STRICT);
+// error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_STRICT);
 
 /*
 |--------------------------------------------------------------------------

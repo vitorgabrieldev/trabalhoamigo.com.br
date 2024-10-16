@@ -1,18 +1,71 @@
-
 <?php
-
+// Inicia a sessão
 if (!isset($_SESSION)) {
     session_start();
 }
 
+if (!defined('DB_SERVER')) {
+    define('DB_SERVER', '185.173.111.184');
+}
+if (!defined('DB_USERNAME')) {
+    define('DB_USERNAME', 'u858577505_trabalhoamigo');
+}
+if (!defined('DB_PASSWORD')) {
+    define('DB_PASSWORD', '@#Trabalhoamigo023@_');
+}
+if (!defined('DB_NAME')) {
+    define('DB_NAME', 'u858577505_trabalhoamigo');
+}
+
+// Conexão com o banco de dados
+$conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+
+// Verifica se o formulário foi enviado via POST para atualizar o endereço
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero'], $_POST['cidade'], $_POST['estado'], $_POST['cep'])) {
+    header('Content-Type: application/json');
+    // Verifica se houve erro na conexão
+    if ($conn->connect_error) {
+        echo json_encode(['success' => false, 'message' => 'Falha na conexão com o banco de dados.']);
+        exit;
+    }
+
+    // Verifica se o usuário está logado
+    if (!isset($_SESSION['id_usuario'])) {
+        echo json_encode(['success' => false, 'message' => 'Usuário não autenticado.']);
+        exit;
+    }
+
+    // Filtra e obtém os dados do formulário
+    $id_usuario = $_SESSION['id_usuario'];
+    $rua = $conn->real_escape_string($_POST['rua']);
+    $numero = intval($_POST['numero']);
+    $cidade = $conn->real_escape_string($_POST['cidade']);
+    $estado = $conn->real_escape_string($_POST['estado']);
+    $cep = $conn->real_escape_string($_POST['cep']);
+
+    // Atualiza o endereço do usuário no banco de dados usando prepared statement
+    $sql = "UPDATE enderecos SET rua = ?, numero = ?, cep = ?, bairro = ?, complemento = ? WHERE id_usuario = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sisssi", $rua, $numero, $cep, $cidade, $estado, $id_usuario);
+
+    // Executa a atualização e verifica o resultado
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Endereço atualizado com sucesso.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Erro ao atualizar o endereço: ' . $stmt->error]);
+    }
+
+    $stmt->close();
+    $conn->close();
+    exit;
+}
 ?>
 
 <!-- =================================      TOPO      =================================-->
 <section id="popup-profile">
     <header class="topo-popup-profile">
         <img width="40px" height="40px" class="logo" src="../../../../public/img/logo/favicon.ico" alt="Logo Rodapé">
-        <h2 class="name-user"><?php echo isset($_SESSION['primeiro_nome']) ? $_SESSION['primeiro_nome'] : 'NotFound 404'; ?></h2>
-
+        <h2 class="name-user"><?php echo $_SESSION['primeiro_nome'] ?? 'NotFound 404'; ?></h2>
     </header>
     <hr class="small-line">
     <div class="list-links">
@@ -20,13 +73,14 @@ if (!isset($_SESSION)) {
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
                 <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
             </svg>
-            Meu Perfil
+            Meu perfil
         </a>
-        <a class="link DispathAlert" href="#">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
-                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+        <a class="link" onclick="openModalEndereco()" href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
+                <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
+                <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z"/>
             </svg>
-            Configurações
+            Alterar endereço
         </a>
         <a class="link DispathAlert" href="#">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
@@ -43,7 +97,6 @@ if (!isset($_SESSION)) {
         SAIR
     </a>
 </section>
-
 
 <header id="site-topo">
     <div onclick="window.location.href = '../PaginaInicial/'" class="logo-box">
@@ -84,7 +137,7 @@ if (!isset($_SESSION)) {
             <span class="notification-time">10:30 AM</span>
         </li>
         <li>
-            <p> Seu perfil foi atualizado.</p>
+            <p>Seu perfil foi atualizado.</p>
             <span class="notification-time">9:15 AM</span>
         </li>
         <li>
@@ -94,7 +147,6 @@ if (!isset($_SESSION)) {
     </ul>
 </div>
 
-
 <script>
 function toggleNotifications() {
     const dropdown = document.getElementById('notification-dropdown');
@@ -102,16 +154,243 @@ function toggleNotifications() {
 }
 </script>
 
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/670d6ceb4304e3196ad17d2a/1ia672tsb';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
+<?php
+
+// Verifica se o usuário está logado
+if (!isset($_SESSION['id_usuario'])) {
+    die("Usuário não autenticado.");
+}
+
+// Verifica se houve erro na conexão
+if ($conn->connect_error) {
+    die("Conexão falhou: " . $conn->connect_error);
+}
+
+// Recupera o endereço atual do usuário
+$id_usuario = $_SESSION['id_usuario'];
+$sql = "SELECT rua, numero, cep, bairro, complemento FROM enderecos WHERE id_usuario = ?";
+$stmt = $conn->prepare($sql);
+
+// Verifique se a preparação da consulta foi bem-sucedida
+if (!$stmt) {
+    die("Erro na preparação da consulta: " . $conn->error);
+}
+
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$result = $stmt->get_result();
+$endereco = $result->fetch_assoc();
+
+$stmt->close();
+$conn->close();
+?>
+
+<!-- Modal de Alterar Endereço -->
+<div id="modal-alterar-endereco" class="modal-alterar-endereco" style="display: none">
+    <div class="modal-content-alterar-endereco">
+        <span class="close-alterar-endereco" onclick="closeModalEndereco()">&times;</span>
+        <form id="form-alterar-endereco" action="../layouts/controller/UpdateAdress.php" method="POST">
+            <div class="form-group-alterar-endereco">
+                <label for="cep">CEP:</label>
+                <input type="text" id="cep" name="cep" class="input cep mascara-cep" value="<?php echo isset($endereco['cep']) ? $endereco['cep'] : ''; ?>" required>
+            </div>
+            <hr>
+            <div class="form-group-alterar-endereco">
+                <label for="numero">Número:</label>
+                <input type="text" id="numero" name="numero" value="<?php echo isset($endereco['numero']) ? $endereco['numero'] : ''; ?>" required>
+            </div>
+            <div class="form-group-alterar-endereco">
+                <label for="rua">Rua:</label>
+                <input type="text" id="rua" name="rua" class="input rua" value="<?php echo isset($endereco['rua']) ? $endereco['rua'] : ''; ?>" required disabled>
+            </div>
+            <div class="form-group-alterar-endereco">
+                <label for="bairro">Bairro:</label>
+                <input type="text" id="bairro" name="bairro" class="input bairro" value="<?php echo isset($endereco['bairro']) ? $endereco['bairro'] : ''; ?>" required disabled>
+            </div>
+            <button type="submit" class="btn-alterar-endereco">Salvar</button>
+        </form>
+    </div>
+</div>
+
+<div class="background-loading-50 hidden">
+    <div class="loading-icon"></div>
+</div>
+
+<script>
+function openModalEndereco() {
+    document.getElementById('modal-alterar-endereco').style.display = 'flex';
+    $("#popup-profile").toggle();
+}
+
+function closeModalEndereco() {
+    document.getElementById('modal-alterar-endereco').style.display = 'none';
+}
+
+$(document).ready(function() {
+    // Evento para consulta do CEP
+    $('.mascara-cep').on('input', function () {
+        const cep = $(this).val().trim().replace(/\D/g, ''); // Remove caracteres não numéricos
+        if (cep.length === 8) {
+            $(".background-loading-50").removeClass('hidden');
+
+            $.ajax({
+                url: `https://viacep.com.br/ws/${cep}/json/`,
+                method: 'GET',
+                success: function (data) {
+                    $(".background-loading-50").addClass('hidden');
+                    if (data.erro) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'CEP Inválido',
+                            text: 'Não foi possível encontrar o CEP informado.'
+                        });
+                    } else {
+                        // Preenche os campos com os dados do CEP
+                        $('.input.rua').val(data.logradouro).prop('disabled', false);
+                        $('.input.bairro').val(data.bairro).prop('disabled', false);
+                        $('.input.cidade').val(data.localidade).prop('disabled', false);
+                        $('.input.uf').val(data.uf).prop('disabled', false);
+
+                        // Remove as labels dos campos preenchidos
+                        $('.input.rua').siblings('label').hide();
+                        $('.input.bairro').siblings('label').hide();
+                        $('.input.cidade').siblings('label').hide();
+                        $('.input.uf').siblings('label').hide();
+                    }
+                },
+                error: function () {
+                    $(".background-loading-50").addClass('hidden');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro ao consultar o CEP. Tente novamente mais tarde.'
+                    });
+                }
+            });
+        } else if (cep.length > 8) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'CEP Inválido',
+                text: 'O CEP deve ter exatamente 8 dígitos.'
+            });
+        }
+    });
+
+    // Interceptar a submissão do formulário
+    $("#form-alterar-endereco").on("submit", function(event) {
+        event.preventDefault();
+
+        $(".background-loading-50").removeClass('hidden');
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(data) {
+                $(".background-loading-50").addClass('hidden');
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: data.message 
+                    });
+                    closeModalEndereco();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: data.message
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                $(".background-loading-50").addClass('hidden');
+                console.error('Erro na requisição:', xhr);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Ocorreu um erro, tente novamente mais tarde.'
+                });
+            }
+        });
+    });
+});
 </script>
-<!--End of Tawk.to Script-->
+
+
+</script>
+
+<style>
+.modal-alterar-endereco {
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4); 
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-alterar-endereco * {
+    font-family: sans-serif;
+}
+
+.modal-content-alterar-endereco {
+    background-color: #fff; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    max-width: 500px;
+    border-radius: 10px;
+}
+
+.modal-content-alterar-endereco h2 {
+    margin-bottom: 15px
+}
+
+.close-alterar-endereco {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-alterar-endereco:hover,
+.close-alterar-endereco:focus {
+    color: black;
+    cursor: pointer;
+}
+
+.form-group-alterar-endereco {
+    margin-bottom: 15px;
+}
+
+.form-group-alterar-endereco label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group-alterar-endereco input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.btn-alterar-endereco {
+    background-color: #FA511D;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+.btn-alterar-endereco:hover {
+    background-color: #FA511D;
+}
+</style>

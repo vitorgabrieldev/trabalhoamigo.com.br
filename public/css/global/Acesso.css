@@ -166,6 +166,7 @@ body {
     line-height: auto;
     margin: 0;
 }
+
 #EntrarContaUsuario .left .corpo .content-titulo .descricao {
     font-size: 16px;
     color: #313131;
@@ -390,4 +391,52 @@ body {
     z-index: -1;
     position: absolute;
     margin-bottom: 0;
+}
+
+.background-blue {
+    background: #1a73e8 !important;
+}
+
+.background-blue:hover {
+    background: #2d7ee9 !important;
+}
+
+.color-blue {
+    color: #1a73e8 !important;
+}
+
+.background-light-blue {
+    background: #4e93ec !important;
+}
+
+
+
+
+@media screen and (max-width: 600px) {
+    #EntrarContaUsuario .left .corpo .content-titulo .titulo {
+        font-size: 32px !important;
+    }
+    #EntrarContaUsuario .left .corpo .content-titulo .descricao {
+        font-size: 14px !important;
+    }
+
+    .input  {
+        font-size: 14px !important;
+    }
+    .SendForm {
+        font-size: 16px !important;
+    }
+    .NoLogin * {
+        font-size: 14px !important;
+    }
+    .buttonLinkAnunciante {
+        font-size: 14px !important;
+    }
+}
+
+
+@media screen and (max-width: 400px) {
+    body {
+        margin: 0 20px;
+    }
 }

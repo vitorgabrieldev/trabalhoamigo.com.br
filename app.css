@@ -548,7 +548,8 @@ a {
 }
 
 .status-aguardando {
-    color: orange;
+    color: #f4561a;
+    font-weight: 400;
 }
 .status-aceito {
     color: green;
@@ -566,4 +567,29 @@ a {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    color: #FA511D;
+    padding: 10px 20px;
+    text-decoration: none;
+    margin: 0 5px;
+    border: 1px solid #FA511D;
+    border-radius: 5px;
+}
+
+.pagination a.active {
+    background-color: #FA511D;
+    color: white;
+    border: 1px solid #FA511D;
+}
+
+.pagination a:hover {
+    background-color: #fca88e46;
 }

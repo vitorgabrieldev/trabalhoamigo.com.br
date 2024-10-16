@@ -11,7 +11,7 @@
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    
+
     <!-- Importação do Icone do Projeto -->
     <link rel="icon" href="../../favicon.ico" type="image/x-icon">
 
@@ -79,9 +79,9 @@
                             return $conexao;
                         }
 
-                        // Função para buscar os serviços e categorias
-                        function getServicos($conexao) {
-                            // Consulta SQL para buscar serviços e suas respectivas categorias
+                        // Função para buscar os serviços e categorias com paginação
+                        function getServicos($conexao, $limit, $offset) {
+                            // Consulta SQL para buscar serviços e suas respectivas categorias com paginação
                             $sql = "
                                 SELECT 
                                     s.id_servico, 
@@ -100,9 +100,13 @@
                                     s.ativo = 1
                                 ORDER BY 
                                     s.data_Criacao DESC
+                                LIMIT ? OFFSET ?
                             ";
                             
-                            $result = $conexao->query($sql);
+                            $stmt = $conexao->prepare($sql);
+                            $stmt->bind_param('ii', $limit, $offset);  // Ligamos os parâmetros
+                            $stmt->execute();
+                            $result = $stmt->get_result();
                             
                             if ($result->num_rows > 0) {
                                 return $result->fetch_all(MYSQLI_ASSOC);
@@ -111,6 +115,15 @@
                             }
                         }
 
+                        // Função para contar o total de serviços
+                        function getTotalServicos($conexao) {
+                            $sql = "SELECT COUNT(*) AS total FROM servicos WHERE ativo = 1";
+                            $result = $conexao->query($sql);
+                            $row = $result->fetch_assoc();
+                            return $row['total'];
+                        }
+
+                        // Função para renderizar os serviços
                         function renderServicos($servicos) {
                             if (empty($servicos)) {
                                 echo "<p>Nenhum serviço encontrado.</p>";
@@ -147,45 +160,67 @@
                                     </div>
                                 </div>
                             ';
-
                         }
 
+                        // Função para renderizar a paginação
+                        function renderPagination($currentPage, $totalPages) {
+                            echo '<div class="pagination">';
+                            
+                            // Botão "anterior"
+                            if ($currentPage > 1) {
+                                echo '<a href="?page=' . ($currentPage - 1) . '">&laquo; Anterior</a>';
+                            }
+
+                            // Números de página
+                            for ($i = 1; $i <= $totalPages; $i++) {
+                                if ($i == $currentPage) {
+                                    echo '<a href="?page=' . $i . '" class="active">' . $i . '</a>';
+                                } else {
+                                    echo '<a href="?page=' . $i . '">' . $i . '</a>';
+                                }
+                            }
+
+                            // Botão "próxima"
+                            if ($currentPage < $totalPages) {
+                                echo '<a href="?page=' . ($currentPage + 1) . '">Próxima &raquo;</a>';
+                            }
+                            
+                            echo '</div>';
+                        }
+
+                        // Processa a listagem de serviços com paginação
                         function processListServicos() {
                             try {
                                 $conexao = getDatabaseConnection();
-                                $servicos = getServicos($conexao);
+
+                                // Parâmetros de paginação
+                                $limit = 8; // Serviços por página
+                                $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;  // Página atual, padrão 1
+                                $offset = ($page - 1) * $limit;  // Cálculo de offset
+
+                                // Obter total de serviços e calcular o número total de páginas
+                                $totalServicos = getTotalServicos($conexao);
+                                $totalPages = ceil($totalServicos / $limit);
+
+                                // Buscar os serviços da página atual
+                                $servicos = getServicos($conexao, $limit, $offset);
+
+                                // Renderizar os serviços e a paginação
                                 renderServicos($servicos);
+                                renderPagination($page, $totalPages);
+
                                 $conexao->close();
                             } catch (Exception $e) {
                                 echo "<p>Erro: " . $e->getMessage() . "</p>";
                             }
                         }
 
+                        // Processar a listagem de serviços
                         processListServicos();
-
                     ?>
-
-
                 </div>
             </section>
-    
-            <section id="bloco-chamada">
-                <div class="item">
-                    <a class="DispathAlert">
-                        <img src="../../../../public/img/Bloco-chamada-listagem-1.png" alt="Imagem de Chamada">
-                    </a>
-                </div>
-                <div class="item">
-                    <a class="DispathAlert">
-                        <img src="../../../../public/img/Bloco-chamada-listagem-2.png" alt="Imagem de Chamada">
-                    </a>
-                </div>
-            </section>
-    
         </main>
-        
-        <?php include '../layouts/Footer.php'; ?>
-
-        </section>
+        <!-- ================================================================================== -->
     </body>
 </html>

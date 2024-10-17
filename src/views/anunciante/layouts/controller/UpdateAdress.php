@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['cep'])
     $rua = $conn->real_escape_string($_POST['rua']);
     $numero = intval($_POST['numero']);
     $cep = $conn->real_escape_string($_POST['cep']);
+    $bairro = $conn->real_escape_string($_POST['cep']);
 
     // Atualiza o endereço do usuário no banco de dados usando prepared statement
     $sql = "UPDATE enderecos SET rua = ?, numero = ?, cep = ?, bairro = ?, complemento = ? WHERE id_usuario = ?";

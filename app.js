@@ -151,7 +151,7 @@ function createAccessibilityBar() {
     });
 }
 
-// createAccessibilityBar();modal-titulo
+// createAccessibilityBar();
 
 /* ------------------------------------------------------------
 | Sistema de inserção de loading="lazy" em todas as tag <img>

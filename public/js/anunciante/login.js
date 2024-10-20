@@ -73,7 +73,7 @@ $('#FormEntrarUsuario').on('submit', function (e) {
                         icon: "success",
                         title: "Aguarde enquanto configuramos seu acesso...",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 500,
                         timerProgressBar: true,
                         willClose: () => {
                           window.location.href = '../PaginaInicial/';

@@ -37,15 +37,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['cep'])
     }
 
     // Filtra e obtém os dados do formulário
-    $id_usuario = $_SESSION['id_usuario'];
-    $rua = $conn->real_escape_string($_POST['rua']);
-    $numero = intval($_POST['numero']);
-    $cep = $conn->real_escape_string($_POST['cep']);
+    $id_usuario  = $_SESSION['id_usuario'];
+    $rua         = $conn->real_escape_string($_POST['rua']);
+    $numero      = intval($_POST['numero']);
+    $cep         = $conn->real_escape_string($_POST['cep']);
+    $bairro      = $conn->real_escape_string($_POST['bairro']); // Corrige o campo para 'bairro' em vez de 'cep'
+    $complemento = $conn->real_escape_string($_POST['complemento']);
 
     // Atualiza o endereço do usuário no banco de dados usando prepared statement
     $sql = "UPDATE enderecos SET rua = ?, numero = ?, cep = ?, bairro = ?, complemento = ? WHERE id_usuario = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sisssi", $rua, $numero, $cep, $cidade, $estado, $id_usuario);
+
+    // Corrige a ordem dos parâmetros, removendo cidade e estado, e adicionando complemento
+    $stmt->bind_param("sisssi", $rua, $numero, $cep, $bairro, $complemento, $id_usuario);
 
     // Executa a atualização e verifica o resultado
     if ($stmt->execute()) {

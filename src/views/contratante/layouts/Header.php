@@ -207,6 +207,10 @@ $conn->close();
                 <label for="bairro">Bairro:</label>
                 <input type="text" id="bairro" name="bairro" class="input bairro" value="<?php echo isset($endereco['bairro']) ? $endereco['bairro'] : ''; ?>" required disabled>
             </div>
+            <div class="form-group-alterar-endereco">
+                <label for="complemento">Complemento:</label>
+                <input type="text" id="complemento" name="complemento" class="input complemento" value="<?php echo isset($endereco['complemento']) ? $endereco['complemento'] : ''; ?>">
+            </div>
             <button type="submit" class="btn-alterar-endereco">Salvar</button>
         </form>
     </div>

@@ -313,15 +313,6 @@
     padding: 0 20px;
     z-index: 2;
 }
-#CriarContaUsuario .rowOthersLogin::before {
-    content: '';
-    width: 35%;
-    height: 1px;
-    background: rgb(217, 217, 217);
-    margin-top: 10px;
-    position: absolute;
-    z-index: 1;
-}
 #CriarContaUsuario .rowOthersLogin .flexSocial {
     display: flex;
     justify-content: space-between;
@@ -362,15 +353,6 @@
     background: #fff;
     padding: 0 20px;
     z-index: 2;
-}
-#CriarContaUsuario .SouAnunciante::before {
-    content: '';
-    width: 35%;
-    height: 1px;
-    background: rgb(217, 217, 217);
-    margin-top: 9spx;
-    position: absolute;
-    z-index: 1;
 }
 #CriarContaUsuario .SouAnunciante .buttonLinkAnunciante {
     width: 100%;

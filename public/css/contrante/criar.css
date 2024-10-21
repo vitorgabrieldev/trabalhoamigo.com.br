@@ -343,15 +343,6 @@
     padding: 0 20px;
     z-index: 2;
 }
-#CriarContaUsuario .SouAnunciante::before {
-    content: '';
-    width: 35%;
-    height: 1px;
-    background: rgb(217, 217, 217);
-    margin-top: 9spx;
-    position: absolute;
-    z-index: 1;
-}
 #CriarContaUsuario .SouAnunciante .buttonLinkAnunciante {
     width: 100%;
     padding: 10px 0;

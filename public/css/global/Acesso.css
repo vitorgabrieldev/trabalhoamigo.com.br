@@ -22,6 +22,7 @@ body {
     font-size: 1rem;
     color: #2e2c2c;
     transition: border 150ms cubic-bezier(0.4,0,0.2,1);
+    font-size: 14px;
 }
 .errorMessage {
     color: rgb(249, 84, 84);
@@ -102,7 +103,7 @@ body {
     transform: rotate(45deg);
 }
 #EntrarContaUsuario {
-    padding: 70px 140px;
+    padding: 40px;
     display: flex;
     justify-content: space-between;
     gap: 50px;
@@ -161,14 +162,14 @@ body {
 }
 #EntrarContaUsuario .left .corpo .content-titulo .titulo {
     color: #FA511D;
-    font-size: 40px;
+    font-size: 32px;
     font-weight: 600;
     line-height: auto;
     margin: 0;
 }
 
 #EntrarContaUsuario .left .corpo .content-titulo .descricao {
-    font-size: 16px;
+    font-size: 14px;
     color: #313131;
     font-weight: 400;
     margin: 0;
@@ -221,7 +222,7 @@ body {
     border-radius: 4px;
     padding: 10px 0;
     color: #fff;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -315,7 +316,7 @@ body {
     align-items: center;
     color: #fff;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 14px;
     text-decoration: none;
     transition: .33s;
     border-radius: 4px;

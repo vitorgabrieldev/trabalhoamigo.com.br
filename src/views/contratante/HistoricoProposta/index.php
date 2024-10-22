@@ -60,6 +60,7 @@ $conn->close();
     <script src="../../../../app.js" defer></script>
     <link rel="stylesheet" href="../../../../app.css">
     <link rel="stylesheet" href="../../../../public/css/contrante/HistoricoProposta.css">
+    <script src="../../../../public/js/contratante/HistoricoProposta.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -128,15 +129,13 @@ $conn->close();
                         <span class="<?= $statusClass ?>">Status: <?= $statusText ?></span>
                     <?php endif; ?>
 
-                    <?php if ($proposta['status'] == 2): // Mostrar botão apenas se status for aceito ?>
-                        <button class="button" onclick="showContractorInfo(
-                            '<?= addslashes($proposta['primeiro_nome']) ?>',
-                            '<?= addslashes($proposta['telefone']) ?>',
-                            '<?= addslashes($proposta['celular']) ?>',
-                            '<?= addslashes($proposta['whatsapp']) ?>',
-                            '<?= addslashes($proposta['unique_id']) ?>',
-                            '<?= addslashes($proposta['email']) ?>'
-                        )">Entrar em Contato <i class="bi bi-arrow-right"></i></button>
+                    <?php if ($proposta['status'] == 2): ?>
+                        <button class="button" onclick="showContractorInfo('<?= addslashes($proposta['primeiro_nome']) ?>','<?= addslashes($proposta['telefone']) ?>','<?= addslashes($proposta['celular']) ?>','<?= addslashes($proposta['whatsapp']) ?>','<?= addslashes($proposta['unique_id']) ?>','<?= addslashes($proposta['email']) ?>')">
+                            Abrir <i class="bi bi-arrow-right"></i>
+                        </button>
+                        <button class="button" onclick="showModalSettings('<?= addslashes($proposta['id_contrato']) ?>')">
+                            Gerenciar <i class="bi bi-gear-fill"></i>
+                        </button>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>

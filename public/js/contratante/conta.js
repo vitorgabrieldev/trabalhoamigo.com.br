@@ -132,45 +132,47 @@ $('#FormCriarUsuario').on('submit', function (e) {
 // Consulta de CEP
 $('.input.cep').on('blur', function () {
     const cep = $(this).val().trim().replace(/\D/g, ''); // Remove caracteres não numéricos
-    if (cep.length === 8) {
-        $.ajax({
-            url: `https://viacep.com.br/ws/${cep}/json/`,
-            method: 'GET',
-            success: function (data) {
-                if (data.erro) {
+    if (cep.length >= 1) {
+        if (cep.length === 8) {
+            $.ajax({
+                url: `https://viacep.com.br/ws/${cep}/json/`,
+                method: 'GET',
+                success: function (data) {
+                    if (data.erro) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'CEP Inválido',
+                            text: 'Não foi possível encontrar o CEP informado.'
+                        });
+                    } else {
+                        // Preenche os campos com os dados do CEP
+                        $('.input.rua').val(data.logradouro);
+                        $('.input.bairro').val(data.bairro);
+                        $('.input.cidade').val(data.localidade);
+                        $('.input.uf').val(data.uf);
+    
+                        // Remove as labels dos campos preenchidos
+                        $('.input.rua').siblings('label').hide();
+                        $('.input.bairro').siblings('label').hide();
+                        $('.input.cidade').siblings('label').hide();
+                        $('.input.uf').siblings('label').hide();
+                    }
+                },
+                error: function () {
                     Swal.fire({
                         icon: 'error',
-                        title: 'CEP Inválido',
-                        text: 'Não foi possível encontrar o CEP informado.'
+                        title: 'Erro',
+                        text: 'Erro ao consultar o CEP. Tente novamente mais tarde.'
                     });
-                } else {
-                    // Preenche os campos com os dados do CEP
-                    $('.input.rua').val(data.logradouro);
-                    $('.input.bairro').val(data.bairro);
-                    $('.input.cidade').val(data.localidade);
-                    $('.input.uf').val(data.uf);
-
-                    // Remove as labels dos campos preenchidos
-                    $('.input.rua').siblings('label').hide();
-                    $('.input.bairro').siblings('label').hide();
-                    $('.input.cidade').siblings('label').hide();
-                    $('.input.uf').siblings('label').hide();
                 }
-            },
-            error: function () {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro',
-                    text: 'Erro ao consultar o CEP. Tente novamente mais tarde.'
-                });
-            }
-        });
-    } else {
-        Swal.fire({
-            icon: 'warning',
-            title: 'CEP Inválido',
-            text: 'O CEP deve ter 8 dígitos.'
-        });
+            });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'CEP Inválido',
+                text: 'O CEP deve ter 8 dígitos.'
+            });
+        }
     }
 });
 

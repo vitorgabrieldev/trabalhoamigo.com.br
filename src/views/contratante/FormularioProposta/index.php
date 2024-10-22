@@ -71,7 +71,10 @@ try {
 <html lang="pt-br">
 
 <head>
-    <title>Proposta de Serviço | Trabalho Amigo</title>
+    <!-- Título da Página - SEO -->
+    <title>Envie Sua Proposta | Trabalho Amigo</title>
+    <!-- Descrição da Página - SEO -->
+    <meta name="description" content="Preencha o formulário para enviar sua proposta e conectar-se com freelancers. Facilite a contratação de serviços na plataforma Trabalho Amigo." />
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel="stylesheet" href="../../../../public/css/contrante/FormularioProposta.css">

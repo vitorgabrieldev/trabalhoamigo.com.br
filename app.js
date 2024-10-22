@@ -45,8 +45,8 @@ addFaviconAndMeta('/trabalhoamigo.com.br/public/img/logo/favicon.ico', [
     { name: 'description', content: 'TRABALHO AMIGO' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     { charset: 'UTF-8' },
-    { name: 'keywords', content: 'trabalho, amigo, freelancer, serviços, comunidade' },
-    { name: 'author', content: 'Trabalho Amigo' },
+    { name: 'keywords', content: 'trabalho, freelancer, serviços, comunidades, trabalho remoto, plataforma de serviços, oportunidades de trabalho, rede colaborativa, trabalho amigo' },
+    { name: 'author', content: 'Vitor Gabriel de Oliveira, Maria Eduarda Mendes Galvão, Thaynna Carolliny Ribeiros dos Santos, João Victor Farias da Silva, Layla Beatrice de Oliveira' },
     { name: 'robots', content: 'index, follow' },
     { name: 'googlebot', content: 'index, follow' },
     { name: 'theme-color', content: '#2B88F4' },
@@ -85,75 +85,6 @@ addFaviconAndMeta('/trabalhoamigo.com.br/public/img/logo/favicon.ico', [
     { name: 'twitter:description', content: 'Sozinhos somos um, Juntos somos mais' },
     { name: 'twitter:image', content: '/trabalhoamigo.com.br/public/img/logo/opengraph.png' }
 ]);
-
-/* ------------------------------------------------------------
-| Sistema de criaçõa de barra de acessibildiade
-/-------------------------------------------------------------- */
-function createAccessibilityBar() {
-    const accessibilityBar = document.createElement('div');
-    accessibilityBar.id = 'accessibility-bar';
-    accessibilityBar.innerHTML = `
-        <div class="accessibility-bar-content">
-            <button id="toggle-contrast" title="Toggle Contrast">🌗</button>
-            <button id="increase-font-size" title="Increase Font Size">A+</button>
-            <button id="decrease-font-size" title="Decrease Font Size">A-</button>
-            <button id="increase-line-height" title="Increase Line Height">Line+</button>
-            <button id="decrease-line-height" title="Decrease Line Height">Line-</button>
-            <button id="change-font" title="Change Font">Font</button>
-            <button id="reset-settings" title="Reset Settings">🔄</button>
-        </div>
-    `;
-    document.body.appendChild(accessibilityBar);
-
-    const styles = `#accessibility-bar {position: fixed;bottom: 10px;left: 10px;background-color: #222;color: #fff;padding: 15px;border-radius: 8px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);z-index: 1000;}.accessibility-bar-content {display: flex;flex-direction: column;gap: 10px;}.accessibility-bar-content button {background: #2B88F4;border: none;color: #fff;padding: 10px 15px;border-radius: 5px;cursor: pointer;font-size: 16px;transition: background 0.3s ease;}.accessibility-bar-content button:hover {background: #1a5ab0;}`;
-    const styleSheet = document.createElement('style');
-    styleSheet.type = 'text/css';
-    styleSheet.innerText = styles;
-    document.head.appendChild(styleSheet);
-
-    const fontOptions = ['Arial', 'Verdana', 'Georgia', 'Times New Roman', 'Courier New'];
-    let currentFontIndex = 0;
-    let currentLineHeight = 1.5;
-
-    document.getElementById('toggle-contrast').addEventListener('click', () => {
-        document.body.classList.toggle('high-contrast');
-    });
-
-    document.getElementById('increase-font-size').addEventListener('click', () => {
-        document.body.style.fontSize = 'larger';
-    });
-
-    document.getElementById('decrease-font-size').addEventListener('click', () => {
-        document.body.style.fontSize = 'smaller';
-    });
-
-    document.getElementById('increase-line-height').addEventListener('click', () => {
-        currentLineHeight += 0.1;
-        document.body.style.lineHeight = currentLineHeight;
-    });
-
-    document.getElementById('decrease-line-height').addEventListener('click', () => {
-        if (currentLineHeight > 1) {
-            currentLineHeight -= 0.1;
-            document.body.style.lineHeight = currentLineHeight;
-        }
-    });
-
-    document.getElementById('change-font').addEventListener('click', () => {
-        currentFontIndex = (currentFontIndex + 1) % fontOptions.length;
-        document.body.style.fontFamily = fontOptions[currentFontIndex];
-    });
-
-    document.getElementById('reset-settings').addEventListener('click', () => {
-        document.body.classList.remove('high-contrast');
-        document.body.style.fontSize = '';
-        document.body.style.lineHeight = '';
-        document.body.style.fontFamily = '';
-        currentLineHeight = 1.5;
-    });
-}
-
-// createAccessibilityBar();
 
 /* ------------------------------------------------------------
 | Sistema de inserção de loading="lazy" em todas as tag <img>

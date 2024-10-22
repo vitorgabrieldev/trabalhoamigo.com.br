@@ -105,7 +105,7 @@ $conn->close();
 <html lang="pt-br">
 <head>
     <title>Histórico de Propostas | Trabalho Amigo</title>
-    <meta name="description" content="Histórico de Propostas do Anunciante">
+    <meta name="description" content="Confira o histórico de propostas enviadas e recebidas, e gerencie suas oportunidades de trabalho na plataforma Trabalho Amigo." />
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>

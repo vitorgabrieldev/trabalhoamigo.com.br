@@ -49,8 +49,10 @@ $conn->close();
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <!-- Título da Página - SEO -->
     <title>Histórico de Propostas | Trabalho Amigo</title>
-    <meta name="description" content="Histórico de Propostas do Anunciante">
+    <!-- Descrição da Página - SEO -->
+    <meta name="description" content="Acesse o histórico de suas propostas enviadas e recebidas. Gerencie suas oportunidades de trabalho com facilidade no Trabalho Amigo." />
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>

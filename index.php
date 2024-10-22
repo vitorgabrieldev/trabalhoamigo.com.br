@@ -69,7 +69,3 @@ require_once 'src/Bootstrap.php';
 |
 */
 Init();
-
-?>
-
-<meta name="google-site-verification" content="Xwi2DRIzkwuCzTHj5k51v3e8hScVPzeRlxG1hBWNHtE" />

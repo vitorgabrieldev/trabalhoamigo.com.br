@@ -11,10 +11,10 @@ if (!isset($_SESSION)) {
 <html lang="pt-br">
 <head>
 
-    <!-- Tituloda Página - SEO -->
-    <title>Crie sua Conta Gratuitamente | Trabalho Amigo</title>
+    <!-- Título da Página - SEO -->
+    <title>Trabalho Amigo | Conecte-se com Freelancers e Compartilhe Serviços Gratuitamente</title>
     <!-- Descrição da Página - SEO -->
-    <meta name="description" content="Crie sua Conta">
+    <meta name="description" content="Bem-vindo ao Trabalho Amigo! Crie sua conta gratuitamente e comece a conectar-se com freelancers e comunidades para compartilhar e contratar serviços de forma fácil e eficiente." />
 
     <!-- Metas tags de configurações das páginas -->
     <meta charset='utf-8'>

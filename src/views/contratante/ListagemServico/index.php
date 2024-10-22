@@ -2,10 +2,10 @@
 <html lang="pt-br">
 <head>
 
-    <!-- Tituloda Página - SEO -->
-    <title>Listagem Serviços | Trabalho Amigo</title>
+    <!-- Título da Página - SEO -->
+    <title>Listagem de Serviços | Trabalho Amigo</title>
     <!-- Descrição da Página - SEO -->
-    <meta name="description" content="Crie sua Conta">
+    <meta name="description" content="Explore nossa listagem de serviços disponíveis e encontre freelancers qualificados para atender suas necessidades. Comece a contratar hoje mesmo!" />
 
     <!-- Metas tags de configurações das páginas -->
     <meta charset='utf-8'>

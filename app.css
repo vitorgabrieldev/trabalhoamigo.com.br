@@ -148,7 +148,7 @@ a {
 }
 #popup-profile .topo-popup-profile{
     display: flex;
-    justify-content: center;
+    justify-content: start;
     gap: 15px;
     align-items: center;
 }
@@ -648,5 +648,5 @@ a {
 
 .span-edit-fix-left {
     margin-top: 2px;
-    margin-left: 6px;
+    margin-left: 0;
 }

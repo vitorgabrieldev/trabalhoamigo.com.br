@@ -38,7 +38,7 @@ function sendMessage() {
     xhr.open("POST", "php/insert-chat.php", true);
 
     // Indicador de carregamento
-    sendBtn.innerHTML = "Enviando...";
+    sendBtn.innerHTML = "...";
     sendBtn.disabled = true;
 
     xhr.onload = () => {

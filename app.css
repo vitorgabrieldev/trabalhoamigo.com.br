@@ -645,3 +645,8 @@ a {
     font-size: 24px;
     color: #000; /* Cor do texto */
 }
+
+.span-edit-fix-left {
+    margin-top: 2px;
+    margin-left: 6px;
+}

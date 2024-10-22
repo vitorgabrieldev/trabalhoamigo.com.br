@@ -92,4 +92,4 @@ setInterval(() => {
     if (!chatBox.classList.contains("active")) {
         fetchMessages();
     }
-}, 5000);
+}, 1000);

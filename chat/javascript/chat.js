@@ -87,6 +87,7 @@ function scrollToBottom() {
 }
 
 // Busque novas mensagens a cada 5 segundos apenas se a caixa de chat não estiver ativa
+fetchMessages();
 setInterval(() => {
     if (!chatBox.classList.contains("active")) {
         fetchMessages();

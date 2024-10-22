@@ -25,11 +25,22 @@
         </div>
       </header>
       <div class="chat-box">
-
+        <div class="background-loading">
+          <div class="dot-spinner">
+              <div class="dot-spinner__dot"></div>
+              <div class="dot-spinner__dot"></div>
+              <div class="dot-spinner__dot"></div>
+              <div class="dot-spinner__dot"></div>
+              <div class="dot-spinner__dot"></div>
+              <div class="dot-spinner__dot"></div>
+              <div class="dot-spinner__dot"></div>
+              <div class="dot-spinner__dot"></div>
+          </div>
+        </div>
       </div>
-      <form action="#" class="typing-area">
+      <div action="#" class="typing-area">
         <input type="text" class="incoming_id" name="incoming_id" value="<?php echo $user_id; ?>" hidden>
-        <input type="text" name="message" class="input-field" placeholder="Digite sua mensagem aqui... autocomplete="off">
+        <input type="text" name="message" class="input-field" placeholder="Digite sua mensagem aqui..." autocomplete="off">
         <button><i class="fab fa-telegram-plane"></i></button>
       </form>
     </section>

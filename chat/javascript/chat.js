@@ -4,6 +4,9 @@ const form = document.querySelector(".typing-area"),
     sendBtn = form.querySelector("button"),
     chatBox = document.querySelector(".chat-box");
 
+inputField.disabled = true;
+sendBtn.disabled = true;
+
 let lastMessageId = 0; // Guardar o ID da última mensagem
 
 // Evita o envio padrão do formulário
@@ -38,16 +41,18 @@ function sendMessage() {
     xhr.open("POST", "php/insert-chat.php", true);
 
     // Indicador de carregamento
-    sendBtn.innerHTML = "...";
+    sendBtn.innerHTML = "<div class='loading-chat'></div>";
     sendBtn.disabled = true;
+    inputField.disabled = true;
 
     xhr.onload = () => {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            inputField.value = ""; // Limpa o campo de entrada
+            inputField.value = ""; 
             sendBtn.innerHTML = "<i class='fab fa-telegram-plane'></i>"; // Restaura o botão
             sendBtn.disabled = false;
-            scrollToBottom(); // Rola para baixo
-            fetchMessages(); // Busca novas mensagens após o envio
+            inputField.disabled = false;
+            scrollToBottom();
+            fetchMessages();
         }
     }
 
@@ -63,13 +68,15 @@ function fetchMessages() {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
             let data = xhr.responseText;
             if (data.trim() !== "") {
-                chatBox.innerHTML = data; // Atualiza a caixa de chat
-                scrollToBottom(); // Rolagem automática para o final do chat
+                chatBox.innerHTML = data;
+                scrollToBottom();
             }
         }
     }
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhr.send("incoming_id=" + incoming_id + "&last_message_id=" + lastMessageId);
+
+    return true;
 }
 
 // Monitora se a caixa de chat está ativa
@@ -86,10 +93,20 @@ function scrollToBottom() {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Busque novas mensagens a cada 5 segundos apenas se a caixa de chat não estiver ativa
-fetchMessages();
-setInterval(() => {
-    if (!chatBox.classList.contains("active")) {
-        fetchMessages();
+async function fetchAndStartLoop() {
+    const getRequest = await fetchMessages(); 
+
+    if (getRequest) {
+        
+        inputField.disabled = false;
+        sendBtn.disabled = false;
+        
+        setInterval(() => {
+            if (!chatBox.classList.contains("active")) {
+                fetchMessages();
+            }
+        }, 2000);
     }
-}, 1000);
+}
+
+fetchAndStartLoop();

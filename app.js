@@ -7,10 +7,12 @@ $(".openMenuTopo").click(() => {
     $("#offCanva-mobile").toggle();
 });
 
-$("#popup-profile").toggle();
+// Alterna a visibilidade do #popup-profile e oculta o #notification-dropdown
+$("#popup-profile").toggle();            // Alterna o #popup-profile
 $(".userProfile-circle").click(() => {
-    $("#popup-profile").toggle();
-}); 
+    $("#popup-profile").toggle();            // Alterna o #popup-profile
+    $("#notification-dropdown").hide();      // Oculta o #notification-dropdown
+});
 
 
 /* ------------------------------------------------------------
@@ -201,38 +203,38 @@ addSEOData();
 /* ------------------------------------------------------------
 | Sistema de broqueio para telas menores (Temporário)
 /-------------------------------------------------------------- */
-setInterval(() => {
-    const blurMediaScreen = document.querySelector('.blurMediaScreen');
+// setInterval(() => {
+//     const blurMediaScreen = document.querySelector('.blurMediaScreen');
 
-    if (window.innerWidth < 1024) {
-        if (!blurMediaScreen) {
-            document.body.innerHTML += `
-                <div class="blurMediaScreen" style="
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    background-color: black;
-                    color: white;
-                    font-family: Arial, sans-serif;
-                    font-size: 24px;
-                    text-align: center;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    z-index: 1000;
-                ">
-                    <p>Este site não está disponível para dispositivos móveis.</p>
-                </div>
-            `;
-        }
-    } else {
-        if (blurMediaScreen) {
-            blurMediaScreen.remove();
-        }
-    }
-}, 1000);
+//     if (window.innerWidth < 1024) {
+//         if (!blurMediaScreen) {
+//             document.body.innerHTML += `
+//                 <div class="blurMediaScreen" style="
+//                     display: flex;
+//                     justify-content: center;
+//                     align-items: center;
+//                     height: 100vh;
+//                     background-color: black;
+//                     color: white;
+//                     font-family: Arial, sans-serif;
+//                     font-size: 24px;
+//                     text-align: center;
+//                     position: fixed;
+//                     top: 0;
+//                     left: 0;
+//                     width: 100%;
+//                     z-index: 1000;
+//                 ">
+//                     <p>Este site não está disponível para dispositivos móveis.</p>
+//                 </div>
+//             `;
+//         }
+//     } else {
+//         if (blurMediaScreen) {
+//             blurMediaScreen.remove();
+//         }
+//     }
+// }, 1000);
 
 /* ------------------------------------------------------------
 | Sistema de disparo de alerta de construção ativa
@@ -283,7 +285,7 @@ window.onclick = function(event) {
 /* ------------------------------------------------------------
 | Sistema de deslogar geral
 /-------------------------------------------------------------- */
-const Logout = () => {
+var Logout = () => {
     // Adiciona a confirmação antes de continuar
     Swal.fire({
         title: 'Você tem certeza?',
@@ -412,65 +414,85 @@ document.addEventListener('DOMContentLoaded', definirMascaras);
 * ----------------------------------------------------- */
 function updateCharCount() {
     const maxLength = 5000;
-    const currentLength = $("#descricao").val().length;
+    
+    const descricaoVal = $("#descricao").val() || ""; 
+    const currentLength = descricaoVal.length;
     const remainingChars = maxLength - currentLength;
+    
     $(".count").text(remainingChars);
 }
 
 $("#descricao").on("input", updateCharCount);
 
-$(document).ready(updateCharCount);
-
-/*------------------------------------------------------
-*  Sistema de exibição de politicas de privacidade
-* ----------------------------------------------------- */
-document.getElementById('privacy-policy-btn').addEventListener('click', function() {
-    Swal.fire({
-        title: 'Política de Privacidade',
-        html: `
-            <div style="text-align: left;">
-                <p><strong>1. Coleta de Informações:</strong> Coletamos informações pessoais fornecidas por você, como nome, e-mail, e dados de contato, bem como informações sobre o serviço que você compartilha na plataforma.</p><br>
-                <p><strong>2. Uso das Informações:</strong> Utilizamos as informações para facilitar a comunicação entre usuários, melhorar a experiência na plataforma e garantir a segurança dos serviços compartilhados. Seus dados podem ser usados para envio de notificações relacionadas à plataforma.</p><br>
-                <p><strong>3. Compartilhamento de Dados:</strong> Compartilhamos suas informações apenas com os usuários relevantes para a execução dos serviços oferecidos ou solicitados. Não vendemos suas informações a terceiros.</p><br>
-                <p><strong>4. Segurança:</strong> Implementamos medidas de segurança para proteger suas informações, como criptografia e monitoramento de atividades suspeitas.</p><br>
-                <p><strong>5. Seus Direitos:</strong> Você tem o direito de acessar, corrigir ou excluir suas informações pessoais a qualquer momento, além de poder solicitar a interrupção do uso dos seus dados.</p><br>
-                <p><strong>6. Alterações na Política:</strong> Esta política de privacidade pode ser atualizada a qualquer momento. Recomendamos a leitura periódica desta página para manter-se informado.</p><br>
-                <p><strong>Contato:</strong> Para dúvidas ou solicitações sobre a política de privacidade, entre em contato conosco pelo e-mail suporte@trabalhoamigo.com.</p>
-            </div>
-        `,
-        icon: 'info',
-        showCloseButton: true,
-        showCancelButton: false,
-        focusConfirm: true,
-        confirmButtonText: 'Fechar!',
-        width: '600px',
-        padding: '3em',
-    });
+$(document).ready(function() {
+    if ($("#descricao").length) {
+        updateCharCount();
+    }
 });
 
-/*------------------------------------------------------
-*  Sistema de exibição de Termos de uso
-* ----------------------------------------------------- */
-document.getElementById('termos-btn').addEventListener('click', function() {
+/* ------------------------------------------------------------
+| Sistema de exclusão de conta
+/-------------------------------------------------------------- */
+var Delete = () => {
+    // Adiciona a confirmação antes de continuar
     Swal.fire({
-        title: 'Termos de Uso',
-        html: `
-            <div style="text-align: left;">
-                <p><strong>1. Aceitação dos Termos:</strong> Ao utilizar nossa plataforma, você concorda em cumprir estes termos. Caso não concorde com qualquer parte dos termos, você não deve utilizar a plataforma.</p><br>
-                <p><strong>2. Uso da Plataforma:</strong> Nossa plataforma é destinada ao compartilhamento de serviços entre comunidades. Você concorda em usar a plataforma de maneira responsável e respeitosa, sem violar leis ou direitos de terceiros.</p><br>
-                <p><strong>3. Responsabilidade pelos Conteúdos:</strong> Você é responsável por todo conteúdo ou informação que compartilhar na plataforma. Isso inclui a veracidade e a legalidade das informações postadas.</p><br>
-                <p><strong>4. Propriedade Intelectual:</strong> O conteúdo da plataforma, incluindo textos, gráficos e logos, é protegido por direitos autorais. Você não pode reproduzir ou utilizar qualquer parte do conteúdo sem nossa permissão expressa.</p><br>
-                <p><strong>5. Modificações dos Termos:</strong> Podemos modificar estes termos a qualquer momento. Recomendamos que você revise os termos periodicamente para estar ciente de quaisquer alterações.</p><br>
-                <p><strong>6. Suspensão de Conta:</strong> Reservamo-nos o direito de suspender ou encerrar a sua conta caso haja violação dos termos ou uso indevido da plataforma.</p><br>
-                <p><strong>7. Contato:</strong> Para dúvidas ou esclarecimentos sobre os Termos de Uso, entre em contato conosco pelo e-mail suporte@trabalhoamigo.com.</p>
-            </div>
-        `,
-        icon: 'info',
-        showCloseButton: true,
-        showCancelButton: false,
-        focusConfirm: true,
-        confirmButtonText: 'Fechar!',
-        width: '600px',
-        padding: '3em',
+        title: 'Você tem certeza?',
+        text: "Digite 'DELETAR MINHA CONTA' para confirmar a exclusão da conta:",
+        icon: 'warning',
+        input: 'text', // tipo de input
+        inputPlaceholder: 'Digite "DELETAR MINHA CONTA"',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: (inputValue) => {
+            if (inputValue !== 'DELETAR MINHA CONTA') {
+                Swal.showValidationMessage('Você deve digitar "DELETAR MINHA CONTA" para continuar');
+            }
+            return inputValue;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `../../../controllers/global/DeleteAccount.php`, 
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    console.log("Resposta completa do servidor:", data);
+            
+                    if (typeof data === 'object' && data !== null) {
+                        console.log("Status da resposta:", data.status);
+            
+                        if (data.status === 'success') {
+                            location.href = "../EntrarConta/";
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: data.message 
+                            });
+                        }
+                    } else {
+                        console.error("A resposta não é um objeto JSON válido:", data);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: 'Resposta do servidor não é JSON válido.'
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Erro na requisição AJAX:", status, error); // Log do erro
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro na Autenticação.'
+                    });
+                }
+            });
+            
+        }
     });
-});
+    
+};

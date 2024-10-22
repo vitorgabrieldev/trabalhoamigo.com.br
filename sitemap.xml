@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Página inicial -->
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Páginas de Anunciante -->
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/anunciante/CadastroServico/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/anunciante/CriarConta/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/anunciante/EntrarConta/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/anunciante/ListagemProposta/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Páginas de Contratante -->
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/contratante/CriarConta/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/contratante/EntrarConta/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/contratante/FormularioProposta/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/contratante/HistoricoProposta/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/contratante/ListagemServico/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://trabalhoamigo.vitorgabrieldev.io/src/views/contratante/PaginaInicial/</loc>
+    <lastmod>2024-10-21T12:46:48+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+</urlset>

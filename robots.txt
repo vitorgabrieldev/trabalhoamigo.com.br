@@ -1,0 +1,10 @@
+# Bloquear diretórios desnecessários
+User-agent: *
+Disallow: /chat/
+
+# Permitir acesso ao resto do site
+User-agent: *
+Allow: /
+
+# Indicar a localização do sitemap
+Sitemap: https://trabalhoamigo.vitorgabrieldev.io/sitemap.xml

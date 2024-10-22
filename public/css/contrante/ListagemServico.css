@@ -165,3 +165,9 @@
 .btn-contratar:hover {
     background: #e0481c; /* Cor ao passar o mouse */
 }
+
+.listagem-imagem {
+    max-height: 250px;
+    min-height: 250px;
+    object-fit: cover;
+}

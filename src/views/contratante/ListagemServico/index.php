@@ -99,7 +99,8 @@
                                     s.aceita_oferta, 
                                     s.comunitario, 
                                     c.nome AS categoria_nome,
-                                    s.data_Criacao
+                                    s.data_Criacao,
+                                    s.imagem
                                 FROM 
                                     servicos s
                                 INNER JOIN 
@@ -137,11 +138,16 @@
                                 echo "<p>Nenhum serviço encontrado.</p>";
                                 return;
                             }
-                            
+
                             echo '<ul class="listagem-servico">';
                             foreach ($servicos as $servico) {
                                 echo '<li class="listagem-item">';
                                 echo '<div class="item-conteudo">';
+                                if (!empty($servico['imagem']) && $servico['imagem'] !== 'null') {
+                                    echo '<img class="listagem-imagem" src="../../../../public/uploads/servicos/' . htmlspecialchars($servico['imagem']) . '" alt="' . htmlspecialchars($servico['titulo']) . '" />';
+                                } else {
+                                    echo '<img class="listagem-imagem" src="../../../../public/uploads/servicos/default-image.png" alt="Imagem não disponível" />'; // imagem padrão caso não haja uma imagem
+                                }
                                 echo '<h2 class="listagem-titulo">' . htmlspecialchars($servico['titulo']) . '</h2>';
                                 echo '<p class="listagem-descricao">Descrição: ' . htmlspecialchars($servico['descricao']) . '</p>';
                                 echo '<p class="listagem-preco">' . ($servico['preco'] == 0 ? 'Comunitário' : 'Preço: R$ ' . number_format($servico['preco'], 2, ',', '.')) . '</p>';

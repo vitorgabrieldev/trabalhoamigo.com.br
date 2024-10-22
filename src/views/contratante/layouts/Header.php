@@ -61,6 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
 }
 ?>
 
+<script src="../../../../public/js/global/Loading.js"></script>
+
 <!-- =================================      TOPO      =================================-->
 <section id="popup-profile">
     <header class="topo-popup-profile">
@@ -585,17 +587,23 @@ function closeModalPerfil() {
 
 <script>
     $('#form-editar-perfil').on('submit', function(event) {
-        event.preventDefault(); // Impede o envio normal do formulário
+        event.preventDefault();
 
-        var formData = $(this).serialize(); // Pega os dados do formulário em formato de string
+        $(".background-loading-50").removeClass('hidden');
+
+        var formData = $(this).serialize();
 
         // Envia a requisição AJAX
         $.ajax({
-            url: '../layouts/controller/UpdateProfile.php', // O endpoint PHP
-            type: 'POST', // Método de envio
-            data: formData, // Dados a serem enviados
-            dataType: 'json', // Espera resposta JSON
+            url: '../layouts/controller/UpdateProfile.php',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
             success: function(response) {
+
+                $(".background-loading-50").addClass('hidden');
+                document.getElementById('modal-editar-perfil').style.display = 'none';
+
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
@@ -614,7 +622,8 @@ function closeModalPerfil() {
                 }
             },
             error: function(xhr, status, error) {
-                // Em caso de erro na requisição AJAX
+                $(".background-loading-50").addClass('hidden');
+                
                 console.error('Erro AJAX:', error);
                 alert('Ocorreu um erro ao atualizar o perfil. Tente novamente.');
             }

@@ -26,6 +26,7 @@ if (!isset($_SESSION)) {
 
     <!-- Tags Globais do projeto -->
     <script src="../../../../app.js" defer></script>
+    <script src="../../../../public/js/global/Loading.js"></script>
     <link rel="stylesheet" href="../../../../app.css">
 
     <!-- Tags Especificas de cada página-->

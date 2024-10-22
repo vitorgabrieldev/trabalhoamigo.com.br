@@ -58,25 +58,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
     }
 
     $stmt->close();
-    $conn->close();
     exit;
 }
 
 ?>
 
+<script src="../../../../public/js/global/Loading.js"></script>
+
 <section id="popup-profile">
     <header class="topo-popup-profile">
-        <img width="40px" height="40px" class="logo" src="../../../../public/img/logo/favicon.ico" alt="Logo Rodapé">
+        <div class="edit-user">
+        <?php
+            $userImage = isset($_SESSION['img']) ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] : '../../../../public/img/UserProfile-default.png';
+        ?>
+        <img class="img-editor" id="profile-image" src="<?php echo htmlspecialchars($userImage); ?>" alt="Imagem de Usuário Padrão">    
+            <span class="span-edit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" class="bi bi-pencil-square" viewBox="0 0 16 16"><path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/></svg>
+            </span>
+        </div>
+        <input type="file" id="profile-image-input" accept="image/*" style="display: none;" onchange="updateProfileImage(event)">
         <h2 class="name-user"><?php echo isset($_SESSION['primeiro_nome']) ? $_SESSION['primeiro_nome'] : 'NotFound 404'; ?></h2>
-
     </header>
     <hr class="small-line">
     <div class="list-links">
-        <a class="link DispathAlert" href="#">
+        <a onclick="openModalPerfil()" class="link" href="#">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
                 <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
             </svg>
-            Meu Perfil
+            Alterar dados
         </a>
         <a class="link" onclick="openModalEndereco()" href="#">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
@@ -108,6 +117,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
     </a>
 </section>
 
+<script>
+
+    const spanEdit = document.querySelector('.span-edit');
+    const profileImageInput = document.getElementById('profile-image-input');
+    const imgEditor = document.querySelector('.img-editor');
+
+    spanEdit.addEventListener('click', () => {
+        profileImageInput.click();
+    });
+
+    profileImageInput.addEventListener('change', uploadImage);
+
+    function uploadImage(event) {
+        const input = event.target;
+
+        if (input.files && input.files[0]) {
+            const formData = new FormData();
+            formData.append('arquivo', input.files[0]);
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imgEditor.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+
+            $(".background-loading-50").removeClass('hidden');
+
+            $.ajax({
+                url: '../layouts/controller/upload.php',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    $(".background-loading-50").addClass('hidden');
+                    location.reload();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $(".background-loading-50").addClass('hidden');
+                    location.reload();
+                }
+            });
+        }
+    }
+
+</script>
+
 <header id="site-topo">
     <a href="../PaginaInicial/">
         <div class="logo-box">
@@ -130,7 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
             </a>
         </div>
         <div class="userProfile-circle">
-            <img src="../../../../public/img/UserProfile-default.png" alt="Imagem de Usuário Padrão">
+            <?php
+                $userImage = isset($_SESSION['img']) ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] : '../../../../public/img/UserProfile-default.png';
+            ?>
+            <img class="imag-topo" width="40px" heigth="40px" src="<?php echo htmlspecialchars($userImage); ?>" alt="Imagem de Usuário Padrão">
             <img src="../../../../public/img/Topo-User-More.png" alt="Btn Mais informações">
         </div>
         <div class="openMenuTopo menu-mobile">
@@ -218,7 +277,6 @@ $result = $stmt->get_result();
 $endereco = $result->fetch_assoc();
 
 $stmt->close();
-$conn->close();
 ?>
 
 <!-- Modal de Alterar Endereço -->
@@ -434,3 +492,219 @@ $(document).ready(function() {
     background-color: #FA511D;
 }
 </style>
+
+
+<?php
+
+// Verifica se o usuário está logado
+if (!isset($_SESSION['id_usuario'])) {
+    die("Usuário não autenticado.");
+}
+
+// Verifica se houve erro na conexão
+if ($conn->connect_error) {
+    die("Conexão falhou: " . $conn->connect_error);
+}
+
+$id_usuario = $_SESSION['id_usuario'];
+$query_usuario = "SELECT * FROM usuarios WHERE id_usuario = ?";
+$stmt_usuario = $conn->prepare($query_usuario);
+
+// Verifique se a preparação da consulta foi bem-sucedida
+if (!$stmt_usuario) {
+    die("Erro na preparação da consulta: " . $conn->error);
+}
+
+$stmt_usuario->bind_param("i", $id_usuario);
+$stmt_usuario->execute();
+$result = $stmt_usuario->get_result();
+$usuario = $result->fetch_assoc();
+
+$stmt_usuario->close();
+$conn->close();
+?>
+
+
+<!-- Modal de Editar Perfil -->
+<div id="modal-editar-perfil" class="modal-editar-perfil" style="display: none">
+    <div class="modal-content-editar-perfil">
+        <span class="close-editar-perfil" onclick="closeModalPerfil()">&times;</span>
+        <form id="form-editar-perfil" action="../layouts/controller/UpdateProfile.php" method="POST">
+            <div class="form-group-editar-perfil">
+                <label for="primeiro_nome">Primeiro nome:</label>
+                <input type="text" id="primeiro_nome" name="primeiro_nome" class="input primeiro_nome" value="<?php echo isset($usuario['primeiro_nome']) ? $usuario['primeiro_nome'] : ''; ?>" required>
+            </div>
+            <div class="form-group-editar-perfil">
+                <label for="ultimo_nome">Último nome:</label>
+                <input type="text" id="ultimo_nome" name="ultimo_nome" class="input ultimo_nome" value="<?php echo isset($usuario['ultimo_nome']) ? $usuario['ultimo_nome'] : ''; ?>" required>
+            </div>
+            <hr>
+            <div class="form-group-editar-perfil">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email" class="input email" value="<?php echo isset($usuario['email']) ? $usuario['email'] : ''; ?>" required>
+            </div>
+            <div class="form-group-editar-perfil">
+                <label for="telefone">Telefone:</label>
+                <input type="text" id="telefone" name="telefone" class="input telefone mascara-telefone" value="<?php echo isset($usuario['telefone']) ? $usuario['telefone'] : ''; ?>" required>
+            </div>
+            <div class="form-group-editar-perfil">
+                <label for="celular">Celuar:</label>
+                <input type="text" id="celular" name="celular" class="input celular mascara-telefone" value="<?php echo isset($usuario['celular']) ? $usuario['celular'] : ''; ?>" required>
+            </div>
+            <div class="form-group-editar-perfil">
+                <label for="whatsapp">WhatsApp:</label>
+                <input type="text" id="whatsapp" name="whatsapp" class="input whatsapp mascara-telefone" value="<?php echo isset($usuario['whatsapp']) ? $usuario['whatsapp'] : ''; ?>" required>
+            </div>
+            <hr>
+            <div class="form-group-editar-perfil">
+                <label for="senha">Nova Senha:</label>
+                <input type="password" id="senha" name="senha" class="input senha">
+            </div>
+            <div class="form-group-editar-perfil">
+                <label for="confirmar-senha">Confirmar Senha:</label>
+                <input type="password" id="confirmar-senha" name="confirmar_senha" class="input confirmar-senha">
+            </div>
+            <button type="submit" class="btn-editar-perfil">Salvar</button>
+        </form>
+    </div>
+</div>
+
+<div class="background-loading-50 hidden">
+    <div class="loading-icon"></div>
+</div>
+
+<script>
+function openModalPerfil() {
+    document.getElementById('modal-editar-perfil').style.display = 'flex';
+    $("#popup-profile").toggle();
+}
+
+function closeModalPerfil() {
+    document.getElementById('modal-editar-perfil').style.display = 'none';
+}
+</script>
+
+<style>
+.modal-editar-perfil {
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); 
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-editar-perfil * {
+    font-family: sans-serif;
+}
+
+.modal-content-editar-perfil {
+    background-color: #fff; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    max-width: 500px;
+    border-radius: 10px;
+    max-height: 80%; /* Define a altura máxima do conteúdo */
+    overflow-y: auto; /* Permite rolagem vertical se necessário */
+}
+
+
+.modal-content-editar-perfil h2 {
+    margin-bottom: 15px;
+}
+
+.close-editar-perfil {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-editar-perfil:hover,
+.close-editar-perfil:focus {
+    color: black;
+    cursor: pointer;
+}
+
+.form-group-editar-perfil {
+    margin-bottom: 15px;
+}
+
+.form-group-editar-perfil label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group-editar-perfil input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.btn-editar-perfil {
+    background-color: #FA511D;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+.btn-editar-perfil:hover {
+    background-color: #FA511D;
+}
+</style>
+
+
+<script>
+    $('#form-editar-perfil').on('submit', function(event) {
+        event.preventDefault();
+
+        $(".background-loading-50").removeClass('hidden');
+
+        var formData = $(this).serialize();
+
+        // Envia a requisição AJAX
+        $.ajax({
+            url: '../layouts/controller/UpdateProfile.php',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+
+                $(".background-loading-50").addClass('hidden');
+                document.getElementById('modal-editar-perfil').style.display = 'none';
+
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: response.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro!',
+                        text: response.message,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                $(".background-loading-50").addClass('hidden');
+                
+                console.error('Erro AJAX:', error);
+                alert('Ocorreu um erro ao atualizar o perfil. Tente novamente.');
+            }
+        });
+    });
+</script>

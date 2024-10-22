@@ -66,8 +66,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
 <!-- =================================      TOPO      =================================-->
 <section id="popup-profile">
     <header class="topo-popup-profile">
-        <img width="40px" height="40px" class="logo" src="../../../../public/img/logo/favicon.ico" alt="Logo Rodapé">
-        <h2 class="name-user"><?php echo $_SESSION['primeiro_nome'] ?? 'NotFound 404'; ?></h2>
+        <div class="edit-user">
+        <?php
+            $userImage = isset($_SESSION['img']) ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] : '../../../../public/img/UserProfile-default.png';
+        ?>
+        <img class="img-editor" id="profile-image" src="<?php echo htmlspecialchars($userImage); ?>" alt="Imagem de Usuário Padrão">    
+            <span class="span-edit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" class="bi bi-pencil-square" viewBox="0 0 16 16"><path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/></svg>
+            </span>
+        </div>
+        <input type="file" id="profile-image-input" accept="image/*" style="display: none;" onchange="updateProfileImage(event)">
+        <h2 class="name-user"><?php echo isset($_SESSION['primeiro_nome']) ? $_SESSION['primeiro_nome'] : 'NotFound 404'; ?></h2>
     </header>
     <hr class="small-line">
     <div class="list-links">
@@ -107,6 +116,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
     </a>
 </section>
 
+<script>
+
+    const spanEdit = document.querySelector('.span-edit');
+    const profileImageInput = document.getElementById('profile-image-input');
+    const imgEditor = document.querySelector('.img-editor');
+
+    spanEdit.addEventListener('click', () => {
+        profileImageInput.click();
+    });
+
+    profileImageInput.addEventListener('change', uploadImage);
+
+    function uploadImage(event) {
+        const input = event.target;
+
+        if (input.files && input.files[0]) {
+            const formData = new FormData();
+            formData.append('arquivo', input.files[0]);
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imgEditor.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+
+            $(".background-loading-50").removeClass('hidden');
+
+            $.ajax({
+                url: '../layouts/controller/upload.php',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    $(".background-loading-50").addClass('hidden');
+                    location.reload();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $(".background-loading-50").addClass('hidden');
+                    location.reload();
+                }
+            });
+        }
+    }
+
+</script>
+
 <header id="site-topo">
     <div onclick="window.location.href = '../PaginaInicial/'" class="logo-box">
         <img width="40px" height="40px" class="logo" src="../../../../public/img/logo/favicon.ico" alt="Logo Rodapé">
@@ -127,7 +183,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
             </a>
         </div>
         <div class="userProfile-circle">
-            <img src="../../../../public/img/UserProfile-default.png" alt="Imagem de Usuário Padrão">
+            <?php
+                $userImage = isset($_SESSION['img']) ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] : '../../../../public/img/UserProfile-default.png';
+            ?>
+            <img class="imag-topo" width="40px" heigth="40px" src="<?php echo htmlspecialchars($userImage); ?>" alt="Imagem de Usuário Padrão">
             <img src="../../../../public/img/Topo-User-More.png" alt="Btn Mais informações">
         </div>
         <div class="openMenuTopo menu-mobile">

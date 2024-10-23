@@ -8,7 +8,6 @@ $(".openMenuTopo").click(() => {
 });
 
 // Alterna a visibilidade do #popup-profile e oculta o #notification-dropdown
-$("#popup-profile").toggle(); 
 $(".userProfile-circle").click(() => {
     $("#popup-profile").toggle();            // Alterna o #popup-profile
     $("#notification-dropdown").hide();      // Oculta o #notification-dropdown

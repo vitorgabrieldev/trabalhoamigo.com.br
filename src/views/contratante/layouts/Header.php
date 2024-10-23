@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
 </section>
 
 <script>
-
+    $("#popup-profile").toggle();
     const spanEdit = document.querySelector('.span-edit');
     const profileImageInput = document.getElementById('profile-image-input');
     const imgEditor = document.querySelector('.img-editor');

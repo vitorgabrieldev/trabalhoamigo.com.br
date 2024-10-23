@@ -27,14 +27,14 @@ a {
 
 #site-topo {
     background: #F8F8F8;
-    padding: 25px 50px;
+    padding: 15px 50px;
     display: flex;
     justify-content: space-between;
     box-shadow: 10px 0 10px rgba(0, 0, 0, 0.151);
 }
 #site-topo .logo-box {
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     margin-top: 5px;
 }
 #site-topo .logo {
@@ -57,13 +57,13 @@ a {
     align-items: center;
     gap: 10px;
     font-weight: 600;
-    font-size: 20px;
+    font-size: 14px;
     color: #FA511D;
     text-decoration: none;
 }
 #site-topo .link-element img {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
 }
 #site-topo .userProfile-circle {
     display: flex;
@@ -143,7 +143,7 @@ a {
     border: 1px solid rgba(156, 156, 156, 0.171);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.158);
     border-radius: 12px;
-    padding: 10px 10px;
+    padding: 10px 20px 10px 10px;
     z-index: 999;
 }
 #popup-profile .topo-popup-profile{
@@ -154,7 +154,7 @@ a {
 }
 #popup-profile .name-user {
     font-weight: 700;
-    font-size: 18px;
+    font-size: 14px;
     color: #333232;
 }
 #popup-profile .topo-popup-profile img {
@@ -171,18 +171,18 @@ a {
     row-gap: 10px;
 }
 #popup-profile .link {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: #525151;
     text-decoration: none;
     display: flex;
     gap: 10px;
     align-items: center;
-    padding: 5px 10px;
+    padding: 2px 5px;
     border-radius: 4px;
 } 
 #popup-profile .link:hover {
-    background: #fa511d34;
+    background: #fa511d0a;
     transition: .33s;
 }
 #popup-profile .link-child-logout {
@@ -202,8 +202,8 @@ a {
     justify-content: space-between;
 }
 #site-rodape .topo-rodape .logo {
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
 }
 #site-rodape .navigation-social {
     display: flex;
@@ -211,13 +211,13 @@ a {
     gap: 15px;
 }
 #site-rodape .navigation-social img {
-    width: 45px;
-    height: 45px;
+    width: 35px;
+    height: 35px;
     cursor: pointer;
     transition: .33s;
 }
 #site-rodape .navigation-social img:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 #site-rodape .bar-long {
     margin: 30px 0;
@@ -237,17 +237,21 @@ a {
 }
 #site-rodape .item .titulo {
     font-weight: 800;
-    font-size: 22px;
+    font-size: 18px;
     color: #FA511D;
 }
 #site-rodape .item .list-itens {
     display: flex;
     flex-direction: column;
-    row-gap: 15px;
+    row-gap: 10px;
+}
+#site-rodape .item .list-itens .itens-links:hover {
+    transition: .1s;
+    text-decoration: underline;
 }
 #site-rodape .item .list-itens .itens-links {
     text-decoration: none;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
     color: #686868;
 }
@@ -256,7 +260,8 @@ a {
     justify-content: start;
 }
 #site-rodape .d-flex-footer .copy {
-    font-size: 16px;
+    font-size: 12px;
+    letter-spacing: 1px;
     font-weight: 500;
     color: #686868;
 }
@@ -625,6 +630,7 @@ a {
     border-radius: 50%;
     width: 50px;
     height: 50px;
+    user-select: none;
 }
 
 #loading-screen {

@@ -28,7 +28,7 @@ function getDatabaseConnection() {
 
 // Função para verificar se o CPF, e-mail ou telefone já estão registrados
 function isDuplicate($conexao, $cpf, $email, $telefone) {
-    $sql = "SELECT COUNT(*) AS count FROM usuarios WHERE cpf = ? OR email = ? OR telefone = ?";
+    $sql = "SELECT COUNT(*) AS count FROM usuarios WHERE cpf = ? OR email = ? OR telefone = ? AND ativo = 1";
     $stmt = $conexao->prepare($sql);
     $stmt->bind_param('sss', $cpf, $email, $telefone);
     $stmt->execute();
@@ -174,12 +174,15 @@ function sessionAction($dados) {
     $_SESSION['telefone'] = $dados['telefone'];
     $_SESSION['email'] = $dados['email'];
     $_SESSION['cpf'] = $dados['cpf'];
-    $_SESSION['cnpj'] = $dados['cnpj'];
     $_SESSION['data_Criacao'] = $dados['data_Criacao'];
     $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
     $_SESSION['ativo'] = $dados['ativo'];
     $_SESSION['unique_id'] = $dados['unique_id'];
-    $_SESSION['img'] = $dados['img'];
+    
+    // Verifica se existe imagem no banco
+    if (empty($dados['img'])) {
+        $_SESSION['img'] = $dados['img'];
+    }
 
 };
 

@@ -26,7 +26,7 @@ function getDatabaseConnection() {
 }
 
 function verificarUsuario($conexao, $email, $senha) {
-    $sql = "SELECT id_usuario, senha FROM usuarios WHERE email = ? and tipo_usuario = 'anunciante'";
+    $sql = "SELECT id_usuario, senha FROM usuarios WHERE email = ? and tipo_usuario = 'anunciante' AND ativo = 1";
     $stmt = $conexao->prepare($sql);
 
     if (!$stmt) {
@@ -101,13 +101,16 @@ function processLogin() {
                 $_SESSION['telefone'] = $dados['telefone'];
                 $_SESSION['email'] = $dados['email'];
                 $_SESSION['cpf'] = $dados['cpf'];
-                $_SESSION['cnpj'] = $dados['cnpj'];
                 $_SESSION['data_Criacao'] = $dados['data_Criacao'];
                 $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
                 $_SESSION['ativo'] = $dados['ativo'];
                 $_SESSION['id_usuario'] = $usuarioId;
                 $_SESSION['unique_id'] = $dados['unique_id'];
-                $_SESSION['img'] = $dados['img'];
+
+                // Verifica se existe imagem no banco
+                if (empty($dados['img'])) {
+                    $_SESSION['img'] = $dados['img'];
+                }
 
                 echo json_encode([
                     'success' => true,

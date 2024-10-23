@@ -69,7 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
     <header class="topo-popup-profile">
         <div class="edit-user">
         <?php
-            $userImage = isset($_SESSION['img']) ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] : '../../../../public/img/UserProfile-default.png';
+            $userImage = (isset($_SESSION['img']) && strlen($_SESSION['img']) > 1) 
+            ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] 
+            : '../../../../public/img/UserProfile-default.png';
         ?>
         <img class="img-editor" id="profile-image" src="<?php echo htmlspecialchars($userImage); ?>">    
             <span class="span-edit">
@@ -187,7 +189,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
         </div>
         <div class="userProfile-circle">
             <?php
-                $userImage = isset($_SESSION['img']) ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] : '../../../../public/img/UserProfile-default.png';
+                $userImage = (isset($_SESSION['img']) && strlen($_SESSION['img']) > 1) 
+                ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] 
+                : '../../../../public/img/UserProfile-default.png';
             ?>
             <img class="imag-topo" width="40px" heigth="40px" src="<?php echo htmlspecialchars($userImage); ?>">
             <img src="../../../../public/img/Topo-User-More.png" alt="Btn Mais informações">

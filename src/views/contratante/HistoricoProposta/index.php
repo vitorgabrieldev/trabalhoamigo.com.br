@@ -31,7 +31,7 @@ if ($id_usuario) {
             FROM proposta p 
             JOIN servicos s ON p.id_servico_fk = s.id_servico 
             JOIN usuarios u ON p.id_usuario_prestador_fk = u.id_usuario 
-            WHERE p.id_usuario_contrante_fk = ?";
+            WHERE p.id_usuario_contrante_fk = ? AND u.ativo = 1";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id_usuario);

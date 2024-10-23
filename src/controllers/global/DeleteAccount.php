@@ -23,12 +23,16 @@ if ($conn->connect_error) {
 
 if (isset($_SESSION['id_usuario'])) {
     $userId = $_SESSION['id_usuario'];
-    error_log("ID do usuário: $userId"); // Log para depuração
+    error_log("ID do usuário: $userId");
 
     // Prepare a consulta para excluir o usuário
-    $query = "DELETE FROM usuarios WHERE id_usuario = ?";
+    $query = "UPDATE usuarios SET ativo = 0, delete_at = ?, email = ? WHERE id_usuario = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $userId);
+
+    $deleteAt      = date("Y-m-d H:i:s");
+    $deleteEmail   = 'delete_'.$_SESSION['email'].'_'.uniqid();
+
+    $stmt->bind_param("ssi", $deleteAt, $deleteEmail, $userId);
 
     if ($stmt->execute()) {
 

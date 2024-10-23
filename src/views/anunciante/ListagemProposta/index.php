@@ -89,7 +89,7 @@ $sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS t
         FROM proposta p 
         JOIN servicos s ON p.id_servico_fk = s.id_servico 
         JOIN usuarios u ON p.id_usuario_contrante_fk = u.id_usuario 
-        WHERE p.id_usuario_prestador_fk = ? AND p.status != 4";
+        WHERE p.id_usuario_prestador_fk = ? AND p.status != 4 AND u.ativo = 1";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
@@ -154,32 +154,32 @@ $conn->close();
                 <div class="grid-item"><?= $proposta['titulo_servico'] ?></div>
                 <div class="grid-item">R$ <?= number_format($proposta['valor_total'], 2, ',', '.') ?></div>
                 <div class="grid-item">
-                    <?php if ($proposta['status'] == 2):?>
-                        <button class="button" onclick="showContractorInfo(
-                            '<?= addslashes($proposta['primeiro_nome']) ?>',
-                            '<?= addslashes($proposta['telefone']) ?>',
-                            '<?= addslashes($proposta['celular']) ?>',
-                            '<?= addslashes($proposta['whatsapp']) ?>',
-                            '<?= addslashes($proposta['unique_id']) ?>',
-                            '<?= addslashes($proposta['email']) ?>',
-                            '<?= addslashes($proposta['id_contrato']) ?>'
-                        )">
-                            Entrar em contato <i class="bi bi-arrow-right"></i>
-                        </button>
-                    <?php else: ?>
-                        <button class="button button-vermais" onclick="showServiceDetails(
-                            <?= $proposta['id_contrato'] ?>,
-                            '<?= addslashes($proposta['titulo_servico']) ?>',
-                            <?= $proposta['valor_total'] ?>,
-                            '<?= addslashes($proposta['primeiro_nome']) ?>',
-                            '<?= addslashes($proposta['telefone']) ?>',
-                            '<?= addslashes($proposta['celular']) ?>',
-                            '<?= addslashes($proposta['whatsapp']) ?>',
-                            '<?= addslashes($proposta['email']) ?>',
-                            '<?= addslashes($proposta['prazo_estimado']) ?>',
-                            '<?= addslashes($proposta['data_esperada']) ?>'
-                        )">Clique para ver proposta</button>
-                    <?php endif; ?>
+                <?php if ($proposta['status'] == 1): ?>
+                    <button class="button button-vermais" onclick="showServiceDetails(
+                        <?= $proposta['id_contrato'] ?>,
+                        '<?= addslashes($proposta['titulo_servico']) ?>',
+                        <?= $proposta['valor_total'] ?>,
+                        '<?= addslashes($proposta['primeiro_nome']) ?>',
+                        '<?= addslashes($proposta['telefone']) ?>',
+                        '<?= addslashes($proposta['celular']) ?>',
+                        '<?= addslashes($proposta['whatsapp']) ?>',
+                        '<?= addslashes($proposta['email']) ?>',
+                        '<?= addslashes($proposta['prazo_estimado']) ?>',
+                        '<?= addslashes($proposta['data_esperada']) ?>'
+                    )">Visualizar <i class="bi bi-gear-fill"></i></button>
+                <?php elseif ($proposta['status'] == 2): ?>
+                    <button class="button" onclick="showContractorInfo(
+                        '<?= addslashes($proposta['primeiro_nome']) ?>',
+                        '<?= addslashes($proposta['telefone']) ?>',
+                        '<?= addslashes($proposta['celular']) ?>',
+                        '<?= addslashes($proposta['whatsapp']) ?>',
+                        '<?= addslashes($proposta['unique_id']) ?>',
+                        '<?= addslashes($proposta['email']) ?>',
+                        '<?= addslashes($proposta['id_contrato']) ?>'
+                    )">Entrar em contato <i class="bi bi-arrow-right"></i></button>
+                <?php elseif ($proposta['status'] == 3): ?>
+                    <button class="button button-finalizado" disabled>Proposta finalizada</button>
+                <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>

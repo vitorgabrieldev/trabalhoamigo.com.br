@@ -100,36 +100,69 @@
                                     s.comunitario, 
                                     c.nome AS categoria_nome,
                                     s.data_Criacao,
-                                    s.imagem
+                                    s.imagem,
+                                    u.id_usuario
                                 FROM 
                                     servicos s
                                 INNER JOIN 
                                     categorias c ON s.id_categoria_fk = c.id_categoria
+                                INNER JOIN 
+                                    usuarios u ON s.id_usuario_fk = u.id_usuario
                                 WHERE 
-                                    s.ativo = 1
+                                    s.ativo = 1 
+                                    AND u.ativo = 1
                                 ORDER BY 
                                     s.data_Criacao DESC
                                 LIMIT ? OFFSET ?
                             ";
-                            
+
+                            // Preparar a consulta
                             $stmt = $conexao->prepare($sql);
-                            $stmt->bind_param('ii', $limit, $offset);  // Ligamos os parâmetros
-                            $stmt->execute();
+
+                            // Verificar se a preparação falhou
+                            if ($stmt === false) {
+                                die('Erro na preparação da consulta: ' . $conexao->error);
+                            }
+
+                            // Associar os parâmetros
+                            $stmt->bind_param('ii', $limit, $offset);
+
+                            // Executar a consulta
+                            if (!$stmt->execute()) {
+                                die('Erro na execução da consulta: ' . $stmt->error);
+                            }
+
+                            // Obter os resultados
                             $result = $stmt->get_result();
-                            
-                            if ($result->num_rows > 0) {
+
+                            // Retornar os dados ou um array vazio se não houver resultados
+                            if ($result) {
                                 return $result->fetch_all(MYSQLI_ASSOC);
                             } else {
                                 return [];
                             }
                         }
 
-                        // Função para contar o total de serviços
+                        // Função para contar o total de serviços com usuários ativados
                         function getTotalServicos($conexao) {
-                            $sql = "SELECT COUNT(*) AS total FROM servicos WHERE ativo = 1";
+                            $sql = "
+                                SELECT COUNT(*) AS total 
+                                FROM servicos s
+                                INNER JOIN usuarios u ON s.id_usuario_fk = u.id_usuario
+                                WHERE s.ativo = 1
+                                AND u.ativo = 1
+                            ";
+                            
+                            // Executar a consulta
                             $result = $conexao->query($sql);
-                            $row = $result->fetch_assoc();
-                            return $row['total'];
+
+                            // Verificar se a consulta retornou resultado
+                            if ($result) {
+                                $row = $result->fetch_assoc();
+                                return $row['total'];
+                            } else {
+                                return 0; // Retorna 0 se não houver resultados ou ocorrer erro
+                            }
                         }
 
                         // Função para renderizar os serviços
@@ -208,7 +241,7 @@
                                 $conexao = getDatabaseConnection();
 
                                 // Parâmetros de paginação
-                                $limit = 8; // Serviços por página
+                                $limit = 6; // Serviços por página
                                 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;  // Página atual, padrão 1
                                 $offset = ($page - 1) * $limit;  // Cálculo de offset
 

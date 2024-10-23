@@ -1,112 +1,121 @@
-const form = document.querySelector(".typing-area"),
-    incoming_id = form.querySelector(".incoming_id").value,
-    inputField = form.querySelector(".input-field"),
-    sendBtn = form.querySelector("button"),
-    chatBox = document.querySelector(".chat-box");
+$(document).ready(function () {
+    const form = $(".typing-area"),
+        incoming_id = form.find(".incoming_id").val(),
+        inputField = form.find(".input-field"),
+        sendBtn = form.find("button"),
+        chatBox = $(".chat-box");
 
-inputField.disabled = true;
-sendBtn.disabled = true;
+    inputField.prop("disabled", true);
+    sendBtn.prop("disabled", true);
 
-let lastMessageId = 0; // Guardar o ID da última mensagem
+    let lastMessageId = 0; // Guardar o ID da última mensagem
 
-// Evita o envio padrão do formulário
-form.onsubmit = (e) => {
-    e.preventDefault();
-}
+    // Evita o envio padrão do formulário
+    form.on("submit", function (e) {
+        e.preventDefault();
+    });
 
-inputField.focus();
-inputField.onkeyup = (e) => {
-    if (inputField.value != "") {
-        sendBtn.classList.add("active");
-    } else {
-        sendBtn.classList.remove("active");
-    }
-}
+    inputField.focus();
 
-// Envia a mensagem ao clicar no botão ou pressionar Enter
-inputField.addEventListener("keypress", (e) => {
-    if (e.key === "Enter" && inputField.value != "") {
-        sendMessage();
-    }
-});
-
-sendBtn.onclick = () => {
-    if (sendBtn.classList.contains("active")) {
-        sendMessage();
-    }
-}
-
-function sendMessage() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "php/insert-chat.php", true);
-
-    // Indicador de carregamento
-    sendBtn.innerHTML = "<div class='loading-chat'></div>";
-    sendBtn.disabled = true;
-    inputField.disabled = true;
-
-    xhr.onload = () => {
-        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            inputField.value = ""; 
-            sendBtn.innerHTML = "<i class='fab fa-telegram-plane'></i>"; // Restaura o botão
-            sendBtn.disabled = false;
-            inputField.disabled = false;
-            scrollToBottom();
-            fetchMessages();
+    inputField.on("keyup", function () {
+        if (inputField.val() != "") {
+            sendBtn.addClass("active");
+        } else {
+            sendBtn.removeClass("active");
         }
-    }
+    });
 
-    let formData = new FormData(form);
-    xhr.send(formData);
-}
+    // Envia a mensagem ao clicar no botão ou pressionar Enter
+    inputField.on("keypress", function (e) {
+        if (e.key === "Enter" && inputField.val() != "") {
+            sendMessage();
+        }
+    });
 
-// Função para buscar novas mensagens a partir da última mensagem carregada
-function fetchMessages() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "php/get-chat.php", true);
-    xhr.onload = () => {
-        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            let data = xhr.responseText;
-            if (data.trim() !== "") {
-                chatBox.innerHTML = data;
-                scrollToBottom();
+    sendBtn.on("click", function () {
+        if (sendBtn.hasClass("active")) {
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
+        const servico_id = new URLSearchParams(window.location.search).get('proposta_id');
+
+        let formData = form.serializeArray(); // Serializa os dados do formulário
+        formData.push({ name: 'proposta_id', value: servico_id }); // Adiciona o servico_id
+
+        sendBtn.html("<div class='loading-chat'></div>").prop("disabled", true);
+        inputField.prop("disabled", true);
+
+        $.ajax({
+            type: "POST",
+            url: "php/insert-chat.php",
+            data: formData,
+            dataType: "json",
+            success: function (response) {
+                if (response.error) {
+                    alert(response.error);
+                } else {
+                    inputField.val(""); // Limpa o campo de entrada
+                    sendBtn.html("<i class='fab fa-telegram-plane'></i>").prop("disabled", false);
+                    inputField.prop("disabled", false);
+                    scrollToBottom();
+                    fetchMessages(); // Chama a função para buscar novas mensagens
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Erro ao enviar mensagem:", error);
             }
-        }
+        });
     }
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhr.send("incoming_id=" + incoming_id + "&last_message_id=" + lastMessageId);
 
-    return true;
-}
+    function fetchMessages() {
+        $.ajax({
+            type: "POST",
+            url: "php/get-chat.php",
+            data: {
+                incoming_id: incoming_id,
+                last_message_id: lastMessageId,
+                proposta_id: new URLSearchParams(window.location.search).get('proposta_id')
+            },
+            success: function (data) {
+                if (data.trim() !== "") {
+                    chatBox.html(data);
+                    scrollToBottom();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Erro ao buscar mensagens:", error);
+            }
+        });
+    }
 
-// Monitora se a caixa de chat está ativa
-chatBox.onmouseenter = () => {
-    chatBox.classList.add("active");
-}
+    // Monitora se a caixa de chat está ativa
+    chatBox.on("mouseenter", function () {
+        chatBox.addClass("active");
+    });
 
-chatBox.onmouseleave = () => {
-    chatBox.classList.remove("active");
-}
+    chatBox.on("mouseleave", function () {
+        chatBox.removeClass("active");
+    });
 
-// Função para rolar a barra de chat para o fundo
-function scrollToBottom() {
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
+    // Função para rolar a barra de chat para o fundo
+    function scrollToBottom() {
+        chatBox.scrollTop(chatBox[0].scrollHeight);
+    }
 
-async function fetchAndStartLoop() {
-    const getRequest = await fetchMessages(); 
+    async function fetchAndStartLoop() {
+        await fetchMessages(); // Busca mensagens na inicialização
 
-    if (getRequest) {
-        
-        inputField.disabled = false;
-        sendBtn.disabled = false;
+        inputField.prop("disabled", false);
+        sendBtn.prop("disabled", false);
         
         setInterval(() => {
-            if (!chatBox.classList.contains("active")) {
+            if (!chatBox.hasClass("active")) {
                 fetchMessages();
             }
         }, 2000);
     }
-}
 
-fetchAndStartLoop();
+    fetchAndStartLoop();
+});

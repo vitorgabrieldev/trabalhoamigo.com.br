@@ -11,12 +11,18 @@
     <section class="chat-area">
       <header>
         <?php 
-          $user_id = mysqli_real_escape_string($conn, $_GET['user_id']);
+          $user_id        = mysqli_real_escape_string($conn, $_GET['user_id']);
+          $proposta_id    = mysqli_real_escape_string($conn, $_GET['proposta_id']);
+
+          if (!isset($proposta_id)) {
+            header("location: ../");  
+          }
+
           $sql = mysqli_query($conn, "SELECT * FROM usuarios WHERE unique_id = {$user_id}");
           if(mysqli_num_rows($sql) > 0){
             $row = mysqli_fetch_assoc($sql);
           }else{
-            header("location: usuarios.php");
+            header("location: ../");
           }
         ?>
         <div class="details">
@@ -38,11 +44,13 @@
           </div>
         </div>
       </div>
-      <div action="#" class="typing-area">
-        <input type="text" class="incoming_id" name="incoming_id" value="<?php echo $user_id; ?>" hidden>
-        <input type="text" name="message" class="input-field" placeholder="Digite sua mensagem aqui..." autocomplete="off">
-        <button><i class="fab fa-telegram-plane"></i></button>
+      <form class="typing-area">
+          <input type="text" class="incoming_id" name="incoming_id" value="<?php echo $user_id; ?>" hidden>
+          <input type="text" name="message" class="input-field" placeholder="Digite sua mensagem aqui..." autocomplete="off">
+          <button type="submit"><i class="fab fa-telegram-plane"></i></button> <!-- Lembre-se de adicionar type="submit" -->
       </form>
+
+
     </section>
   </div>
 

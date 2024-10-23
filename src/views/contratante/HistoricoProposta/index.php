@@ -130,7 +130,7 @@ $conn->close();
                     <?php endif; ?>
 
                     <?php if ($proposta['status'] == 2): ?>
-                        <button class="button" onclick="showContractorInfo('<?= addslashes($proposta['primeiro_nome']) ?>','<?= addslashes($proposta['telefone']) ?>','<?= addslashes($proposta['celular']) ?>','<?= addslashes($proposta['whatsapp']) ?>','<?= addslashes($proposta['unique_id']) ?>','<?= addslashes($proposta['email']) ?>')">
+                        <button class="button" onclick="showContractorInfo('<?= addslashes($proposta['primeiro_nome']) ?>','<?= addslashes($proposta['telefone']) ?>','<?= addslashes($proposta['celular']) ?>','<?= addslashes($proposta['whatsapp']) ?>','<?= addslashes($proposta['unique_id']) ?>','<?= addslashes($proposta['email']) ?>','<?= addslashes($proposta['id_contrato']) ?>')">
                             Abrir <i class="bi bi-arrow-right"></i>
                         </button>
                         <button class="button" onclick="showModalSettings('<?= addslashes($proposta['id_contrato']) ?>')">
@@ -145,7 +145,7 @@ $conn->close();
     <?php include '../layouts/Footer.php'; ?>
 
     <script>
-        function showContractorInfo(primeiroNome, telefone, celular, whatsapp, unique_id, email) {
+        function showContractorInfo(primeiroNome, telefone, celular, whatsapp, unique_id, email, id_proposta) {
             Swal.fire({
                 title: 'Informações do Prestador',
                 html: `
@@ -164,7 +164,7 @@ $conn->close();
                 padding: '1.5rem',
             }).then((result) => {
                 if (result.isDismissed) {
-                    window.open(`../../../../chat/chat.php?user_id=${unique_id}`, "_blank");
+                    window.open(`../../../../chat/chat.php?user_id=${unique_id}&proposta_id=${id_proposta}`, "_blank");
                 }
             });
         }

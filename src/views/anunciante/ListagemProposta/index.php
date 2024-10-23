@@ -161,7 +161,8 @@ $conn->close();
                             '<?= addslashes($proposta['celular']) ?>',
                             '<?= addslashes($proposta['whatsapp']) ?>',
                             '<?= addslashes($proposta['unique_id']) ?>',
-                            '<?= addslashes($proposta['email']) ?>'
+                            '<?= addslashes($proposta['email']) ?>',
+                            '<?= addslashes($proposta['id_contrato']) ?>'
                         )">
                             Entrar em contato <i class="bi bi-arrow-right"></i>
                         </button>
@@ -309,7 +310,7 @@ $conn->close();
         }, 3000);
     }
 
-    function showContractorInfo(primeiroNome, telefone, celular, whatsapp, unique_id, email) {
+    function showContractorInfo(primeiroNome, telefone, celular, whatsapp, unique_id, email, id_contrato) {
         Swal.fire({
         title: 'Informações do Contratante',
         html: `
@@ -335,7 +336,7 @@ $conn->close();
         if (result.isConfirmed) {
             // O usuário clicou em "Fechar"
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            window.open(`../../../../chat/chat.php?user_id=${unique_id}`, "_blank");
+            window.open(`../../../../chat/chat.php?user_id=${unique_id}&proposta_id=${id_contrato}`, "_blank");
         }
     });
     }

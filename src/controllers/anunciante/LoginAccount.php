@@ -106,11 +106,7 @@ function processLogin() {
                 $_SESSION['ativo'] = $dados['ativo'];
                 $_SESSION['id_usuario'] = $usuarioId;
                 $_SESSION['unique_id'] = $dados['unique_id'];
-
-                // Verifica se existe imagem no banco
-                if (empty($dados['img'])) {
-                    $_SESSION['img'] = $dados['img'];
-                }
+                $_SESSION['img'] = $dados['img'];
 
                 echo json_encode([
                     'success' => true,

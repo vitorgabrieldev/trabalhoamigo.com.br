@@ -178,11 +178,7 @@ function sessionAction($dados) {
     $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
     $_SESSION['ativo'] = $dados['ativo'];
     $_SESSION['unique_id'] = $dados['unique_id'];
-    
-    // Verifica se existe imagem no banco
-    if (empty($dados['img'])) {
-        $_SESSION['img'] = $dados['img'];
-    }
+    $_SESSION['img'] = $dados['img'];
 
 };
 

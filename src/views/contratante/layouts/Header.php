@@ -864,54 +864,65 @@ $(document).ready(function() {
     $('.reset-fator').on('click', function(e) {
         e.preventDefault(); // Impede o comportamento padrão do link
 
-        if (confirm('Você tem certeza que deseja resetar a autenticação de dois fatores?')) {
-            $(".background-loading-50").removeClass('hidden'); // Mostra um loader ou algo para indicar carregamento
+        Swal.fire({
+            title: 'Você tem certeza?',
+            text: 'Deseja realmente resetar a autenticação de dois fatores?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, resetar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $(".background-loading-50").removeClass('hidden'); // Mostra o loader
 
-            $.ajax({
-                url: '../layouts/controller/AuthTOTP_reset.php',
-                method: 'POST',
-                data: {
-                    reset_totp: 1
-                },
-                success: function(response) {
-                    $(".background-loading-50").addClass('hidden');
-                    try {
-                        var data = typeof response === 'string' ? JSON.parse(response) : response;
+                $.ajax({
+                    url: '../layouts/controller/AuthTOTP_reset.php',
+                    method: 'POST',
+                    data: {
+                        reset_totp: 1
+                    },
+                    success: function(response) {
+                        $(".background-loading-50").addClass('hidden');
+                        try {
+                            var data = typeof response === 'string' ? JSON.parse(response) : response;
 
-                        if (data.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Sucesso!',
-                                text: data.message
-                            });
-                            location.reload();
-                        } else {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sucesso!',
+                                    text: data.message
+                                });
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro',
+                                    text: data.message
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Erro ao processar a resposta:', e);
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Erro',
-                                text: data.message
+                                text: 'Ocorreu um erro inesperado ao processar a resposta.'
                             });
                         }
-                    } catch (e) {
-                        console.error('Erro ao processar a resposta:', e);
+                    },
+                    error: function(xhr, status, error) {
+                        $(".background-loading-50").addClass('hidden'); // Esconde o loader
+                        console.error('Erro na requisição:', xhr, status, error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Erro',
-                            text: 'Ocorreu um erro inesperado ao processar a resposta.'
+                            text: 'Ocorreu um erro, tente novamente mais tarde.'
                         });
                     }
-                },
-                error: function(xhr, status, error) {
-                    $(".background-loading-50").addClass('hidden'); // Esconde o loader
-                    console.error('Erro na requisição:', xhr, status, error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erro',
-                        text: 'Ocorreu um erro, tente novamente mais tarde.'
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     });
 });
 

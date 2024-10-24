@@ -96,11 +96,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
             </svg>
             Alterar endereço
         </a>
-        <a class="link DispathAlert" href="#">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
-                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247m2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/>
+        <a class="link" onclick="openModalSecurity()" href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-shield-lock-fill" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 0c-.69 0-1.843.265-2.928.56-1.11.3-2.229.655-2.887.87a1.54 1.54 0 0 0-1.044 1.262c-.596 4.477.787 7.795 2.465 9.99a11.8 11.8 0 0 0 2.517 2.453c.386.273.744.482 1.048.625.28.132.581.24.829.24s.548-.108.829-.24a7 7 0 0 0 1.048-.625 11.8 11.8 0 0 0 2.517-2.453c1.678-2.195 3.061-5.513 2.465-9.99a1.54 1.54 0 0 0-1.044-1.263 63 63 0 0 0-2.887-.87C9.843.266 8.69 0 8 0m0 5a1.5 1.5 0 0 1 .5 2.915l.385 1.99a.5.5 0 0 1-.491.595h-.788a.5.5 0 0 1-.49-.595l.384-1.99A1.5 1.5 0 0 1 8 5"/>
             </svg>
-            Ajuda
+            Segurança
         </a>
     </div>
     <hr class="small-line">
@@ -713,4 +713,239 @@ function closeModalPerfil() {
             }
         });
     });
+</script>
+
+<?php
+
+if (!isset($_SESSION)) {
+    session_start();
+}
+
+require '../../../../vendor/autoload.php';
+
+use OTPHP\TOTP;
+
+$username = $usuario['primeiro_nome'];
+$hostname = 'TrabalhoAmigo';
+
+$totp = TOTP::create();
+
+$totp->setLabel($username . '@' . $hostname);
+$secret = $totp->getSecret();
+$_SESSION['TOTP_secret'] = $secret;
+$provisioningUri = $totp->getProvisioningUri();
+$urimage = 'https://api.qrserver.com/v1/create-qr-code/?data='.$provisioningUri;
+
+?>
+
+<!-- Modal de segurança -->
+<div id="modal-alterar-seguranca" class="modal-alterar-endereco" style="display: none">
+    <div class="modal-content-alterar-endereco">
+        <span class="close-alterar-endereco" onclick="closeModalSeguranca()">&times;</span>
+
+        <?php if (!isset($usuario['totp_secret']) || empty($usuario['totp_secret'])): ?>
+            <!-- Se o usuário não tiver o `totp_secret`, exibe o formulário para configurar o TOTP -->
+            <form id="form-alterar-securanca" action="../layouts/controller/AuthTOTP.php" method="POST">
+                <div class="qrcode-container">
+                    <img class="arcode-imagem" src="<?= $urimage ?>" alt="Imagem qrcode">
+                </div>
+                <div class="qrcode-description">
+                    <p class="text-qrcode">
+                        Escaneie pelo seu celular
+                    </p>
+                </div>
+                <hr class="margin-bottom-15-px">
+                <div class="form-group-alterar-endereco">
+                    <label for="numero">Código:</label>
+                    <input maxlength="6" type="text" id="code" name="code" placeholder="Digite o código que aparece em seu aplicativo vinculado" required>
+                </div>
+                <button type="submit" class="btn-alterar-endereco">Verificar código</button>
+            </form>
+        <?php else: ?>
+            <!-- Se o usuário já tiver o `totp_secret`, exibe uma mensagem de que a autenticação TOTP está configurada -->
+            <div class="totp-configured">
+                <p>Gerenciar autenticação de dois fatores.</p>
+                <section class="container-fatores">
+                <label class="switch">
+                <input type="checkbox" id="fatores" name="fatores" <?php if (isset($usuario['totp_enabled']) && $usuario['totp_enabled'] == 1) echo 'checked'; ?> />
+                <span class="slider"></span>
+                </label>
+                </section>
+                <hr>
+                <a href="#" class="reset-fator">Resetar autenticação de dois fatores</a>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<script>
+function openModalSecurity() {
+    document.getElementById('modal-alterar-seguranca').style.display = 'flex';
+    $("#popup-profile").toggle();
+}
+
+function closeModalSeguranca() {
+    document.getElementById('modal-alterar-seguranca').style.display = 'none';
+}
+
+// Interceptar a submissão do formulário
+$("#form-alterar-securanca").on("submit", function(event) {
+    event.preventDefault();
+
+    $(".background-loading-50").removeClass('hidden');
+
+    $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function(data) {
+            $(".background-loading-50").addClass('hidden');
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso!',
+                    text: data.message 
+                });
+                closeModalSeguranca();
+                location.reload();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: data.message
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            $(".background-loading-50").addClass('hidden');
+            console.error('Erro na requisição:', xhr);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Ocorreu um erro, tente novamente mais tarde.'
+            });
+        }
+    });
+});
+
+
+$(document).ready(function(){
+    $('#fatores').change(function(){
+        var isChecked = $(this).is(':checked');
+        
+        $(".background-loading-50").removeClass('hidden');
+
+        $.ajax({
+            url: '../layouts/controller/AuthTOTP_button.php',
+            method: 'POST',
+            data: {
+                ativar_totp: isChecked ? 1 : 0
+            },
+            success: function(response) {
+                $(".background-loading-50").addClass('hidden');
+                try {
+                    var data = response;
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: data.message
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.message
+                        });
+                    }
+                } catch (e) {
+                    console.error('Erro ao processar a resposta:', e);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Ocorreu um erro inesperado ao processar a resposta.'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                $(".background-loading-50").addClass('hidden');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro na requisição: ' + error
+                });
+            }
+        });
+    });
+});
+
+
+$(document).ready(function() {
+    $('.reset-fator').on('click', function(e) {
+        e.preventDefault(); // Impede o comportamento padrão do link
+
+        Swal.fire({
+            title: 'Você tem certeza?',
+            text: 'Deseja realmente resetar a autenticação de dois fatores?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, resetar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $(".background-loading-50").removeClass('hidden'); // Mostra o loader
+
+                $.ajax({
+                    url: '../layouts/controller/AuthTOTP_reset.php',
+                    method: 'POST',
+                    data: {
+                        reset_totp: 1
+                    },
+                    success: function(response) {
+                        $(".background-loading-50").addClass('hidden');
+                        try {
+                            var data = typeof response === 'string' ? JSON.parse(response) : response;
+
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sucesso!',
+                                    text: data.message
+                                });
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro',
+                                    text: data.message
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Erro ao processar a resposta:', e);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: 'Ocorreu um erro inesperado ao processar a resposta.'
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $(".background-loading-50").addClass('hidden'); // Esconde o loader
+                        console.error('Erro na requisição:', xhr, status, error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: 'Ocorreu um erro, tente novamente mais tarde.'
+                        });
+                    }
+                });
+            }
+        });
+    });
+});
+
+
 </script>

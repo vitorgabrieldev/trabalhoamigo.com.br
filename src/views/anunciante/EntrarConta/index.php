@@ -28,20 +28,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        #vanta {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        #EntrarContaUsuario {
-            z-index: 999;
-            background: #fff;
-            border-radius: 12px;
-        }
-    </style>
-
-    <style>
         body {
             overflow-y: hidden;
         }
@@ -68,32 +54,6 @@
                     });
                 }
             });
-        </script>
-
-        <div id="vanta"></div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
-
-        <script>
-            var setVanta = () => {
-                if (window.VANTA) {
-                    VANTA.WAVES({
-                        el: "#vanta",  // Selecionando o elemento onde a animação será aplicada
-                        mouseControls: true,
-                        touchControls: true,
-                        gyroControls: true,
-                        minHeight: 200.00,
-                        minWidth: 200.00,
-                        scale: 1.00,
-                        scaleMobile: 1.00,
-                        color: '#1a73e8'
-                    });
-                }
-            };
-
-            window.onload = function() {
-                setVanta();
-            };
         </script>
 
         <section id="EntrarContaUsuario">
@@ -137,6 +97,12 @@
                     </div>
                 </main>
             </div>
+            
+            <div class="background-loading-50 hidden">
+                <div class="loading-icon"></div>
+            </div>
         </section>
+
+
     </body>
 </html>

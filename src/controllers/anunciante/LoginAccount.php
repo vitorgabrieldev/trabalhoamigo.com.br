@@ -26,22 +26,21 @@ function getDatabaseConnection() {
 }
 
 function verificarUsuario($conexao, $email, $senha) {
-    $sql = "SELECT id_usuario, senha FROM usuarios WHERE email = ? and tipo_usuario = 'anunciante' AND ativo = 1";
+    $sql = "SELECT id_usuario, senha, totp_enabled FROM usuarios WHERE email = ? AND tipo_usuario = 'anunciante' AND ativo = 1";
     $stmt = $conexao->prepare($sql);
 
     if (!$stmt) {
-        // Exibe a mensagem de erro da consulta SQL
         throw new Exception("Erro na preparação da consulta: " . $conexao->error);
     }
 
     $stmt->bind_param('s', $email);
     $stmt->execute();
-    $stmt->bind_result($id, $senhaHash);
+    $stmt->bind_result($id, $senhaHash, $totp_enabled);
     $stmt->fetch();
     $stmt->close();
     
     if ($id && password_verify($senha, $senhaHash)) {
-        return $id;
+        return ['id' => $id, 'totp_enabled' => $totp_enabled];
     } else {
         return false;
     }
@@ -69,6 +68,28 @@ function retornUsuarioLogado($conexao, $email) {
     }
 }
 
+require '../../../vendor/autoload.php';
+
+use OTPHP\TOTP;
+
+function verificarTOTP($id, $code) {
+    $conexao = getDatabaseConnection();
+
+    $sql = "SELECT totp_secret FROM usuarios WHERE id_usuario = ?";
+    $stmt = $conexao->prepare($sql);
+
+    if (!$stmt) { throw new Exception("Erro na preparação da consulta: " . $conexao->error);}
+
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $stmt->bind_result($totp_secret);
+    $stmt->fetch();
+    $stmt->close();
+
+    $totp = TOTP::create($totp_secret);
+
+    return $totp->verify($code);
+}
 
 function processLogin() {
     try {
@@ -77,6 +98,7 @@ function processLogin() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'] ?? null;
             $senha = $_POST['senha'] ?? null;
+            $totpCode = $_POST['totp'] ?? null;
 
             if (empty($email) || empty($senha)) {
                 echo json_encode([
@@ -86,9 +108,28 @@ function processLogin() {
                 exit;
             }
 
-            $usuarioId = verificarUsuario($conexao, $email, $senha);
+            $usuario = verificarUsuario($conexao, $email, $senha);
 
-            if ($usuarioId) {
+            if ($usuario) {
+                if ($usuario['totp_enabled']) {
+                    if (empty($totpCode)) {
+                        echo json_encode([
+                            'success' => false,
+                            'require_totp' => true,
+                            'message' => 'Autenticação de dois fatores necessária.'
+                        ]);
+                        exit;
+                    }
+
+                    if (!verificarTOTP($usuario['id'], $totpCode)) {
+                        echo json_encode([
+                            'success' => false,
+                            'message' => 'Código de autenticação de dois fatores inválido.'
+                        ]);
+                        exit;
+                    }
+                }
+
                 session_start();
                 
                 $dados = retornUsuarioLogado($conexao, $email);
@@ -104,9 +145,10 @@ function processLogin() {
                 $_SESSION['data_Criacao'] = $dados['data_Criacao'];
                 $_SESSION['tipo_usuario'] = $dados['tipo_usuario'];
                 $_SESSION['ativo'] = $dados['ativo'];
-                $_SESSION['id_usuario'] = $usuarioId;
+                $_SESSION['id_usuario'] = $usuario['id'];
                 $_SESSION['unique_id'] = $dados['unique_id'];
                 $_SESSION['img'] = $dados['img'];
+                $_SESSION['id_usuario'] = $usuario['id'];
 
                 echo json_encode([
                     'success' => true,
@@ -133,5 +175,6 @@ function processLogin() {
         ]);
     }
 }
+
 
 processLogin();

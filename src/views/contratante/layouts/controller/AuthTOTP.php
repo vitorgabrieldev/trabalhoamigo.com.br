@@ -1,8 +1,8 @@
 <?php
 
-require '../../../../../library/AuthTOTP/vendor/autoload.php';
+require '../../../../../vendor/autoload.php';
 
-use AuthTOTP\GoogleAuthenticator;
+use OTPHP\TOTP;
 
 session_start();
 
@@ -13,70 +13,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $userId = $_SESSION['id_usuario'];
 
         // Certifique-se de que o secret já foi armazenado na sessão
-        $secret = $_SESSION['TOTP_secret'];;
+        if (isset($_SESSION['TOTP_secret'])) {
+            $secret = $_SESSION['TOTP_secret'];
 
-        // O código enviado pelo usuário
-        $code = $_POST['code'];
+            // O código enviado pelo usuário
+            $code = $_POST['code'];
 
-        // Instancia o GoogleAuthenticator
-        $googleAuthenticator = new GoogleAuthenticator();
+            // Instancia o TOTP com o secret do usuário
+            $totp = TOTP::create($secret);
 
-        // Verifica se o código é válido
-        if ($googleAuthenticator->checkCode($secret, $code)) {
+            // Verifica se o código é válido
+            if ($totp->verify($code)) {
 
-            // Salva o TOTP no banco
-            header('Content-Type: application/json');
+                // Salva o TOTP no banco
+                header('Content-Type: application/json');
 
-            // Configuração da conexão com o banco de dados
-            define('DB_SERVER', '185.173.111.184');
-            define('DB_USERNAME', 'u858577505_trabalhoamigo');
-            define('DB_PASSWORD', '@#Trabalhoamigo023@_');
-            define('DB_NAME', 'u858577505_trabalhoamigo');
+                // Configuração da conexão com o banco de dados
+                define('DB_SERVER', '185.173.111.184');
+                define('DB_USERNAME', 'u858577505_trabalhoamigo');
+                define('DB_PASSWORD', '@#Trabalhoamigo023@_');
+                define('DB_NAME', 'u858577505_trabalhoamigo');
 
-            // Conexão com o banco de dados
-            $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+                // Conexão com o banco de dados
+                $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
-            // Verifica se houve erro na conexão
-            if ($conn->connect_error) {
-                echo json_encode(['success' => false, 'message' => 'Falha na conexão com o banco de dados.']);
-                exit;
-            }
+                // Verifica se houve erro na conexão
+                if ($conn->connect_error) {
+                    echo json_encode(['success' => false, 'message' => 'Falha na conexão com o banco de dados.']);
+                    exit;
+                }
 
-            // Prepara a atualização do segredo TOTP no banco
-            $id_usuario = $_SESSION['id_usuario'];
-            $sql = "UPDATE usuarios SET totp_secret = ? WHERE id_usuario = ?";
-            $stmt = $conn->prepare($sql);
+                // Prepara a atualização do segredo TOTP no banco
+                $sql = "UPDATE usuarios SET totp_secret = ?, totp_enabled = 1 WHERE id_usuario = ?";
+                $stmt = $conn->prepare($sql);
 
-            if ($stmt) {
-                $stmt->bind_param("si", $secret, $id_usuario);
+                if ($stmt) {
+                    $stmt->bind_param("si", $secret, $userId);
 
-                // Executa a atualização e verifica o resultado
-                if ($stmt->execute()) {
-                    $response = [
-                        'success' => true,
-                        'message' => 'Código verificado com sucesso! O segredo TOTP foi salvo.'
-                    ];
+                    // Executa a atualização e verifica o resultado
+                    if ($stmt->execute()) {
+                        $response = [
+                            'success' => true,
+                            'message' => 'Código verificado com sucesso! O segredo TOTP foi salvo.'
+                        ];
+                    } else {
+                        $response = [
+                            'success' => false,
+                            'message' => 'Ocorreu um erro ao atualizar o segredo TOTP.'
+                        ];
+                    }
+
+                    $stmt->close(); // Fecha a declaração
                 } else {
                     $response = [
                         'success' => false,
-                        'message' => 'Ocorreu um erro ao atualizar o segredo TOTP.'
+                        'message' => 'Falha ao preparar a consulta.'
                     ];
                 }
 
-                $stmt->close(); // Fecha a declaração
+                $conn->close(); // Fecha a conexão com o banco de dados
             } else {
+                // O código está incorreto
                 $response = [
                     'success' => false,
-                    'message' => 'Falha ao preparar a consulta.'
+                    'message' => 'Código inválido. Tente novamente.'
                 ];
             }
-
-            $conn->close(); // Fecha a conexão com o banco de dados
         } else {
-            // O código está incorreto
             $response = [
                 'success' => false,
-                'message' => 'Código inválido. Tente novamente.'
+                'message' => 'O segredo TOTP não foi encontrado na sessão.'
             ];
         }
     } else {
@@ -92,4 +98,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode($response);
     exit();
 }
-?>

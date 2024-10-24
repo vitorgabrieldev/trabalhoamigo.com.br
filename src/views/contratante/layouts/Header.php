@@ -700,35 +700,20 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-function gerarChaveUnica($comprimento = 15) {
-    // Define o conjunto de caracteres (apenas letras)
-    $caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    
-    // Gera uma chave aleatória
-    $chaveUnica = '';
-    for ($i = 0; $i < $comprimento; $i++) {
-        $chaveUnica .= $caracteres[rand(0, strlen($caracteres) - 1)];
-    }
-    
-    return $chaveUnica;
-}
+require '../../../../vendor/autoload.php';
 
-require '../../../../library/AuthTOTP/vendor/autoload.php';
-
-use AuthTOTP\GoogleAuthenticator;
+use OTPHP\TOTP;
 
 $username = $usuario['primeiro_nome'];
 $hostname = 'TrabalhoAmigo';
 
-if (isset($_SESSION['TOTP_secret'])) {
-    $secret = $_SESSION['TOTP_secret'];
-} else {
-    $secret = gerarChaveUnica();
-    $_SESSION['TOTP_secret'] = $secret;
-}
+$totp = TOTP::create();
 
-$googleAuthenticator = new GoogleAuthenticator();
-$qrcode_imagem = $googleAuthenticator->generateQRCodeUrl($username, $hostname, $secret);
+$totp->setLabel($username . '@' . $hostname);
+$secret = $totp->getSecret();
+$_SESSION['TOTP_secret'] = $secret;
+$provisioningUri = $totp->getProvisioningUri();
+$urimage = 'https://api.qrserver.com/v1/create-qr-code/?data='.$provisioningUri;
 
 ?>
 
@@ -737,22 +722,38 @@ $qrcode_imagem = $googleAuthenticator->generateQRCodeUrl($username, $hostname, $
     <div class="modal-content-alterar-endereco">
         <span class="close-alterar-endereco" onclick="closeModalSeguranca()">&times;</span>
 
-        <form id="form-alterar-securanca" action="../layouts/controller/AuthTOTP.php" method="POST">
-            <div class="qrcode-container">
-                <img class="arcode-imagem" src="<?= $qrcode_imagem ?>" alt="Imagem qrcode">
+        <?php if (!isset($usuario['totp_secret']) || empty($usuario['totp_secret'])): ?>
+            <!-- Se o usuário não tiver o `totp_secret`, exibe o formulário para configurar o TOTP -->
+            <form id="form-alterar-securanca" action="../layouts/controller/AuthTOTP.php" method="POST">
+                <div class="qrcode-container">
+                    <img class="arcode-imagem" src="<?= $urimage ?>" alt="Imagem qrcode">
+                </div>
+                <div class="qrcode-description">
+                    <p class="text-qrcode">
+                        Escaneie pelo seu celular
+                    </p>
+                </div>
+                <hr class="margin-bottom-15-px">
+                <div class="form-group-alterar-endereco">
+                    <label for="numero">Código:</label>
+                    <input maxlength="6" type="text" id="code" name="code" placeholder="Digite o código que aparece em seu aplicativo vinculado" required>
+                </div>
+                <button type="submit" class="btn-alterar-endereco">Verificar código</button>
+            </form>
+        <?php else: ?>
+            <!-- Se o usuário já tiver o `totp_secret`, exibe uma mensagem de que a autenticação TOTP está configurada -->
+            <div class="totp-configured">
+                <p>Gerenciar autenticação de dois fatores.</p>
+                <section class="container-fatores">
+                <label class="switch">
+                <input type="checkbox" id="fatores" name="fatores" <?php if (isset($usuario['totp_enabled']) && $usuario['totp_enabled'] == 1) echo 'checked'; ?> />
+                <span class="slider"></span>
+                </label>
+                </section>
+                <hr>
+                <a href="#" class="reset-fator">Resetar autenticação de dois fatores</a>
             </div>
-            <div class="qrcode-description">
-                <p class="text-qrcode">
-                    Escaneie pelo seu celular
-                </p>
-            </div>
-            <hr class="margin-bottom-15-px">
-            <div class="form-group-alterar-endereco">
-                <label for="numero">Código:</label>
-                <input maxlength="6" type="text" id="code" name="code" placeholder="Digite o códgio que aparece em seu aplicativo vinculado" required>
-            </div>
-            <button type="submit" class="btn-alterar-endereco">Verificar código</button>
-        </form>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -784,7 +785,8 @@ $("#form-alterar-securanca").on("submit", function(event) {
                     title: 'Sucesso!',
                     text: data.message 
                 });
-                closeModalEndereco();
+                closeModalSeguranca();
+                location.reload();
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -804,5 +806,114 @@ $("#form-alterar-securanca").on("submit", function(event) {
         }
     });
 });
+
+
+$(document).ready(function(){
+    $('#fatores').change(function(){
+        var isChecked = $(this).is(':checked');
+        
+        $(".background-loading-50").removeClass('hidden');
+
+        $.ajax({
+            url: '../layouts/controller/AuthTOTP_button.php',
+            method: 'POST',
+            data: {
+                ativar_totp: isChecked ? 1 : 0
+            },
+            success: function(response) {
+                $(".background-loading-50").addClass('hidden');
+                try {
+                    var data = response;
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: data.message
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.message
+                        });
+                    }
+                } catch (e) {
+                    console.error('Erro ao processar a resposta:', e);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Ocorreu um erro inesperado ao processar a resposta.'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                $(".background-loading-50").addClass('hidden');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro na requisição: ' + error
+                });
+            }
+        });
+    });
+});
+
+
+$(document).ready(function() {
+    $('.reset-fator').on('click', function(e) {
+        e.preventDefault(); // Impede o comportamento padrão do link
+
+        if (confirm('Você tem certeza que deseja resetar a autenticação de dois fatores?')) {
+            $(".background-loading-50").removeClass('hidden'); // Mostra um loader ou algo para indicar carregamento
+
+            $.ajax({
+                url: '../layouts/controller/AuthTOTP_reset.php',
+                method: 'POST',
+                data: {
+                    reset_totp: 1
+                },
+                success: function(response) {
+                    $(".background-loading-50").addClass('hidden');
+                    try {
+                        var data = typeof response === 'string' ? JSON.parse(response) : response;
+
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso!',
+                                text: data.message
+                            });
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: data.message
+                            });
+                        }
+                    } catch (e) {
+                        console.error('Erro ao processar a resposta:', e);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: 'Ocorreu um erro inesperado ao processar a resposta.'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $(".background-loading-50").addClass('hidden'); // Esconde o loader
+                    console.error('Erro na requisição:', xhr, status, error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Ocorreu um erro, tente novamente mais tarde.'
+                    });
+                }
+            });
+        }
+    });
+});
+
 
 </script>

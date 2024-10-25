@@ -779,7 +779,7 @@ $urimage = 'https://api.qrserver.com/v1/create-qr-code/?data=' . urlencode($prov
         <?php else: ?>
             <!-- Se o usuário já tiver o `totp_secret`, exibe uma mensagem de que a autenticação TOTP está configurada -->
             <div class="totp-configured">
-                <p>Gerenciar autenticação de dois fatores.</p>
+                <p>Ativar/Desativar Autenticação de Dois Fatores.</p>
                 <section class="container-fatores">
                 <label class="switch">
                 <input type="checkbox" id="fatores" name="fatores" <?php if (isset($usuario['totp_enabled']) && $usuario['totp_enabled'] == 1) echo 'checked'; ?> />

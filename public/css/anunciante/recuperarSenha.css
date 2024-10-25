@@ -1,0 +1,123 @@
+/* Estilo Global para o Body e HTML */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: Arial, sans-serif; /* Define uma fonte padrão */
+    background-color: #f4f4f4; /* Cor de fundo suave */
+}
+
+/* Estilo do Container de Recuperação de Senha */
+#RecuperarSenha {
+    padding: 40px; /* Aumenta o padding para um layout mais espaçoso */
+    border-radius: 12px; /* Bordas arredondadas */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Sombra mais pronunciada */
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    background-color: #fff; /* Fundo branco para o container */
+}
+
+/* Estilo do Cabeçalho */
+#RecuperarSenha header {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+}
+
+#RecuperarSenha header .titulo {
+    font-size: 28px; /* Tamanho do título aumentado */
+    font-weight: 700; /* Fonte mais pesada */
+    color: #1a73e9; /* Cor personalizada */
+}
+
+#RecuperarSenha header .descricao {
+    font-size: 16px; /* Tamanho da descrição */
+    font-weight: 400; /* Peso normal */
+    color: #383838; /* Cor da descrição */
+}
+
+/* Estilo do Corpo do Formulário */
+.corpo {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px; /* Aumenta o espaçamento entre os elementos */
+}
+
+/* Estilo do Formulário */
+.corpo #FormRecuperarSenha {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px; /* Aumenta o espaçamento */
+}
+
+/* Estilo do Grupo de Entrada */
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px; /* Espaçamento entre label e input */
+}
+
+/* Estilo do Rótulo */
+.inputGroup .label {
+    font-family: monospace; /* Fonte monoespaçada */
+    font-size: 16px; /* Tamanho do rótulo */
+    font-weight: 600; /* Peso mais pesado */
+    color: #333; /* Cor do rótulo */
+}
+
+/* Estilo do Campo de Entrada */
+.inputGroup .input {
+    padding: 12px; /* Padding mais confortável */
+    border: 1px solid #ccc; /* Borda padrão */
+    border-radius: 4px; /* Bordas arredondadas */
+    outline: none; /* Remove o contorno padrão */
+    transition: border-color 0.3s; /* Transição suave */
+}
+
+.inputGroup .input:focus {
+    border-color: #1a73e9; /* Cor da borda ao focar */
+}
+
+/* Estilo do Botão de Envio */
+.SendForm {
+    max-width: 200px; /* Largura máxima do botão */
+    padding: 12px; /* Padding mais confortável */
+    background-color: #1a73e9; /* Cor de fundo do botão */
+    color: white; /* Cor do texto do botão */
+    border: none; /* Remove borda padrão */
+    border-radius: 4px; /* Bordas arredondadas */
+    font-size: 16px; /* Tamanho do texto do botão */
+    cursor: pointer; /* Cursor em forma de ponteiro */
+    transition: background-color 0.3s, transform 0.2s; /* Transição suave para cor e transformação */
+}
+
+.SendForm:hover {
+    background-color: #3b87e9; /* Cor do botão ao passar o mouse */
+}
+
+/* Estilo da Seção "Não tem conta?" */
+.NoLogin {
+    text-align: left; /* Centraliza texto */
+}
+
+.NoLogin .titulo {
+    font-size: 14px; /* Tamanho do texto */
+    font-weight: 500; /* Peso normal */
+    color: #333; /* Cor do texto */
+}
+
+.NoLogin .link {
+    color: #1a73e9; /* Cor do link */
+    text-decoration: none; /* Remove sublinhado do link */
+}
+
+.NoLogin .link:hover {
+    text-decoration: underline; /* Sublinha o link ao passar o mouse */
+}

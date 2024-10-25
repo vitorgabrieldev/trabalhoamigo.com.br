@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+    <!-- Título da Página - SEO -->
+    <title>Esqueci Minha Senha | Trabalho Amigo</title>
+    <!-- Descrição da Página - SEO -->
+    <meta name="description" content="Recupere sua senha no Trabalho Amigo de forma rápida e segura." />
+
+    <!-- Metas tags de configurações das páginas -->
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <!-- Importação do Icone do Projeto -->
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+
+    <!-- Tags Globais do projeto -->
+    <script src="../../../../app.js" defer></script>
+    <link rel="stylesheet" href="../../../../app.css">
+
+    <!-- Tags Especificas de cada página-->
+    <link rel="stylesheet" href="../../../../public/css/anunciante/recuperarSenha.css">
+    <script src="../../../../public/js/contratante/recuperarSenha.js" defer></script>
+
+    <!-- Importação da bibliotecas -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            overflow-y: hidden;
+        }
+    </style>
+
+</head>
+
+<body>
+    <section id="RecuperarSenha">
+        <div>
+            <img width="60px" src="../../../../public/img/logo/favicon.ico" alt="Logo Trabalho Amigo">
+        </div>
+        <header>
+            <h1 class="titulo">Recuperar Senha</h1>
+            <p class="descricao">Informe seu email para receber instruções de recuperação de senha.</p>
+        </header>
+        <main class="corpo">
+            <form id="FormRecuperarSenha">
+                <section class="inputGroup">
+                    <label for="email" class="label">Email</label>
+                    <input required placeholder="Digite seu e-mail aqui" type="text" name="email" autocomplete="off" class="input email" id="email">
+                </section>
+                <button type="submit" class="SendForm">Enviar Código</button>
+
+                <section class="NoLogin">
+                    <h2 class="titulo">Lembrou sua senha? <a href="../EntrarConta/" class="link">Voltar ao Login</a></h2>
+                </section>
+            </form>
+        </main>
+    </section>
+
+    <script>
+
+        $('#email').focus();
+
+        $('#FormRecuperarSenha').on('submit', function (e) {
+            e.preventDefault();
+
+            let formData = {
+                email: $('.input.email').val().trim(),
+            };
+
+            // Validação simples
+            if (!validarEmail(formData.email)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro de Validação',
+                    text: 'Email inválido. Por favor, verifique e tente novamente.'
+                });
+                return;
+            }
+
+            // Enviar requisição para o servidor
+            $.ajax({
+                url: '../../../controllers/contratante/RecuperarSenha.php',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso',
+                            text: 'Um email com instruções de recuperação foi enviado.'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Ocorreu um erro ao enviar o email. Tente novamente.'
+                    });
+                }
+            });
+        });
+
+        function validarEmail(email) {
+            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regexEmail.test(email);
+        }
+    </script>
+</body>
+</html>

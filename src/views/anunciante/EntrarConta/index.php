@@ -77,6 +77,7 @@
                             <div class="input-group">
                                 <input required="" type="password" name="text" autocomplete="off" class="input senha">
                                 <label class="user-label">Senha</label>
+                                <a href="../EsqueciMinhaSenha/" class="esqueci_senha">Esqueci minha senha</a>
                                 <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
                             </div>
                         </section>

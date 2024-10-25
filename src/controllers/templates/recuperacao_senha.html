@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperação de Senha</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9; /* Cor de fundo clara */
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #404040; /* Cor de fundo para a imagem */
+            color: white; /* Texto em branco para contraste */
+        }
+        .message {
+            font-size: 18px;
+            color: #333;
+            margin: 20px 0;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .codigo {
+            font-size: 24px; /* Tamanho maior para destaque */
+            font-weight: bold; /* Negrito para mais ênfase */
+            color: #d9534f; /* Cor para destacar o código */
+            background-color: #f2f2f2; /* Fundo claro para contraste */
+            border: 2px solid #d9534f; /* Bordas em destaque */
+            padding: 10px;
+            border-radius: 5px; /* Bordas arredondadas */
+            display: inline-block; /* Para manter o tamanho do bloco */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="./Imagem-email.png" alt="Imagem Logo">
+    </div>
+    <div class="message">
+        <p>Por favor, não compartilhe seu código de recuperação com ninguém. Manter essa informação em sigilo é essencial para a segurança da sua conta.</p>
+    </div>
+    <h1>Recuperação de Senha</h1>
+    <p>Seu código de recuperação é:</p>
+    <p class="codigo">{{codigo}}</p>
+</body>
+</html>

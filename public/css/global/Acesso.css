@@ -441,3 +441,12 @@ body {
         margin: 0 20px;
     }
 }
+
+.esqueci_senha {
+    font-size: 14px;
+    text-decoration: underline;
+    padding-top: 10px;
+    width: 100%;
+    text-align: right;
+    display: block;
+}

@@ -717,6 +717,20 @@ function closeModalPerfil() {
 
 <?php
 
+function gerarSegredoBase32($length = 16) {
+    $bytes = random_bytes($length);
+    
+    $base32 = '';
+
+    $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    for ($i = 0; $i < strlen($bytes); $i++) {
+        $base32 .= $alphabet[ord($bytes[$i]) >> 3];
+        $base32 .= $alphabet[(ord($bytes[$i]) & 0x07) << 2];
+    }
+
+    return substr($base32, 0, $length);
+}
+
 if (!isset($_SESSION)) {
     session_start();
 }
@@ -728,15 +742,16 @@ use OTPHP\TOTP;
 $username = $usuario['primeiro_nome'];
 $hostname = 'TrabalhoAmigo';
 
-$totp = TOTP::create();
+$secret = gerarSegredoBase32(16);
+$totp = TOTP::create($secret);
 
 $totp->setLabel($username . '@' . $hostname);
-$secret = $totp->getSecret();
-$_SESSION['TOTP_secret'] = $secret;
+$_SESSION['TOTP_secret'] = $totp->getSecret();
 $provisioningUri = $totp->getProvisioningUri();
-$urimage = 'https://api.qrserver.com/v1/create-qr-code/?data='.$provisioningUri;
+$urimage = 'https://api.qrserver.com/v1/create-qr-code/?data=' . urlencode($provisioningUri); 
 
 ?>
+
 
 <!-- Modal de segurança -->
 <div id="modal-alterar-seguranca" class="modal-alterar-endereco" style="display: none">

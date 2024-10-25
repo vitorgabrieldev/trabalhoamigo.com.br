@@ -5,7 +5,7 @@
  * @param {string} email - O email a ser validado.
  * @return {boolean} - Retorna true se o email for válido.
  */
- function validarEmail(email) {
+function validarEmail(email) {
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regexEmail.test(email);
 }
@@ -35,13 +35,12 @@ function validarDadosLogin(formData) {
     return erros;
 }
 
-
 $('#FormEntrarUsuario').on('submit', function (e) {
-    e.preventDefault(); 
+    e.preventDefault();
 
     let formData = {
-        email: $('.input.email').val().trim(), 
-        senha: $('.input.senha').val().trim() 
+        email: $('.input.email').val().trim(),
+        senha: $('.input.senha').val().trim(),
     };
 
     let erros = validarDadosLogin(formData); 
@@ -54,7 +53,6 @@ $('#FormEntrarUsuario').on('submit', function (e) {
             footer: erros.join('<br>')
         });
     } else {
-
         // Ativa animação de loading
         $(".SendForm").html(`<section class="loading-container"><div class='loading-form-animation'></div></section>`);
 
@@ -63,11 +61,48 @@ $('#FormEntrarUsuario').on('submit', function (e) {
             type: 'POST',
             data: formData,
             success: function (response) {
-                
                 // Desativa animação de loading
                 $(".SendForm").html("Acessar sua conta");
 
-                if (response.success) {
+                if (response.require_totp) {
+                    Swal.fire({
+                        title: 'Autenticação de dois fatores',
+                        input: 'text',
+                        inputLabel: 'Insira o código do autenticador',
+                        showCancelButton: true,
+                        confirmButtonText: 'Enviar',
+                        preConfirm: (totp) => {
+                            formData.totp = totp;
+                            $(".background-loading-50").removeClass('hidden');
+                            $.ajax({
+                                url: '../../../controllers/contratante/LoginAccount.php',
+                                type: 'POST',
+                                data: formData,
+                                success: function (response) {
+                                    $(".background-loading-50").addClass('hidden');
+                                    if (response.success) {
+                                        Swal.fire({
+                                            position: "center",
+                                            icon: "success",
+                                            title: "Aguarde enquanto configuramos seu acesso...",
+                                            showConfirmButton: false,
+                                            timer: 500,
+                                            willClose: () => {
+                                              window.location.href = '../PaginaInicial/';
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Erro de Login',
+                                            text: response.message
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else if (response.success) {
                     Swal.fire({
                         position: "center",
                         icon: "success",
@@ -88,7 +123,6 @@ $('#FormEntrarUsuario').on('submit', function (e) {
                 }
             },
             error: function (xhr, status, error) {
-                
                 // Desativa animação de loading
                 $(".SendForm").html("Acessar sua conta");
 

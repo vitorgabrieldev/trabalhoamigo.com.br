@@ -3,7 +3,7 @@
 <head>
 
     <!-- Título da Página - SEO -->
-    <title>Crie sua Conta Gratuitamente e Conecte-se com Freelancers | Trabalho Amigo</title>
+    <title>Entre em sua Conta rapidamente e Conecte-se com Freelancers | Trabalho Amigo</title>
     <!-- Descrição da Página - SEO -->
     <meta name="description" content="Crie sua conta gratuitamente no Trabalho Amigo e comece a conectar-se com freelancers para compartilhar e contratar serviços de forma prática e eficiente." />
 

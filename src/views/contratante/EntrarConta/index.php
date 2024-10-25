@@ -3,7 +3,7 @@
 <head>
 
     <!-- Título da Página - SEO -->
-    <title>Login | Trabalho Amigo</title>
+    <title>Entre em sua conta rapidamente em procure por serviço que melhor lhe atendem | Trabalho Amigo</title>
     <!-- Descrição da Página - SEO -->
     <meta name="description" content="Acesse sua conta no Trabalho Amigo e conecte-se com freelancers e serviços de forma rápida e segura." />
 

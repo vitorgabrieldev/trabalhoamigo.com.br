@@ -31,7 +31,7 @@ function verificarUsuario($email) {
     
     $conexao = getDatabaseConnection();
     
-    $sql = "SELECT id_usuario FROM usuarios WHERE email = ? AND tipo_usuario = 'contratante' AND ativo = 1";
+    $sql = "SELECT id_usuario FROM usuarios WHERE email = ? AND tipo_usuario = 'anunciante' AND ativo = 1";
     $stmt = $conexao->prepare($sql);
 
     if (!$stmt) {

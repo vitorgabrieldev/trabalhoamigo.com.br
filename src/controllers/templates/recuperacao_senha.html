@@ -5,49 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperação de Senha</title>
     <style>
+        .content {
+            max-width: 600px;
+            box-shadow: 0 0 10px #00000031;
+            background-color: white; /* Fundo branco para destaque */
+            border-radius: 8px; /* Bordas arredondadas */
+            overflow: hidden; /* Para evitar overflow */
+        }
+
+        img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9; /* Cor de fundo clara */
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Centraliza verticalmente */
+            height: 100vh; /* Ocupa toda a altura da tela */
         }
+
         .header {
             text-align: center;
             padding: 20px;
             background-color: #404040; /* Cor de fundo para a imagem */
             color: white; /* Texto em branco para contraste */
         }
+
         .message {
-            font-size: 18px;
+            font-size: 16px;
+            font-weight: 500;
             color: #333;
             margin: 20px 0;
-            text-align: center;
+            text-align: left;
+            display: block;
+            padding: 0 30px;
         }
+
         h1 {
             text-align: center;
             color: #333;
+            margin: 0;
+            padding-top: 20px; /* Espaço acima do título */
         }
+
         .codigo {
             font-size: 24px; /* Tamanho maior para destaque */
             font-weight: bold; /* Negrito para mais ênfase */
             color: #d9534f; /* Cor para destacar o código */
-            background-color: #f2f2f2; /* Fundo claro para contraste */
             border: 2px solid #d9534f; /* Bordas em destaque */
             padding: 10px;
             border-radius: 5px; /* Bordas arredondadas */
             display: inline-block; /* Para manter o tamanho do bloco */
+            margin-top: 0;
+            text-align: center; /* Centraliza o código */
+        }
+
+        .content-password {
+            display: block;
+            align-items: center;
+            text-align: center;
+            padding: 0 30px; /* Adiciona preenchimento */
+        }
+
+        .content-termos {
+            padding: 20px 30px;
+            font-size: 12px;
+            color: #333;
+            text-align: center; /* Centraliza o texto */
+            border-top: 1px solid #ddd; /* Adiciona uma linha superior */
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <img src="./Imagem-email.png" alt="Imagem Logo">
+    <div class="content">
+        <div class="header">
+            <img src="https://trabalhoamigo.vitorgabrieldev.io/src/controllers/templates/Imagem-email.png" alt="Imagem Logo">
+        </div>
+        <div class="message" style="margin-bottom: 30px;">
+            <p>Por favor, não compartilhe seu código de recuperação com ninguém. Manter essa informação em sigilo é essencial para a segurança da sua conta.</p>
+        </div>
+        <div class="content-password">
+            <h1>Recuperação de Senha</h1>
+            <p>Seu código de recuperação é:</p>
+            <p class="codigo">{{codigo}}</p>
+        </div>
+        <div class="message">
+            <p>Para garantir a segurança da sua conta, aqui estão algumas dicas importantes:</p>
+            <ul>
+                <li>Utilize senhas fortes, combinando letras, números e caracteres especiais.</li>
+                <li>Ative a autenticação em duas etapas, se disponível, para aumentar a segurança.</li>
+                <li>Troque sua senha regularmente e nunca use a mesma senha para diferentes contas.</li>
+                <li>Esteja atento a e-mails e mensagens suspeitas que possam tentar obter suas informações pessoais.</li>
+            </ul>
+        </div>
+        <div class="content-termos">
+            <p>Direitos reservados. Para mais informações, consulte nossas <a href="https://trabalhoamigo.vitorgabrieldev.io/src/views/politicas/termos/">Diretrizes e Termos de Uso</a>. Qualquer dúvida, entre em contato conosco.</p>
+        </div>
     </div>
-    <div class="message">
-        <p>Por favor, não compartilhe seu código de recuperação com ninguém. Manter essa informação em sigilo é essencial para a segurança da sua conta.</p>
-    </div>
-    <h1>Recuperação de Senha</h1>
-    <p>Seu código de recuperação é:</p>
-    <p class="codigo">{{codigo}}</p>
 </body>
 </html>

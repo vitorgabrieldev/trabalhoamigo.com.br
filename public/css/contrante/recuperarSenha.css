@@ -102,6 +102,11 @@ body, html {
     background-color: #d44513; /* Cor do botão ao passar o mouse */
 }
 
+.SendForm:disabled {
+    background-color: #6e6e6e;
+    cursor: no-drop;
+}
+
 /* Estilo da Seção "Não tem conta?" */
 .NoLogin {
     text-align: left; /* Centraliza texto */
@@ -120,4 +125,13 @@ body, html {
 
 .NoLogin .link:hover {
     text-decoration: underline; /* Sublinha o link ao passar o mouse */
+}
+
+.timer-off {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.codeBtn {
+    background: #2d86f5;
 }

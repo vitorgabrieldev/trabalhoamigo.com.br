@@ -21,7 +21,6 @@
 
     <!-- Tags Especificas de cada página-->
     <link rel="stylesheet" href="../../../../public/css/anunciante/recuperarSenha.css">
-    <script src="../../../../public/js/contratante/recuperarSenha.js" defer></script>
 
     <!-- Importação da bibliotecas -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -49,8 +48,12 @@
                 <section class="inputGroup">
                     <label for="email" class="label">Email</label>
                     <input required placeholder="Digite seu e-mail aqui" type="text" name="email" autocomplete="off" class="input email" id="email">
+                    <p class="timer-off hidden">Aguarde <span id="timer">30</span> segundos para enviar novamente</p>
                 </section>
-                <button type="submit" class="SendForm">Enviar Código</button>
+                <div class="group-btn">
+                    <button type="submit" class="SendForm disabled-button">Enviar Código</button>
+                    <button type="button" class="SendForm codeBtn hidden">Validar código</button>
+                </div>
 
                 <section class="NoLogin">
                     <h2 class="titulo">Lembrou sua senha? <a href="../EntrarConta/" class="link">Voltar ao Login</a></h2>
@@ -59,9 +62,27 @@
         </main>
     </section>
 
+    <div class="background-loading-50 hidden">
+        <div class="loading-icon"></div>
+    </div>
+
     <script>
 
         $('#email').focus();
+
+        $(".codeBtn").click(() => {
+            SwalInsertCode();
+        });
+
+        let remainingTime = localStorage.getItem('remainingTime');
+        let timerInterval;
+
+        if (remainingTime) {
+            $('.timer-off').removeClass("hidden");
+            $('#email').prop('disabled', true);
+            $('.disabled-button').prop('disabled', true);
+            startTimer(parseInt(remainingTime));
+        }
 
         $('#FormRecuperarSenha').on('submit', function (e) {
             e.preventDefault();
@@ -80,17 +101,34 @@
                 return;
             }
 
-            // Enviar requisição para o servidor
+            $('.background-loading-50').removeClass('hidden');
+
             $.ajax({
-                url: '../../../controllers/contratante/RecuperarSenha.php',
+                url: '../../../controllers/anunciante/RecuperarSenha.php',
                 type: 'POST',
                 data: formData,
                 success: function (response) {
+
+                    $('.background-loading-50').addClass('hidden');
+
+                    response = JSON.parse(response);
+
                     if (response.success) {
+                        
+                        $('.codeBtn').removeClass('hidden');
+
+                        $('.timer-off').removeClass("hidden");
+                        $('#email').prop('disabled', true);
+                        $('.disabled-button').prop('disabled', true);
+
+                        startTimer(30);
+
                         Swal.fire({
                             icon: 'success',
                             title: 'Sucesso',
-                            text: 'Um email com instruções de recuperação foi enviado.'
+                            text: 'Código de recuperação enviado com sucesso.'
+                        }).then(() => {
+                            SwalInsertCode();
                         });
                     } else {
                         Swal.fire({
@@ -99,21 +137,126 @@
                             text: response.message
                         });
                     }
+
                 },
                 error: function () {
+                    $('.background-loading-50').addClass('hidden');
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro',
-                        text: 'Ocorreu um erro ao enviar o email. Tente novamente.'
+                        text: 'Ocorreu um erro ao enviar o e-mail. Tente novamente.'
                     });
                 }
             });
         });
 
+        function startTimer(seconds) {
+            let remainingTime = seconds;
+
+            $('#timer').text(remainingTime); // Exibe o tempo restante no elemento com o ID "timer"
+
+            timerInterval = setInterval(() => {
+                remainingTime--;
+                $('#timer').text(remainingTime);
+                localStorage.setItem('remainingTime', remainingTime); // Armazena o tempo restante no localStorage
+
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    $('#email').prop('disabled', false);
+                    $('.disabled-button').prop('disabled', false);
+                    $('.timer-off').addClass("hidden");
+                    localStorage.removeItem('remainingTime'); // Remove o tempo restante do localStorage
+                }
+            }, 1000);
+        }
+
         function validarEmail(email) {
             const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return regexEmail.test(email);
         }
+
+        function SwalInsertCode() {
+            Swal.fire({
+                title: 'Digite o código de recuperação',
+                input: 'text',
+                inputLabel: 'Código',
+                inputPlaceholder: 'Insira seu código aqui',
+                showCancelButton: true,
+                confirmButtonText: 'Verificar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: (codigoRecuperacao) => {
+                    return new Promise((resolve) => {
+                        $.ajax({
+                            url: '../../../controllers/anunciante/VerificarCodigo.php',
+                            type: 'POST',
+                            data: {
+                                email: $("#email").val(),
+                                codigo: codigoRecuperacao
+                            },
+                            success: function (result) {
+                                if (result.success) {
+                                    resolve(result);
+                                } else {
+                                    Swal.showValidationMessage(result.message);
+                                    resolve(false);
+                                }
+                            },
+                            error: function () {
+                                Swal.showValidationMessage('Erro ao verificar o código.');
+                                resolve(false);
+                            }
+                        });
+                    });
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Redefinir Senha',
+                        html: `
+                            <input type="password" id="novaSenha" class="swal2-input" placeholder="Nova senha">
+                            <input type="password" id="confirmarSenha" class="swal2-input" placeholder="Confirmar senha">
+                        `,
+                        confirmButtonText: 'Redefinir',
+                        preConfirm: () => {
+                            const novaSenha = Swal.getPopup().querySelector('#novaSenha').value;
+                            const confirmarSenha = Swal.getPopup().querySelector('#confirmarSenha').value;
+
+                            if (!novaSenha || !confirmarSenha) {
+                                Swal.showValidationMessage('Por favor, preencha ambos os campos.');
+                            } else if (novaSenha !== confirmarSenha) {
+                                Swal.showValidationMessage('As senhas não coincidem.');
+                            } else {
+                                return { novaSenha };
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '../../../controllers/anunciante/RedefinirSenha.php',
+                                type: 'POST',
+                                data: {
+                                    email: $("#email").val(),
+                                    novaSenha: result.value.novaSenha
+                                },
+                                success: function (finalResult) {
+                                    if (finalResult.success) {
+                                        Swal.fire('Sucesso!', 'Senha redefinida com sucesso.', 'success').then(() => {
+                                            window.location.href = '../EntrarConta/';
+                                        });
+                                    } else {
+                                        Swal.fire('Erro', finalResult.message, 'error');
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire('Erro', 'Não foi possível redefinir a senha. Tente novamente.', 'error');
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
     </script>
+
 </body>
 </html>

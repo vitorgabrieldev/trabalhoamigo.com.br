@@ -121,3 +121,17 @@ body, html {
 .NoLogin .link:hover {
     text-decoration: underline; /* Sublinha o link ao passar o mouse */
 }
+
+.timer-off {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.SendForm:disabled {
+    background-color: #6e6e6e;
+    cursor: no-drop;
+}
+
+.codeBtn {
+    background: #fe4f1f;
+}

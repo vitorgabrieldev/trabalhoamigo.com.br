@@ -17,9 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idServico = $_POST['idServico'];
 
     if ($action === 'accept') {
-        $idContrato = $_POST['idContrato']; // Novo parâmetro
-        $qtdServico = $_POST['qtdServico']; // Novo parâmetro
-        $valorFinal = $_POST['valorFinal']; // Novo parâmetro
+        $idContrato = $_POST['idContrato'];
+        $qtdServico = $_POST['qtdServico'];
+        $valorFinal = $_POST['valorFinal'];
         acceptService($idServico, $idContrato, $qtdServico, $valorFinal);
     } elseif ($action === 'reject') {
         rejectService($idServico);
@@ -30,18 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
     global $conn;
 
-    // Atualiza o status da proposta para '2' (aceito)
     $sql = "UPDATE proposta SET status = '2' WHERE id_contrato = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $idContrato);  // Corrigido para usar $idContrato
+    $stmt->bind_param("i", $idContrato);
 
     if ($stmt->execute()) {
-        $stmt->close(); // Fecha o statement do UPDATE
+        $stmt->close();
 
-        // Agora faz a inserção na tabela contratos
         $sqlInsert = "INSERT INTO contratos (id_servico_fk, id_contrato_fk, qtd_servico, valor_final) VALUES (?, ?, ?, ?)";
         $stmtInsert = $conn->prepare($sqlInsert);
-        $stmtInsert->bind_param("iiid", $idServico, $idContrato, $qtdServico, $valorFinal); // Ajustado para "d" (double) em valor_final
+        $stmtInsert->bind_param("iiid", $idServico, $idContrato, $qtdServico, $valorFinal); 
 
         if ($stmtInsert->execute()) {
             echo json_encode(['message' => 'Serviço aceito e contrato cadastrado com sucesso.']);
@@ -49,7 +47,7 @@ function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
             echo json_encode(['error' => 'Erro ao cadastrar contrato: ' . $stmtInsert->error]);
         }
 
-        $stmtInsert->close(); // Fecha o statement da inserção
+        $stmtInsert->close(); 
     } else {
         echo json_encode(['error' => 'Erro ao aceitar serviço: ' . $stmt->error]);
     }
@@ -73,7 +71,7 @@ function rejectService($idServico) {
 
 // Buscar propostas
 $id_usuario = $_SESSION['id_usuario'];
-$sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS titulo_servico, 
+$sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS titulo_servico, s.preco AS preco_servico,
                p.valor_total, u.primeiro_nome, u.telefone, u.celular, u.whatsapp, u.email, u.unique_id,
                p.prazo_estimado, p.data_esperada, p.status
         FROM proposta p 
@@ -142,7 +140,7 @@ $conn->close();
             <?php foreach ($propostas as $proposta): ?>
                 <div class="grid-item"><?= $proposta['data_envio'] ?></div>
                 <div class="grid-item"><?= $proposta['titulo_servico'] ?></div>
-                <div class="grid-item">R$ <?= number_format($proposta['valor_total'], 2, ',', '.') ?></div>
+                <div class="grid-item">R$ <?= ($proposta['valor_total'] == 0) ? number_format($proposta['preco_servico'], 2, ',', '.') : number_format($proposta['valor_total'], 2, ',', '.') ?></div>
                 <div class="grid-item">
                 <?php if ($proposta['status'] == 1): ?>
                     <button class="button button-vermais" onclick="showServiceDetails(
@@ -195,38 +193,39 @@ $conn->close();
     }
 
     function showServiceDetails(idServico, tituloServico, valorTotal, primeiroNome, telefone, celular, whatsapp, email, prazo_estimado, data_esperada) {
+
         Swal.fire({
-                title: 'Detalhes da proposta',
-                html: `
-                    <div style="text-align: left;">
-                        <p><strong>Serviço:</strong> ${tituloServico}</p><br>
-                        <p><strong>Valor proposto:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p><br>
-                        <p><strong>Nome do contratante:</strong> ${primeiroNome}</p><br>
-                        <p><strong>Tempo estimado:</strong> ${prazo_estimado} Dias</p><br>
-                        <p><strong>Data estimada:</strong> ${data_esperada}</p><br>
-                    </div>
-                `,
-                showCloseButton: true,
-                showCancelButton: true,
-                confirmButtonText: `Aceitar`,
-                cancelButtonText: `Recusar`,
-                focusConfirm: false,
-                width: '700px',
-                padding: '1.5rem',
-                customClass: {
-                    popup: 'swal-custom-popup',
-                    title: 'swal-custom-title',
-                    htmlContainer: 'swal-custom-html'
-                },
-                allowOutsideClick: false
+            title: "Detalhes da proposta",
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: "Aceitar",
+            denyButtonText: `Recusar`,
+            html: `
+                <div style="text-align: left;">
+                    <p><strong>Serviço:</strong> ${tituloServico}</p><br>
+                    <p><strong>Valor proposto:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p><br>
+                    <p><strong>Nome do contratante:</strong> ${primeiroNome}</p><br>
+                    <p><strong>Tempo estimado:</strong> ${prazo_estimado} Dias</p><br>
+                    <p><strong>Data estimada:</strong> ${data_esperada}</p><br>
+                </div>
+            `,
+            width: '700px',
+            padding: '1.5rem',
+            customClass: {
+                popup: 'swal-custom-popup',
+                title: 'swal-custom-title',
+                htmlContainer: 'swal-custom-html'
+            },
         }).then((result) => {
             if (result.isConfirmed) {
                 acceptService(idServico, tituloServico, valorTotal);
-            } else if (result.isDismissed) {
+                location.reload();
+            } else if (result.isDenied) {
                 rejectService(idServico);
+                location.reload();
             }
         });
-        
+
     }
 
     function acceptService(idServico, tituloServico, valorTotal) {

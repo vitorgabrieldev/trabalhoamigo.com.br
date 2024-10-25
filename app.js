@@ -183,16 +183,21 @@ $(".DispathAlert").click(() => {
 /-------------------------------------------------------------- */
 let servicoId, isComunitario;
 
-function openModal(id, titulo, descricao, preco) {
+function openModal(id, titulo, descricao, preco, imagemUrl) {
     servicoId = id; 
 
     isComunitario = parseInt(preco) == 0 ? ' (Comunitário)' : '';
 
     document.getElementById('modal-titulo').innerHTML = '<strong>Título:</strong> ' + titulo;
     document.getElementById('modal-descricao').innerHTML = '<strong>Descrição:</strong> ' + descricao;
-    document.getElementById('modal-preco').innerHTML = '<strong>Preço:</strong> R$ ' + preco.toFixed(2).replace('.', ',') + isComunitario;
+    document.getElementById('modal-preco').innerHTML = '<strong>Preço:</strong> R$ ' + (preco ? preco.toFixed(2).replace('.', ',') : 'Indisponível') + isComunitario;
     document.getElementById('contratar-btn').setAttribute('href', '../FormularioProposta/?id=' + servicoId); 
-    document.getElementById('modal').style.display = 'block';
+
+    const imagemElement = document.getElementById('modal-imagem');
+    imagemElement.src = imagemUrl || '../../../../public/uploads/servicos/default-image.png'; 
+    imagemElement.alt = titulo;
+
+    document.getElementById('modal').style.display = 'flex';
 }
 
 /* ------------------------------------------------------------
@@ -211,6 +216,15 @@ window.onclick = function(event) {
         closeModal();
     }
 }
+
+/* ------------------------------------------------------------
+| Sistema de fechamento de modal quando pressiona ESC
+/-------------------------------------------------------------- */
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
 
 /* ------------------------------------------------------------
 | Sistema de deslogar geral

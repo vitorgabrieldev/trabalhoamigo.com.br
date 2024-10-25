@@ -166,9 +166,11 @@
                                 echo '<li class="listagem-item">';
                                 echo '<div class="item-conteudo">';
                                 if (!empty($servico['imagem']) && $servico['imagem'] !== 'null') {
-                                    echo '<img class="listagem-imagem" src="../../../../public/uploads/servicos/' . htmlspecialchars($servico['imagem']) . '" alt="' . htmlspecialchars($servico['titulo']) . '" />';
+                                    $imagemUrl = '../../../../public/uploads/servicos/' . htmlspecialchars($servico['imagem']);
+                                    echo '<img class="listagem-imagem" src="' . $imagemUrl . '" alt="' . htmlspecialchars($servico['titulo']) . '" />';
                                 } else {
-                                    echo '<img class="listagem-imagem" src="../../../../public/uploads/servicos/default-image.png" alt="Imagem não disponível" />'; // imagem padrão caso não haja uma imagem
+                                    $imagemUrl = '../../../../public/uploads/servicos/default-image.png'; // imagem padrão caso não haja uma imagem
+                                    echo '<img class="listagem-imagem" src="' . $imagemUrl . '" alt="Imagem não disponível" />';
                                 }
                                 echo '<h2 class="listagem-titulo">' . htmlspecialchars($servico['titulo']) . '</h2>';
                                 echo '<p class="listagem-descricao">Descrição: ' . htmlspecialchars($servico['descricao']) . '</p>';
@@ -177,7 +179,7 @@
                                 echo '<p class="listagem-data">Data de Criação: ' . date('d/m/Y H:i:s', strtotime($servico['data_Criacao'])) . '</p>';
                                 echo '<p class="listagem-oferta">Aceita Oferta: ' . ($servico['aceita_oferta'] ? 'Sim' : 'Não') . '</p>';
                                 echo '<p class="listagem-comunitario">Comunitário: ' . ($servico['comunitario'] ? 'Sim' : 'Não') . '</p>';
-                                echo '<button class="btn-modal" onclick="openModal(' . $servico['id_servico'] . ', \'' . addslashes(htmlspecialchars($servico['titulo'])) . '\', \'' . addslashes(htmlspecialchars($servico['descricao'])) . '\', ' . $servico['preco'] . ')">Fazer proposta</button>';
+                                echo '<button class="btn-modal" onclick="openModal(' . $servico['id_servico'] . ', \'' . addslashes(htmlspecialchars($servico['titulo'])) . '\', \'' . addslashes(htmlspecialchars($servico['descricao'])) . '\', ' . $servico['preco'] . ', \'' . addslashes($imagemUrl) . '\')">Fazer proposta</button>';
                                 echo '</div>';
                                 echo '</li>';
                             }
@@ -188,6 +190,7 @@
                                     <div class="modal-content">
                                         <span class="close" onclick="closeModal()">&times;</span>
                                         <div class="content-container">
+                                            <img id="modal-imagem" src="" alt="" style="max-width: 100%; height: auto; margin-bottom: 15px;" />
                                             <h2 id="modal-titulo"></h2>
                                             <p id="modal-descricao"></p>
                                             <p id="modal-preco"></p>

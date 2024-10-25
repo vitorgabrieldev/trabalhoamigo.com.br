@@ -146,7 +146,6 @@ try {
                 <p class="text-style"><strong>Título:</strong> <?php echo htmlspecialchars($servico['titulo']); ?></p>
                 <p class="text-style"><strong>Descrição:</strong> <?php echo htmlspecialchars($servico['descricao']); ?></p>
                 <p class="text-style"><strong>Preço:</strong> <?php echo $servico['preco'] == 0 ? '<b>Comunitário</b>' : 'R$ ' . number_format($servico['preco'], 2, ',', '.'); ?></p>
-                <p class="text-style"><strong>Este serviço não aceita propostas.</strong></p>
                 <p class="text-style"><strong>Anunciante:</strong> <?php echo htmlspecialchars($servico['primeiro_nome']) . ' ' . htmlspecialchars($servico['ultimo_nome']); ?></p>
                 <p class="text-style"><strong>Email:</strong> <?php echo htmlspecialchars($servico['email']); ?></p>
                 <p class="text-style"><strong>Telefone:</strong> <?php echo htmlspecialchars($servico['telefone']); ?></p>

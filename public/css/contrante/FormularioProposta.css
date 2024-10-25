@@ -33,7 +33,7 @@ body {
     background-color: #fff;
     display: flex;
     flex-direction: column;
-    row-gap: 20px;
+    row-gap: 10px;
     user-select: none;
 }
 
@@ -121,35 +121,28 @@ button[type="submit"]:hover {
 }
 
 .service-info {
-    background: #ffffff; /* Fundo branco para a área de informações */
-    border-radius: 12px; /* Bordas arredondadas */
-    padding: 20px; /* Espaçamento interno */
-    max-width: 500px; /* Largura máxima */
-    margin: 20px auto; /* Margem para centralizar */
-    position: relative; /* Necessário para a barra lateral */
+    border-radius: 10px; /* Bordas arredondadas */
+    padding: 30px; /* Aumenta o espaçamento interno */
+    max-width: 600px; /* Largura máxima */
 }
 
 .service-info h2 {
-    font-size: 1.8em; /* Tamanho do título */
-    color: #FA511D; /* Cor do título */
-    margin-bottom: 15px; /* Espaçamento abaixo do título */
-    text-align: center; /* Centraliza o título */
-    border-bottom: 2px solid #FA511D; /* Linha embaixo do título */
-    padding-bottom: 10px; /* Espaçamento abaixo da linha */
+    font-size: 2em; /* Tamanho do título */
+    color: #333; /* Cor escura para o título */
+    margin-bottom: 20px; /* Espaçamento abaixo do título */
+    text-align: left; /* Alinhamento à esquerda */
+    font-family: 'Arial', sans-serif; /* Fonte moderna */
 }
 
 .text-style {
-    font-size: 1em; /* Tamanho padrão */
-    color: #444; /* Cor do texto */
+    font-size: 1.1em; /* Tamanho do texto */
+    color: #555; /* Cor do texto */
     margin: 10px 0; /* Margem em cima e embaixo */
+    line-height: 1.6; /* Aumenta o espaçamento entre linhas */
+    text-align: left; /* Alinhamento à esquerda */
 }
 
 .text-style strong {
-    color: #FA511D; /* Cor para os rótulos em negrito */
-}
-
-.text-style:hover {
-    background: #f8f8f8; /* Fundo levemente diferente ao passar o mouse */
-    border-radius: 5px; /* Bordas arredondadas */
-    transition: background 0.3s; /* Efeito suave de transição */
+    color: #000; /* Cor preta para os rótulos em negrito */
+    font-weight: bold; /* Negrito */
 }

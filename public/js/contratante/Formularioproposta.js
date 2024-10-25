@@ -7,16 +7,49 @@ $(document).ready(function() {
         var id = $('#idservico').val();
 
         if (descricao.length < 10) {
-            swal("Atenção!", "A descrição deve conter no mínimo 10 caracteres.", "warning");
+            Swal.fire({
+                title: "Atenção!",
+                text: "A descrição deve conter no mínimo 10 caracteres.",
+                icon: "warning",
+                confirmButtonText: "Ok"
+            });
             return false;
         }
         if (tempo <= 0) {
-            swal("Atenção!", "O tempo estimado deve ser maior que zero.", "warning");
+            Swal.fire({
+                title: "Atenção!",
+                text: "O tempo estimado deve ser maior que zero.",
+                icon: "warning",
+                confirmButtonText: "Ok"
+            });
             return false;
         }
         var dataRegex = /^\d{4}-\d{2}-\d{2}$/;
-        if (!data_servico || !dataRegex.test(data_servico)) {
-            swal("Atenção!", "Por favor, insira uma data válida no formato AAAA-MM-DD.", "warning");
+
+        if (!data_servico || !dataRegex.test(data_servico) || new Date(data_servico) <= new Date() || new Date(data_servico) > new Date(new Date().setFullYear(new Date().getFullYear() + 2))) {
+            Swal.fire({
+                title: "Atenção!",
+                text: "Por favor, insira uma data válida no formato AAAA-MM-DD.",
+                icon: "warning",
+                confirmButtonText: "Ok"
+            });
+            
+            if (new Date(data_servico) <= new Date()) {
+                Swal.fire({
+                    title: "Atenção!",
+                    text: "A data deve ser maior que a data atual.",
+                    icon: "warning",
+                    confirmButtonText: "Ok"
+                });
+            } else if (new Date(data_servico) > new Date(new Date().setFullYear(new Date().getFullYear() + 2))) {
+                Swal.fire({
+                    title: "Atenção!",
+                    text: "A data deve estar dentro dos próximos 2 anos.",
+                    icon: "warning",
+                    confirmButtonText: "Ok"
+                });
+            }
+
             return false;
         }
         
@@ -42,14 +75,24 @@ $(document).ready(function() {
                 success: function(response) {
                     $(".background-loading-50").addClass('hidden');
                     if (response === 'true') {
-                        swal("Sucesso!", "Proposta enviada com sucesso!", "success");
+                        Swal.fire({
+                            title: "Sucesso!",
+                            text: "Proposta enviada com sucesso!",
+                            icon: "success",
+                            confirmButtonText: "Ok"
+                        });
                         location.href = '../ListagemServico/'
                     };
                 },
                 error: function(xhr, status, error) {
                     $(".background-loading-50").addClass('hidden');
                     $('#mensagem').html('<p>Ocorreu um erro: ' + error + '</p>');
-                    swal("Erro!", "Ocorreu um erro ao enviar a proposta.", "error");
+                    Swal.fire({
+                        title: "Erro!",
+                        text: "Ocorreu um erro ao enviar a proposta.",
+                        icon: "error",
+                        confirmButtonText: "Ok"
+                    });
                 }
             });
         } else {

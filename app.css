@@ -406,24 +406,31 @@ a {
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
 }
 
 .close {
-    color: #aaa;
+    color: #ffffff;
     float: right;
     font-size: 28px;
     font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
+    background: #fb511d;
+    padding: 5px;
+    border-radius: 50%;
     text-decoration: none;
     cursor: pointer;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .33s;
+}
+
+.close:hover {
+    transform: scale(.95);
 }
 
 .btn-contratar {
@@ -457,6 +464,12 @@ a {
 #modal-preco {
     font-size: 18px;
     font-weight: 500;
+    word-break:break-all;
+}
+
+#modal-imagem {
+    height: 350px !important;
+    object-fit: cover;
 }
 
 .notification-dropdown {

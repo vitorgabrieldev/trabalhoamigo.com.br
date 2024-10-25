@@ -27,7 +27,6 @@
         ?>
         <div class="details">
           <span><?php echo $row['primeiro_nome']. " " . $row['ultimo_nome'] ?></span>
-          <p><?php echo $row['status']; ?></p>
         </div>
       </header>
       <div class="chat-box">

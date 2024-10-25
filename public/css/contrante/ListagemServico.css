@@ -127,7 +127,6 @@
     top: 10px; /* Distância do topo */
     right: 15px; /* Distância da direita */
     font-size: 24px; /* Tamanho do ícone de fechar */
-    color: #FA511D; /* Cor do ícone de fechar */
     cursor: pointer; /* Muda o cursor ao passar o mouse */
 }
 

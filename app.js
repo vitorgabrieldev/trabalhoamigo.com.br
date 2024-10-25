@@ -40,7 +40,7 @@ function addFaviconAndMeta(faviconUrl, metaTags, openGraphTags) {
     });
 }
 
-addFaviconAndMeta('/trabalhoamigo.com.br/public/img/logo/favicon.ico', [
+addFaviconAndMeta('/favicon.ico', [
     { name: 'description', content: 'TRABALHO AMIGO' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     { charset: 'UTF-8' },

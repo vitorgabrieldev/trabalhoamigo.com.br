@@ -47,6 +47,12 @@ if ($result->num_rows > 0) {
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+    <!-- FancyBox CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+    <!-- FancyBox JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
 </head>
 
 <body>
@@ -78,6 +84,33 @@ if ($result->num_rows > 0) {
             <a href="../PaginaInicial/" class="button voltar orange-back">Voltar</a>
         </div>
         <div class="flex-content">
+            <section class="uploads-avancado">
+                <h1 class="titulo-upload-avancado">Mostre para seus clientes uma imagem do seu serviço</h1>
+                <div class="container-upload">
+                    <label for="arquivo" class="custom-file-upload">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-cloud-arrow-up-fill" viewBox="0 0 16 16">
+                            <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2m2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                        Selecionar Arquivo
+                    </label>
+
+                    <span id="fileName" class="name-file">Nenhum arquivo selecionado
+                        <span class="delete-trash" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16"><path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/></svg>
+                        </span>
+                    </span>
+                    <a class="hidden removeHidden" href="" data-fancybox="gallery" id="imageLink">
+                        <img id="imagePreview" src="" alt="">
+                    </a>
+                    
+                    <button class="delete-trash" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                    </svg>
+                    </button>
+                    <input type="file" id="arquivo" name="arquivo" class="input-file" accept="image/*" style="display: none;"/>
+                </div>
+            </section>
             <form enctype="multipart/form-data" id="formCadastroServico" action="../../../controllers/anunciante/CreateService.php" method="POST">
                 <div>
                     <label for="titulo">Título do Serviço:</label>
@@ -120,75 +153,64 @@ if ($result->num_rows > 0) {
                     <button type="submit">Cadastrar Serviço</button>
                 </div>
             </form>
-            <section class="info">
-                <h2>Dicas para Criar um Bom Anúncio</h2>
-                <ul>
-                    <li><strong>Seja Claro e Conciso:</strong> Use uma linguagem simples e direta para que a mensagem seja facilmente compreendida.</li>
-                    <li><strong>Destaque os Benefícios:</strong> Foque no que torna seu produto ou serviço especial e como ele pode resolver um problema.</li>
-                    <li><strong>Inclua Informações Relevantes:</strong> Preço, localização e condições de pagamento devem estar claros.</li>
-                    <li><strong>Crie um Título Atraente:</strong> Um bom título pode fazer toda a diferença. Seja criativo!</li>
-                    <li><strong>Adicione Chamadas para Ação:</strong> Use frases como "Compre agora!" ou "Saiba mais!" para incentivar a ação.</li>
-                    <li><strong>Utilize Provas Sociais:</strong> Comentários, avaliações e depoimentos de clientes podem aumentar a credibilidade do seu anúncio.</li>
-                    <li><strong>Mantenha o Layout Organizado:</strong> Um design limpo e bem estruturado facilita a leitura e a compreensão da informação.</li>
-                    <li><strong>Utilize Palavras-Chave:</strong> Inclua palavras-chave relevantes para que seu anúncio seja facilmente encontrado em buscas.</li>
-                    <li><strong>Teste Diferentes Versões:</strong> Experimente variações no texto e design do anúncio para ver o que funciona melhor.</li>
-                    <li><strong>Mantenha a Consistência de Marca:</strong> Use cores, fontes e estilos que reflitam a identidade da sua marca em todos os anúncios.</li>
-                </ul>
-            </section>
         </div>
-    </section>
-
-    <section class="uploads-avancado">
-        <h1 class="titulo-upload-avancado">Mostre para seus clientes uma imagem do seu serviço</h1>
-        <div class="container-upload">
-            <label for="arquivo" class="custom-file-upload">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-cloud-arrow-up-fill" viewBox="0 0 16 16">
-                    <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2m2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0z"/>
-                </svg>
-                Selecionar Arquivo
-            </label>
-            <span id="fileName" class="name-file">Nenhum arquivo selecionado
-                <span class="delete-trash" style="display: none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
-                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-                    </svg>
-                </span>
-            </span>
-            <input type="file" id="arquivo" name="arquivo" class="input-file" accept="image/*" style="display: none;"/>
-        </div>
+        <section class="info">
+            <h2>Dicas para Criar um Bom Anúncio</h2>
+            <ul>
+                <li><strong>Seja Claro e Conciso:</strong> Use uma linguagem simples e direta para que a mensagem seja facilmente compreendida.</li>
+                <li><strong>Destaque os Benefícios:</strong> Foque no que torna seu produto ou serviço especial e como ele pode resolver um problema.</li>
+                <li><strong>Inclua Informações Relevantes:</strong> Preço, localização e condições de pagamento devem estar claros.</li>
+                 <li><strong>Crie um Título Atraente:</strong> Um bom título pode fazer toda a diferença. Seja criativo!</li>
+                <li><strong>Adicione Chamadas para Ação:</strong> Use frases como "Compre agora!" ou "Saiba mais!" para incentivar a ação.</li>
+                <li><strong>Utilize Provas Sociais:</strong> Comentários, avaliações e depoimentos de clientes podem aumentar a credibilidade do seu anúncio.</li>
+                <li><strong>Mantenha o Layout Organizado:</strong> Um design limpo e bem estruturado facilita a leitura e a compreensão da informação.</li>
+                <li><strong>Utilize Palavras-Chave:</strong> Inclua palavras-chave relevantes para que seu anúncio seja facilmente encontrado em buscas.</li>
+                <li><strong>Teste Diferentes Versões:</strong> Experimente variações no texto e design do anúncio para ver o que funciona melhor.</li>
+                <li><strong>Mantenha a Consistência de Marca:</strong> Use cores, fontes e estilos que reflitam a identidade da sua marca em todos os anúncios.</li>
+            </ul>
+        </section>
     </section>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         $(document).ready(function() {
             // Ao clicar no contêiner, abre a seleção de arquivos
-            $('.container-upload').on('click', function(event) {
-                // Previne que o clique no label dispare outro clique no input
+            $('.uploads-avancado').on('click', function(event) {
                 event.stopPropagation();
                 $('#arquivo').click();
             });
 
-            // Evento para mostrar o nome do arquivo selecionado
+            // Evento para mostrar o nome do arquivo selecionado e exibir a imagem de pré-visualização
             $('#arquivo').on('change', function(event) {
                 const file = event.target.files[0];
                 const fileName = file ? file.name : 'Nenhum arquivo selecionado';
                 $('#fileName').text(fileName);
 
-                // Mostrar o ícone da lixeira se um arquivo foi selecionado
                 if (file) {
                     $('.delete-trash').show();
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Define a URL para o link e a imagem de visualização
+                        $('#imagePreview').attr('src', e.target.result).show();
+                        $('#imageLink').attr('href', e.target.result);
+                        $(".removeHidden").removeClass("hidden");
+                    };
+                    reader.readAsDataURL(file);
                 } else {
                     $('.delete-trash').hide();
+                    $('#imagePreview').hide();
                 }
             });
 
             // Evento para remover a imagem selecionada
             $('.delete-trash').on('click', function() {
-                // Limpa o input de arquivo
+                $(".removeHidden").addClass("hidden");
                 $('#arquivo').val('');
                 $('#fileName').text('Nenhum arquivo selecionado');
-                // Oculta o ícone da lixeira
                 $(this).hide();
+                $('#imagePreview').hide();
+                $('#imageLink').attr('href', ''); // Remove o link do FancyBox
             });
         });
     </script>

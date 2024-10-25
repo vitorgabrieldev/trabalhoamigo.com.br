@@ -70,7 +70,7 @@ if (!isset($_SESSION)) {
                 <h3 class="descricaoBanner">
                     Milhares de oportunidades para você divulgar seus serviços! Clique em saiba mais e venha conosco criar seus anúncios gratuitamente!
                 </h3>
-                <a id="saibamais" class="link-saibamais">SAIBA MAIS</a>
+                <a href="../CadastroServico/" id="saibamais" class="link-saibamais">SAIBA MAIS</a>
             </div>
             <img src="../../../../public/img/Bloco-banner2.png" alt="Banner">
         </section>

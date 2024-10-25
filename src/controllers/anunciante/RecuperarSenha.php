@@ -79,25 +79,25 @@ class RecuperarSenhaController {
             $mail->isSMTP();
             $mail->SMTPAuth = true;
             $mail->SMTPSecure = 'tls';
-            $mail->Host = 'smtp.gmail.com';
-            $mail->Port = 587;
-            $mail->Username = 'vitorgabrieldeoliveira.desktop@gmail.com';
-            $mail->Password = 'qzsm gfmr fhzc okhi';
-    
-            $mail->setFrom('vitorgabrieldeoliveira.desktop@gmail.com', 'Trabalho Amigo');
+            $mail->Host = SMTP_HOST;
+            $mail->Port = SMTP_PORT;
+            $mail->Username = SMTP_USERNAME;
+            $mail->Password = SMTP_PASSWORD;
+            
+            $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
             $mail->addAddress($destinatario);
-    
+            
             $mail->isHTML(true);
             $mail->CharSet = 'UTF-8';
             $mail->Subject = 'Recuperação de Senha';
-    
+            
             // Carregar o conteúdo do arquivo HTML
             $html = file_get_contents('../templates/recuperacao_senha.html');
-            $html = str_replace('{{codigo}}', $codigo, $html); 
-    
+            $html = str_replace('{{codigo}}', $codigo, $html);
+            
             $mail->Body = $html;
             $mail->AltBody = 'Seu código de recuperação é: ' . $codigo;
-    
+            
             $mail->send();
             return true;
         } catch (Exception $e) {

@@ -28,11 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Salva o TOTP no banco
                 header('Content-Type: application/json');
 
-                // Configuração da conexão com o banco de dados
-                define('DB_SERVER', '185.173.111.184');
-                define('DB_USERNAME', 'u858577505_trabalhoamigo');
-                define('DB_PASSWORD', '@#Trabalhoamigo023@_');
-                define('DB_NAME', 'u858577505_trabalhoamigo');
+                require_once __DIR__ . '/../../../../../config/config.php';
 
                 // Conexão com o banco de dados
                 $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);

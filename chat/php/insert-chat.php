@@ -41,7 +41,7 @@ if(isset($_SESSION['unique_id'])){
             $idContratante = $row['id_usuario'];
             
             // Criar notificação
-            criarNotificacao($idContratante, 'Você recebeu uma nova mensagem', 'Informações', 'https://trabalhoamigo.vitorgabrieldev.io/chat/chat.php?user_id='.$outgoing_id.'&proposta_id='.$servico_id);
+            criarNotificacao($idContratante, 'Você recebeu uma nova mensagem', 'Informações', 'https://trabalhoamigo.vitorgabrieldev.io/chat/chat.php?user_id='.$incoming_id.'&proposta_id='.$servico_id);
         } else {
             echo json_encode(['error' => 'Erro ao gerar notificação']);
         }

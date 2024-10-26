@@ -265,7 +265,7 @@ $stmt->close();
             <?php else: ?>
                 <?php foreach ($notificacoesExibidas as $notificacao): ?>
                     <li>
-                        <a href="<?= htmlspecialchars($notificacao['redirecionar']) ?>" class="notification-link">
+                        <a target="_BLANK" href="<?= htmlspecialchars($notificacao['redirecionar']) ?>" class="notification-link">
                             <span class="notification-icon">
                                 <?php if ($notificacao['tipo'] === 'informacao'): ?>
                                     <i class="bi bi-info-circle"></i>
@@ -305,7 +305,7 @@ $stmt->close();
             $notificacoesRestantes = array_slice($notificacoes, $limite);
             foreach ($notificacoesRestantes as $notificacao): ?>
                 <li>
-                    <a href="<?= htmlspecialchars($notificacao['redirecionar']) ?>" class="notification-link">
+                    <a target="_BLANK" href="<?= htmlspecialchars($notificacao['redirecionar']) ?>" class="notification-link">
                         <span class="notification-icon">
                             <?php if ($notificacao['tipo'] === 'informacao'): ?>
                                 <i class="bi bi-info-circle"></i>

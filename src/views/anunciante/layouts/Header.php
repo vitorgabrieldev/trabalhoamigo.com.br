@@ -332,16 +332,19 @@ $stmt->close();
 </div>
 
 <script>
-    document.getElementById('show-more-notifications').onclick = function() {
-        var remainingNotifications = document.getElementById('remaining-notification-list');
-
-        if (remainingNotifications.style.display === "none") {
-            remainingNotifications.style.display = "block";
-            $(".moreNotify").hide();
-        } else {
-            remainingNotifications.style.display = "none";
-        }
-    };
+    var showMoreButton = document.getElementById('show-more-notifications');
+    if (showMoreButton) {
+        showMoreButton.addEventListener('click', function() {
+            var remainingNotifications = document.getElementById('remaining-notification-list');
+            
+            if (remainingNotifications.style.display === "none") {
+                remainingNotifications.style.display = "block";
+                $(".moreNotify").hide();
+            } else {
+                remainingNotifications.style.display = "none";
+            }
+        });
+    }
 
     <?php if ($totalNotificacoes != 0): ?>
         $.notify("Você possui novas notificações", {

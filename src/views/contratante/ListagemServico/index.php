@@ -37,9 +37,22 @@ function getServicos($conexao, $limit, $offset) {
             AND u.ativo = 1
     ";
 
+    $params = [];
+    $types = '';
+
     if (isset($_GET['busca'])) {
         $busca = htmlspecialchars($_GET['busca']);
         $sql .= " AND (s.titulo LIKE ? OR s.descricao LIKE ?)";
+        $params[] = "%$busca%";
+        $params[] = "%$busca%";
+        $types .= 'ss';
+    }
+
+    if (isset($_GET['categoria'])) {
+        $categoriaId = intval($_GET['categoria']);
+        $sql .= " AND s.id_categoria_fk = ?";
+        $params[] = $categoriaId;
+        $types .= 'i';
     }
 
     if (isset($_GET['order'])) {
@@ -50,6 +63,9 @@ function getServicos($conexao, $limit, $offset) {
     }
 
     $sql .= " LIMIT ? OFFSET ?";
+    $params[] = $limit;
+    $params[] = $offset;
+    $types .= 'ii';
 
     $stmt = $conexao->prepare($sql);
 
@@ -57,12 +73,7 @@ function getServicos($conexao, $limit, $offset) {
         die('Erro na preparação da consulta: ' . $conexao->error);
     }
 
-    if (isset($busca)) {
-        $buscaParam = "%" . $busca . "%";
-        $stmt->bind_param('ssii', $buscaParam, $buscaParam, $limit, $offset);
-    } else {
-        $stmt->bind_param('ii', $limit, $offset);
-    }
+    $stmt->bind_param($types, ...$params);
 
     if (!$stmt->execute()) {
         die('Erro na execução da consulta: ' . $stmt->error);
@@ -77,8 +88,6 @@ function getServicos($conexao, $limit, $offset) {
     }
 }
 
-
-// Função para contar o total de serviços com usuários ativados
 function getTotalServicos($conexao) {
     $sql = "
         SELECT COUNT(*) AS total 
@@ -87,11 +96,23 @@ function getTotalServicos($conexao) {
         WHERE s.ativo = 1
         AND u.ativo = 1
     ";
-    
-    $busca = isset($_GET['busca']) ? htmlspecialchars($_GET['busca']) : false;
 
-    if ($busca) {
+    $params = [];
+    $types = '';
+
+    if (isset($_GET['busca'])) {
+        $busca = htmlspecialchars($_GET['busca']);
         $sql .= " AND (s.titulo LIKE ? OR s.descricao LIKE ?)";
+        $params[] = "%$busca%";
+        $params[] = "%$busca%";
+        $types .= 'ss';
+    }
+
+    if (isset($_GET['categoria'])) {
+        $categoriaId = intval($_GET['categoria']);
+        $sql .= " AND s.id_categoria_fk = ?";
+        $params[] = $categoriaId;
+        $types .= 'i';
     }
 
     $stmt = $conexao->prepare($sql);
@@ -100,9 +121,8 @@ function getTotalServicos($conexao) {
         die('Erro na preparação da consulta: ' . $conexao->error);
     }
 
-    if ($busca) {
-        $buscaParam = "%" . $busca . "%";
-        $stmt->bind_param('ss', $buscaParam, $buscaParam);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
     }
 
     $stmt->execute();
@@ -114,6 +134,15 @@ function getTotalServicos($conexao) {
     } else {
         return 0;
     }
+}
+
+function GetCategoriasServicos ($conn) {
+    $sql = "SELECT * FROM categorias ORDER BY ordenacao ASC;";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
 }
 
 ?>
@@ -147,6 +176,8 @@ function getTotalServicos($conexao) {
     <!-- Importação da bibliotecas -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js" defer></script>
 
     <body>
 
@@ -196,6 +227,18 @@ function getTotalServicos($conexao) {
                     </div>
                 </div>
             </section>
+            <div id="filterContainer" class="filtros-box">
+                <h3 class="titulo-box">FILTROS:</h3>
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <?php foreach (GetCategoriasServicos(getDatabaseConnection()) as $categoria): ?>
+                            <div class="swiper-slide filtro-item" data-id="<?php echo htmlspecialchars($categoria['id_categoria']); ?>">
+                                <h1 class="titulo"><?php echo htmlspecialchars($categoria['nome']); ?></h1>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
             <section id="bloco-servico">
                 </div>
                 <div id="listServicos" class="servicos">
@@ -307,11 +350,7 @@ function getTotalServicos($conexao) {
         </main>
         <!-- ================================================================================== -->
 
-        <?php
-
-            include '../layouts/Footer.php';
-
-        ?>
+        <?= include '../layouts/Footer.php'; ?>
 
     </body>
 </html>

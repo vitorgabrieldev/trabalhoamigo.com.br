@@ -170,3 +170,128 @@
     min-height: 250px;
     object-fit: cover;
 }
+
+#bloco-busca {
+    padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+}
+#bloco-busca .row {
+    display: flex;
+    justify-content: space-between;
+}
+#bloco-busca .row .input-box {
+    border: 1px solid #ADB0B5;
+    border-radius: 6px;
+}
+#bloco-busca .row .input-box .input_element {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 10px;
+    border-radius: 6px;
+    min-width: 300px;
+}
+#bloco-busca .row .input-box .button_busca {
+    height: 100%;
+    border: none;
+    border-radius: 0 6px 6px 0;
+    outline: none;
+    background: #FA511D;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: .33s;
+    border-left: 1px solid transparent;
+}
+#bloco-busca .row .input-box .button_busca:hover {
+    background: transparent;
+    color: #FA511D;
+    border-left: 1px solid #ADB0B5;
+}
+#bloco-busca .row .resultado {
+    color: #9E9E9E;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#bloco-busca .row .resultado .isLoading {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #1a1919;
+    border-bottom: 2px solid transparent;
+    border-radius: 50%;
+    animation: loadServicos infinite linear 1s;
+}
+@keyframes loadServicos {
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+#bloco-busca .row .resultado .number {
+    color: #5B5B5B;
+    font-size: 15px;
+    font-weight: 700;
+}
+#bloco-busca .row .ordenar{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#bloco-busca .row .ordenar .titulo {
+    color: #797979;
+    font-size: 14px;
+    font-weight: 600;
+}
+#bloco-busca .row .ordenar .selectOrdenacao {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-weight: 800;
+    color: #454444;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+#bloco-busca .row .ordenar .optionSelectOrdenacao {
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+}
+@media screen and (max-width: 700px) {
+    #bloco-busca .row .input-box .input_element {
+        min-width: 200px;
+    }
+    #bloco-busca .row:last-child {
+        flex-direction: column;
+        row-gap: 20px;
+    }
+}
+@media screen and (max-width: 500px) {
+    #bloco-busca {
+        padding: 40px 15px;
+    }
+    #bloco-busca .resultado {
+        font-size: 12px !important;
+    }
+    #bloco-busca .input_element {
+        font-size: 15px !important;
+    }
+    #bloco-busca .titulo {
+        font-size: 14px;
+    }
+    #bloco-busca .selectOrdenacao {
+        font-size: 14px;
+    }
+}

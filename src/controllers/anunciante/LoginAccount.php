@@ -154,6 +154,8 @@ function processLogin() {
                 $_SESSION['img'] = $dados['img'];
                 $_SESSION['id_usuario'] = $usuario['id'];
 
+                // RandomNotify($usuario['id']);
+
                 echo json_encode([
                     'success' => true,
                     'message' => 'Login bem-sucedido.'
@@ -182,3 +184,51 @@ function processLogin() {
 
 
 processLogin();
+
+/**
+ * Função para enviar notificações de segurança aleatórias.
+ *
+ * @param int $usuario_id ID do usuário que receberá a notificação.
+ */
+function RandomNotify($usuario_id) {
+    // Array de mensagens com tipos associados
+    $notificacoes = [
+        'segurança' => [
+            "Considere ativar a autenticação em duas etapas.",
+            "Lembre-se de verificar sua atividade de login regularmente.",
+            "Ative as notificações de login para maior segurança.",
+            "Utilize senhas fortes e únicas para suas contas.",
+            "Cuidado com phishing! Nunca clique em links suspeitos.",
+        ],
+        'promoções' => [
+            "Aproveite 20% de desconto na sua próxima compra!",
+            "Novos serviços estão disponíveis! Confira já!",
+            "Indique um amigo e ganhe créditos!",
+            "Promoção válida por tempo limitado! Não perca!",
+        ],
+        'alertas' => [
+            "Houve uma alteração na sua conta, verifique as configurações.",
+            "Uma nova mensagem chegou para você!",
+            "Seu perfil precisa de atualização. Complete agora!",
+        ],
+        'dicas' => [
+            "Dica do dia: Mantenha suas senhas em locais seguros.",
+            "Lembre-se de sair da sua conta ao usar dispositivos públicos.",
+            "Explore nossos recursos para aproveitar melhor nossos serviços.",
+        ],
+    ];
+
+    // Escolher aleatoriamente um tipo de notificação
+    $tipos = array_keys($notificacoes);
+    $tipoAleatorio = $tipos[array_rand($tipos)];
+
+    // Escolher uma mensagem aleatória do tipo escolhido
+    $mensagemAleatoria = $notificacoes[$tipoAleatorio][array_rand($notificacoes[$tipoAleatorio])];
+
+    if (rand(1, 100) <= 100) { 
+        $redirecionar = 'https://trabalhoamigo.vitorgabrieldev.io/';
+
+        // Chama a função para criar a notificação
+        criarNotificacao($usuario_id, $mensagemAleatoria, $tipoAleatorio, $redirecionar);
+    }
+}

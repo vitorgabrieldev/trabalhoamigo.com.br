@@ -1,10 +1,8 @@
 <?php
-  $hostname = "185.173.111.184";
-  $username = "u858577505_trabalhoamigo";
-  $senha = "@#Trabalhoamigo023@_";
-  $dbname = "u858577505_trabalhoamigo";
 
-  $conn = mysqli_connect($hostname, $username, $senha, $dbname);
+  require_once __DIR__ . '/../../config/config.php';
+
+  $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
   if(!$conn){
     echo "Database connection error".mysqli_connect_error();
   }

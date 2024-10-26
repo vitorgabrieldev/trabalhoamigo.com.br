@@ -154,6 +154,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
 
 </script>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Notify.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+
+<?php
+
+$id_usuario = $_SESSION['id_usuario'];
+
+$sql = "SELECT id, mensagem, tipo, status_lido, redirecionar, data_criacao
+        FROM notificacoes
+        WHERE usuario_id = ? AND status_lido = 0
+        ORDER BY data_criacao DESC";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_usuario);
+
+if ($stmt->execute()) {
+    $result = $stmt->get_result();
+    $notificacoesAgrupadas = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $chave = $row['mensagem'] . '-' . $row['tipo'];
+
+        if (isset($notificacoesAgrupadas[$chave])) {
+            $notificacoesAgrupadas[$chave]['count']++;
+        } else {
+            $notificacoesAgrupadas[$chave] = [
+                'mensagem' => $row['mensagem'],
+                'tipo' => $row['tipo'],
+                'status_lido' => $row['status_lido'],
+                'redirecionar' => $row['redirecionar'],
+                'data_criacao' => $row['data_criacao'],
+                'count' => 1
+            ];
+        }
+    }
+
+    $notificacoes = array_values($notificacoesAgrupadas);
+    $notificacaoCount = count($notificacoes);
+}
+
+$stmt->close();
+
+?>
+
 <header id="site-topo">
     <div onclick="window.location.href = '../PaginaInicial/'" class="logo-box">
         <img width="40px" height="40px" class="logo" src="../../../../public/img/logo/favicon.ico" alt="Logo Rodapé">
@@ -171,6 +220,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
             <a class="link-element" href="#" onclick="toggleNotifications()">
                 <img src="../../../../public/img/Icon-notification.png" alt="Icon Notificações">
                 Notificações
+                <?php if ($notificacaoCount > 0): ?>
+                    <div class="burble-alert" id="notification-bubble" style="display: flex;"></div>
+                <?php endif; ?>
             </a>
         </div>
         <div class="userProfile-circle">
@@ -192,21 +244,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rua'], $_POST['numero
 <!-- ================================================================================== -->
 
 <div id="notification-dropdown" class="notification-dropdown" style="display:none;">
-    <ul>
-        <li>
-            <p>Sua proposta #874327 foi aceita!</p>
-            <span class="notification-time">10:30 AM</span>
-        </li>
-        <li>
-            <p>Seu perfil foi atualizado.</p>
-            <span class="notification-time">9:15 AM</span>
-        </li>
-        <li>
-            <p>Nova atualização.</p>
-            <span class="notification-time">8:45 AM</span>
-        </li>
-    </ul>
+    <div id="notification-container" style="max-height: 300px; overflow-y: auto;">
+        <ul id="notification-list">
+            <?php 
+            $limite = 4; 
+            $totalNotificacoes = count($notificacoes);
+            $notificacoesExibidas = array_slice($notificacoes, 0, $limite);
+            ?>
+            
+            <?php if ($totalNotificacoes === 0): ?>
+                <li>
+                    <p>Não há notificações</p>
+                </li>
+            <?php else: ?>
+                <?php foreach ($notificacoesExibidas as $notificacao): ?>
+                    <li>
+                        <a href="<?= htmlspecialchars($notificacao['redirecionar']) ?>" class="notification-link">
+                            <span class="notification-icon">
+                                <?php if ($notificacao['tipo'] === 'informacao'): ?>
+                                    <i class="bi bi-info-circle"></i>
+                                <?php elseif ($notificacao['tipo'] === 'servico'): ?>
+                                    <i class="bi bi-briefcase"></i>
+                                <?php elseif ($notificacao['tipo'] === 'segurança'): ?>
+                                    <i class="bi bi-shield-lock"></i>
+                                <?php else: ?>
+                                    <i class="bi bi-bell"></i>
+                                <?php endif; ?>
+                            </span>
+                            <p>
+                                <?= htmlspecialchars($notificacao['mensagem']) ?>
+                                <?= $notificacao['count'] > 1 ? " ({$notificacao['count']}x)" : '' ?>
+                            </p>
+                            <span class="notification-time">
+                                <?= date('H:i', strtotime($notificacao['data_criacao'])) ?>
+                            </span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+
+                <?php if ($totalNotificacoes > $limite): ?>
+                    <li class="moreNotify">
+                        <a href="javascript:void(0)" id="show-more-notifications" class="notification-link">
+                            <p>
+                                +<?= ($totalNotificacoes - $limite) ?> notificações
+                            </p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+            <?php endif; ?>
+        </ul>
+
+        <ul id="remaining-notification-list" style="display:none;">
+            <?php 
+            $notificacoesRestantes = array_slice($notificacoes, $limite);
+            foreach ($notificacoesRestantes as $notificacao): ?>
+                <li>
+                    <a href="<?= htmlspecialchars($notificacao['redirecionar']) ?>" class="notification-link">
+                        <span class="notification-icon">
+                            <?php if ($notificacao['tipo'] === 'informacao'): ?>
+                                <i class="bi bi-info-circle"></i>
+                            <?php elseif ($notificacao['tipo'] === 'servico'): ?>
+                                <i class="bi bi-briefcase"></i>
+                            <?php elseif ($notificacao['tipo'] === 'segurança'): ?>
+                                <i class="bi bi-shield-lock"></i>
+                            <?php else: ?>
+                                <i class="bi bi-bell"></i>
+                            <?php endif; ?>
+                        </span>
+                        <p>
+                            <?= htmlspecialchars($notificacao['mensagem']) ?>
+                            <?= $notificacao['count'] > 1 ? " ({$notificacao['count']}x)" : '' ?>
+                        </p>
+                        <span class="notification-time">
+                            <?= date('H:i', strtotime($notificacao['data_criacao'])) ?>
+                        </span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
 </div>
+
+<script>
+    document.getElementById('show-more-notifications').onclick = function() {
+        var remainingNotifications = document.getElementById('remaining-notification-list');
+
+        if (remainingNotifications.style.display === "none") {
+            remainingNotifications.style.display = "block";
+            $(".moreNotify").hide();
+        } else {
+            remainingNotifications.style.display = "none";
+        }
+    };
+
+    <?php if ($totalNotificacoes != 0): ?>
+        $.notify("Você possui novas notificações", {
+            className: "info",
+            position: "bottom right",
+            autoHide: true,       
+            autoHideDelay: 3000,  
+            showAnimation: "fadeIn", 
+            hideAnimation: "fadeOut",
+            style: 'bootstrap',   
+        });
+    <?php endif; ?>
+</script>
+
 
 <script>
 function toggleNotifications() {
@@ -222,7 +365,6 @@ function toggleNotifications() {
     }
 }
 </script>
-
 
 <?php
 

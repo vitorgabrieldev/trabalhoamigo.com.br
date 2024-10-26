@@ -10,6 +10,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+trocarStatusNotificacoes($_SESSION['id_usuario'], "Sua proposta foi recusada", 1);
+trocarStatusNotificacoes($_SESSION['id_usuario'], "Sua proposta foi aceita", 1);
+
 // Buscar propostas
 $id_usuario = $_SESSION['id_usuario'] ?? null;
 if ($id_usuario) {
@@ -19,7 +22,8 @@ if ($id_usuario) {
             FROM proposta p 
             JOIN servicos s ON p.id_servico_fk = s.id_servico 
             JOIN usuarios u ON p.id_usuario_prestador_fk = u.id_usuario 
-            WHERE p.id_usuario_contrante_fk = ? AND u.ativo = 1";
+            WHERE p.id_usuario_contrante_fk = ? AND u.ativo = 1
+            ORDER BY p.data_contrato DESC";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id_usuario);

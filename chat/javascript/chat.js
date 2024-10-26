@@ -41,8 +41,8 @@ $(document).ready(function () {
     function sendMessage() {
         const servico_id = new URLSearchParams(window.location.search).get('proposta_id');
 
-        let formData = form.serializeArray(); // Serializa os dados do formulário
-        formData.push({ name: 'proposta_id', value: servico_id }); // Adiciona o servico_id
+        let formData = form.serializeArray();
+        formData.push({ name: 'proposta_id', value: servico_id });
 
         sendBtn.html("<div class='loading-chat'></div>").prop("disabled", true);
         inputField.prop("disabled", true);

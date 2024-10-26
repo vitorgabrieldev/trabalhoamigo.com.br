@@ -29,8 +29,39 @@ if(isset($_SESSION['unique_id'])){
         $sql = mysqli_query($conn, "INSERT INTO messages (incoming_msg_id, outgoing_msg_id, msg, servico_id)
                                     VALUES ({$incoming_id}, {$outgoing_id}, '{$message}', '{$servico_id}')") or die(mysqli_error($conn));
 
-        // Você pode querer retornar a mensagem como resposta (opcional)
-        echo json_encode(['success' => true, 'message' => $message]); // Retorna a mensagem se necessário
+        // Consulta para obter o id_usuario_contrante_fk da proposta
+        $sql = "SELECT * FROM usuarios WHERE unique_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $incoming_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $idContratante = $row['id_usuario'];
+            
+            // Criar notificação
+            criarNotificacao($idContratante, 'Você recebeu uma nova mensagem', 'Informações', 'https://trabalhoamigo.vitorgabrieldev.io/chat/chat.php?user_id='.$outgoing_id.'&proposta_id='.$servico_id);
+        } else {
+            echo json_encode(['error' => 'Erro ao gerar notificação']);
+        }
+
+        $sql = "SELECT * FROM usuarios WHERE unique_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $outgoing_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $id = $row['id_usuario'];
+            
+            trocarStatusNotificacoes($id, "Você recebeu uma nova mensagem", 1);
+        } else {
+            echo json_encode(['error' => 'Erro ao gerar notificação']);
+        }
+
+        echo json_encode(['success' => true, 'message' => $message]);
     } else {
         echo json_encode(['error' => 'Mensagem está vazia']);
     }

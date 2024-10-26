@@ -66,6 +66,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Executa a declaração
         if ($stmt->execute()) {
+
+            criarNotificacao($id_usuario_prestador_fk, 'Você recebeu uma nova proposta', 'Informações', '../ListagemProposta/');
+
             echo "true";
         } else {
             echo "Erro ao enviar proposta: " . $stmt->error;

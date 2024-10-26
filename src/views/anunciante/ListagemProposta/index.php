@@ -3,8 +3,9 @@ session_start();
 
 require_once __DIR__ . '/../../../../config/config.php';
 
-
 $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+
+trocarStatusNotificacoes($_SESSION['id_usuario'], "Você recebeu uma nova proposta", 1);
 
 // Verificação da conexão
 if ($conn->connect_error) {
@@ -30,6 +31,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
     global $conn;
 
+    // Consulta para obter o id_usuario_contrante_fk da proposta
+    $sql = "SELECT id_usuario_contrante_fk FROM proposta WHERE id_contrato = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $idContrato);
+
+    // Executar a consulta
+    $stmt->execute();
+
+    // Obter o resultado
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Fetch associativo
+        $row = $result->fetch_assoc();
+        $idContratante = $row['id_usuario_contrante_fk'];
+        
+        // Criar notificação
+        criarNotificacao($idContratante, 'Sua proposta foi aceita', 'Informações', '../HistoricoProposta/');
+    } else {
+        echo json_encode(['error' => 'Nenhuma proposta encontrada para o contrato informado.']);
+        return; // Termina a execução se não encontrar a proposta
+    }
+
+    // Atualizar o status da proposta
     $sql = "UPDATE proposta SET status = '2' WHERE id_contrato = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $idContrato);
@@ -37,6 +62,7 @@ function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
     if ($stmt->execute()) {
         $stmt->close();
 
+        // Inserir os detalhes do contrato
         $sqlInsert = "INSERT INTO contratos (id_servico_fk, id_contrato_fk, qtd_servico, valor_final) VALUES (?, ?, ?, ?)";
         $stmtInsert = $conn->prepare($sqlInsert);
         $stmtInsert->bind_param("iiid", $idServico, $idContrato, $qtdServico, $valorFinal); 
@@ -53,8 +79,32 @@ function acceptService($idServico, $idContrato, $qtdServico, $valorFinal) {
     }
 }
 
+
 function rejectService($idServico) {
     global $conn;
+
+    // Consulta para obter o id_usuario_contrante_fk da proposta
+    $sql = "SELECT id_usuario_contrante_fk FROM proposta WHERE id_contrato = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $idServico);
+
+    // Executar a consulta
+    $stmt->execute();
+
+    // Obter o resultado
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Fetch associativo
+        $row = $result->fetch_assoc();
+        $idContratante = $row['id_usuario_contrante_fk'];
+        
+        // Criar notificação
+        criarNotificacao($idContratante, 'Sua proposta foi recusada', 'Informações', '../HistoricoProposta/');
+    } else {
+        echo json_encode(['error' => 'Nenhuma proposta encontrada para o contrato informado.']);
+        return; // Termina a execução se não encontrar a proposta
+    }
 
     $sql = "UPDATE proposta SET status = '4' WHERE id_contrato = ?";
     $stmt = $conn->prepare($sql);
@@ -77,7 +127,8 @@ $sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS t
         FROM proposta p 
         JOIN servicos s ON p.id_servico_fk = s.id_servico 
         JOIN usuarios u ON p.id_usuario_contrante_fk = u.id_usuario 
-        WHERE p.id_usuario_prestador_fk = ? AND p.status != 4 AND u.ativo = 1";
+        WHERE p.id_usuario_prestador_fk = ? AND p.status != 4 AND u.ativo = 1
+        ORDER BY p.data_contrato DESC";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
@@ -181,7 +232,7 @@ $conn->close();
         </div>
     </div>
 
-    <div class="background-loading hidden">
+    <div class="background-loading-50 hidden">
         <div class="loading-icon"></div>
     </div>
 

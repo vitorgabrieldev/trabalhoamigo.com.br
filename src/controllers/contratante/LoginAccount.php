@@ -121,6 +121,21 @@ function processLogin() {
                     }
                 }
 
+                date_default_timezone_set('America/Sao_Paulo');
+
+                // Atualiza o último login do usuário
+                $sqlUpdate = "UPDATE usuarios SET last_login_at = ? WHERE id_usuario = ?";
+                $stmtUpdate = $conexao->prepare($sqlUpdate);
+
+                if (!$stmtUpdate) {
+                    throw new Exception("Erro na preparação da atualização: " . $conexao->error);
+                }
+
+                $lastLogin = date('Y-m-d H:i:s');
+                $stmtUpdate->bind_param('si', $lastLogin,$usuario['id']);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
+
                 session_start();
                 
                 $dados = retornUsuarioLogado($conexao, $email);

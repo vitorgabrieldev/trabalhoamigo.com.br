@@ -543,12 +543,12 @@ $conn->close();
                 <input type="text" id="telefone" name="telefone" class="input telefone mascara-telefone" value="<?php echo isset($usuario['telefone']) ? $usuario['telefone'] : ''; ?>" required>
             </div>
             <div class="form-group-editar-perfil">
-                <label for="celular">Celuar:</label>
-                <input type="text" id="celular" name="celular" class="input celular mascara-telefone" value="<?php echo isset($usuario['celular']) ? $usuario['celular'] : ''; ?>" required>
+                <label for="celular">Celular:</label>
+                <input type="text" id="celular" name="celular" class="input celular mascara-telefone" value="<?php echo isset($usuario['celular']) ? $usuario['celular'] : ''; ?>" >
             </div>
             <div class="form-group-editar-perfil">
                 <label for="whatsapp">WhatsApp:</label>
-                <input type="text" id="whatsapp" name="whatsapp" class="input whatsapp mascara-telefone" value="<?php echo isset($usuario['whatsapp']) ? $usuario['whatsapp'] : ''; ?>" required>
+                <input type="text" id="whatsapp" name="whatsapp" class="input whatsapp mascara-telefone" value="<?php echo isset($usuario['whatsapp']) ? $usuario['whatsapp'] : ''; ?>" >
             </div>
             <hr>
             <div class="form-group-editar-perfil">

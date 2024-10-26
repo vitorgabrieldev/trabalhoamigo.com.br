@@ -84,6 +84,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['primeiro_nome'], $_PO
 
             if ($result->num_rows > 0) {
                 $usuario = $result->fetch_assoc();
+
+                date_default_timezone_set('America/Sao_Paulo');
+
+                // Atualiza o último login do usuário
+                $sqlUpdate = "UPDATE usuarios SET updated_at = ? WHERE id_usuario = ?";
+                $stmtUpdate = $conn->prepare($sqlUpdate);
+
+                if (!$stmtUpdate) {
+                    throw new Exception("Erro na preparação da atualização: " . $conn->error);
+                }
+
+                $lastLogin = date('Y-m-d H:i:s');
+                $stmtUpdate->bind_param('si', $lastLogin,$id_usuario);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
                 
                 $_SESSION['primeiro_nome']   = $usuario['primeiro_nome'];
                 $_SESSION['ultimo_nome']     = $usuario['ultimo_nome'];

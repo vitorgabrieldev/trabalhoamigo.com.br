@@ -31,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['primeiro_nome'], $_PO
     $ultimo_nome        = $conn->real_escape_string(trim($_POST['ultimo_nome']));
     $email              = $conn->real_escape_string(trim($_POST['email']));
     $telefone           = $conn->real_escape_string(trim($_POST['telefone']));
-    $celular            = $conn->real_escape_string(trim($_POST['celular']));
-    $whatsapp           = $conn->real_escape_string(trim($_POST['whatsapp']));
+    $celular  = empty(trim($_POST['celular'])) ? null : $conn->real_escape_string(trim($_POST['celular']));
+    $whatsapp = empty(trim($_POST['whatsapp'])) ? null : $conn->real_escape_string(trim($_POST['whatsapp']));
     $senha = isset($_POST['senha']) ? trim($_POST['senha']) : null;
     $confirmar_senha = isset($_POST['confirmar_senha']) ? trim($_POST['confirmar_senha']) : null;
 
@@ -56,9 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['primeiro_nome'], $_PO
         }
     }
 
-    
-    // Corrige a cláusula WHERE para usar 'id_usuario'
-    $sql .= " WHERE id_usuario = ?"; // Mudei aqui
+    $sql .= " WHERE id_usuario = ?";
 
     // Preparando a consulta
     $stmt = $conn->prepare($sql);
@@ -84,6 +82,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['primeiro_nome'], $_PO
 
             if ($result->num_rows > 0) {
                 $usuario = $result->fetch_assoc();
+
+                date_default_timezone_set('America/Sao_Paulo');
+
+                // Atualiza o último login do usuário
+                $sqlUpdate = "UPDATE usuarios SET updated_at = ? WHERE id_usuario = ?";
+                $stmtUpdate = $conn->prepare($sqlUpdate);
+
+                if (!$stmtUpdate) {
+                    throw new Exception("Erro na preparação da atualização: " . $conn->error);
+                }
+
+                $lastLogin = date('Y-m-d H:i:s');
+                $stmtUpdate->bind_param('si', $lastLogin,$id_usuario);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
                 
                 $_SESSION['primeiro_nome']   = $usuario['primeiro_nome'];
                 $_SESSION['ultimo_nome']     = $usuario['ultimo_nome'];

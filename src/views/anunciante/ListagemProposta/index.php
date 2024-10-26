@@ -146,7 +146,7 @@ $conn->close();
                     <button class="button button-vermais" onclick="showServiceDetails(
                         <?= $proposta['id_contrato'] ?>,
                         '<?= addslashes($proposta['titulo_servico']) ?>',
-                        <?= $proposta['valor_total'] ?>,
+                        <?= $valor = ($proposta['valor_total'] == 0) ? $proposta['preco_servico'] : $proposta['valor_total']; ?>,
                         '<?= addslashes($proposta['primeiro_nome']) ?>',
                         '<?= addslashes($proposta['telefone']) ?>',
                         '<?= addslashes($proposta['celular']) ?>',
@@ -229,9 +229,9 @@ $conn->close();
     }
 
     function acceptService(idServico, tituloServico, valorTotal) {
-        const idContrato = idServico; // Supondo que idServico é igual a idContrato
-        const qtdServico = 1; // Ajuste conforme necessário
-        const valorFinal = valorTotal.toFixed(2).replace('.', ','); // Ajuste conforme necessário
+        const idContrato = idServico;
+        const qtdServico = 1;
+        const valorFinal = valorTotal.toFixed(2).replace('.', ',');
 
         $(".background-loading").removeClass("hidden");
 

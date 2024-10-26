@@ -16,7 +16,7 @@ trocarStatusNotificacoes($_SESSION['id_usuario'], "Sua proposta foi aceita", 1);
 // Buscar propostas
 $id_usuario = $_SESSION['id_usuario'] ?? null;
 if ($id_usuario) {
-    $sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS titulo_servico, 
+    $sql = "SELECT p.id_contrato, DATE(p.data_contrato) AS data_envio, s.titulo AS titulo_servico, s.preco AS preco_servico , 
                    p.valor_total, u.primeiro_nome, u.telefone, u.celular, u.whatsapp, u.email, u.unique_id,
                    p.prazo_estimado, p.data_esperada, p.status
             FROM proposta p 
@@ -92,7 +92,7 @@ $conn->close();
             <?php foreach ($propostas as $proposta): ?>
                 <div class="grid-item"><?= htmlspecialchars($proposta['data_envio']) ?></div>
                 <div class="grid-item"><?= htmlspecialchars($proposta['titulo_servico']) ?></div>
-                <div class="grid-item">R$ <?= number_format($proposta['valor_total'], 2, ',', '.') ?></div>
+                <div class="grid-item">R$ <?= ($proposta['valor_total'] == 0) ? number_format($proposta['preco_servico'], 2, ',', '.') : number_format($proposta['valor_total'], 2, ',', '.') ?></div>
                 <div class="grid-item">
                     <?php
                     // Definir a classe de status com base no valor

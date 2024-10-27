@@ -83,7 +83,7 @@
                             <article class="row-item-group-form">
                                 <a href="../EsqueciMinhaSenha/" class="link-item-form">Esqueci minha senha</a>
                             </article>
-                            <button type="submit" class="button-send-form anunciante">Entrar</button>
+                            <button type="submit" class="button-send-form anunciante SendForm">Entrar</button>
                             <hr class="separator-item-form">
                             <article class="row-item-group-form-left">
                                 <span class="description-row-item-form">
@@ -92,7 +92,10 @@
                                 </span>
                             </article>
                             <article class="row-item-group-form-left">
-                                <a class="button_other_option anunciante" href="../../contratante/EntrarConta/">Quero contratar serviços</a>
+                                <a class="button_other_option anunciante" href="../../contratante/EntrarConta/">
+                                    <i style="padding-right: 10px" class="bi bi-shop"></i>
+                                    Quero contratar serviços
+                                </a>
                             </article>
                         </main>
                     </form>

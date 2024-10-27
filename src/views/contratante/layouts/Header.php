@@ -234,7 +234,7 @@ $stmt->close();
             <img class="imag-topo" width="40px" heigth="40px" src="<?php echo htmlspecialchars($userImage); ?>">
             <img src="../../../../public/img/Topo-User-More.png" alt="Btn Mais informações">
         </div>
-        <div class="openMenuTopo menu-mobile">
+        <div class="openMenuTopo menu-mobile" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
             </svg>
@@ -437,6 +437,13 @@ $endereco = $result->fetch_assoc();
 function openModalEndereco() {
     document.getElementById('modal-alterar-endereco').style.display = 'flex';
     $("#popup-profile").toggle();
+}
+
+function openModalEnderecoOffcanvas() {
+    document.getElementById('modal-alterar-endereco').style.display = 'flex';
+    const offcanvasElement = document.getElementById('offcanvasExample');
+    const offcanvasInstance = bootstrap.Offcanvas.getOrCreateInstance(offcanvasElement);
+    offcanvasInstance.hide();
 }
 
 function closeModalEndereco() {
@@ -696,6 +703,16 @@ $conn->close();
 function openModalPerfil() {
     document.getElementById('modal-editar-perfil').style.display = 'flex';
     $("#popup-profile").toggle();
+    const offcanvasElement = document.getElementById('offcanvasExample');
+    const offcanvasInstance = bootstrap.Offcanvas.getOrCreateInstance(offcanvasElement);
+    offcanvasInstance.hide();
+}
+
+function openModalPerfilOffcanvas() {
+    document.getElementById('modal-editar-perfil').style.display = 'flex';
+    const offcanvasElement = document.getElementById('offcanvasExample');
+    const offcanvasInstance = bootstrap.Offcanvas.getOrCreateInstance(offcanvasElement);
+    offcanvasInstance.hide();
 }
 
 function closeModalPerfil() {
@@ -911,6 +928,13 @@ function openModalSecurity() {
     $("#popup-profile").toggle();
 }
 
+function openModalSecurityOffcanvas() {
+    document.getElementById('modal-alterar-seguranca').style.display = 'flex';
+    const offcanvasElement = document.getElementById('offcanvasExample');
+    const offcanvasInstance = bootstrap.Offcanvas.getOrCreateInstance(offcanvasElement);
+    offcanvasInstance.hide();
+}
+
 function closeModalSeguranca() {
     document.getElementById('modal-alterar-seguranca').style.display = 'none';
 }
@@ -1076,3 +1100,157 @@ $(document).ready(function() {
 
 
 </script>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">
+        <img src="../../../../public/img/logo/favicon.ico" alt="">    
+        Trabalho Amigo
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <a href="../HistoricoProposta/">Histórico de propostas</a>
+    <a href="../ListagemServico/">Listagem de serviços</a>
+    <hr>
+    <div class="info-profile">
+        <div class="row-offcanvas">
+            <img src="../../../../public/uploads/usuarios/usuario_67182ec1a85a06.21845643.png" alt="Imagem usuário">
+            <span class="username">Vitor Gabriel de Oliveira</span>    
+        </div>
+        <div class="row-offcanvas">
+            <a onclick="openModalPerfilOffcanvas()" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                </svg>
+                Alterar dados
+            </a>    
+        </div>
+        <div class="row-offcanvas">
+            <a onclick="openModalEnderecoOffcanvas()" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
+                    <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
+                    <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z"/>
+                </svg>
+                Alterar endereço
+            </a>
+        </div>
+        <div class="row-offcanvas">
+            <a onclick="openModalSecurityOffcanvas()" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-shield-lock-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0c-.69 0-1.843.265-2.928.56-1.11.3-2.229.655-2.887.87a1.54 1.54 0 0 0-1.044 1.262c-.596 4.477.787 7.795 2.465 9.99a11.8 11.8 0 0 0 2.517 2.453c.386.273.744.482 1.048.625.28.132.581.24.829.24s.548-.108.829-.24a7 7 0 0 0 1.048-.625 11.8 11.8 0 0 0 2.517-2.453c1.678-2.195 3.061-5.513 2.465-9.99a1.54 1.54 0 0 0-1.044-1.263 63 63 0 0 0-2.887-.87C9.843.266 8.69 0 8 0m0 5a1.5 1.5 0 0 1 .5 2.915l.385 1.99a.5.5 0 0 1-.491.595h-.788a.5.5 0 0 1-.49-.595l.384-1.99A1.5 1.5 0 0 1 8 5"/>
+                </svg>
+                Segurança
+            </a>    
+        </div>
+        <hr>
+        <div class="row-offcanvas">
+            <a class="alert" onclick="Delete()" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                  <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5"/>
+                </svg>
+                Excluir usuário
+            </a>
+        </div>
+        <div class="row-offcanvas">
+            <a class="alert" onclick="Logout()" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
+                    <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
+                </svg>
+                SAIR
+            </a>
+        </div>
+    </div>
+  </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+
+    .row-offcanvas img {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #888;
+    }
+    
+    .row-offcanvas a {
+        gap: 10px;
+    }
+
+    .row-offcanvas .username {
+        font-size: 18px;
+        font-weight: 500;
+        color: #2d2d2d;
+    }
+
+    .row-offcanvas {
+        display: flex;
+        justify-content: start;
+        gap: 10px;
+        align-items: center;
+        background: rgb(244, 244, 244);
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #888;
+    }
+
+    .info-profile {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        row-gap: 10px;
+    }
+
+    .offcanvas {
+        width: 100% !important;
+    }
+
+    .offcanvas-header {
+        padding: 40px 40px 20px 40px;
+    }
+
+    .offcanvas-title {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .offcanvas-title img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .list-group-item a {
+        text-decoration: none;
+    }  
+    
+    .offcanvas-body {
+        padding: 20px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .offcanvas-body a {
+        width: calc(100% - 40px);
+        background: #2f82fa;
+        display: flex;
+        justify-content: start;
+        padding: 10px 20px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+
+    .row-offcanvas .alert {
+        background: #FA511D;
+        margin-bottom: 0;
+    }
+
+</style>

@@ -102,5 +102,6 @@
         <div class="background-loading-50 hidden">
                 <div class="loading-icon"></div>
         </div>
+
     </body>
 </html>

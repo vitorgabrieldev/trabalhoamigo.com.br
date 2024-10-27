@@ -118,5 +118,7 @@
         </section>
     </main>
 
+    <?php include '../layouts/Footer.php'; ?>
+
 </body>
 </html>

@@ -91,6 +91,11 @@ a {
         width: 40px !important;
         height: 40px !important;
     }
+
+    #site-topo {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
 }
 #popup-profile {
     position: absolute;
@@ -151,7 +156,7 @@ a {
     position: relative;
     bottom: 0;
     background: #F8EFF8;
-    width: calc(100% - 100px);
+    width: 100%;
     padding: 40px 50px;
     display: flex;
     flex-direction: column;
@@ -181,9 +186,9 @@ a {
 #site-rodape .bar-long {
     margin: 30px 0;
     width: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(76, 76, 76, 0.932);
 }
-#site-rodape .d-flex {
+#site-rodape .row-grid-rodape {
     display: flex;
     justify-content: space-between;
     gap: 50px;
@@ -224,8 +229,8 @@ a {
     font-weight: 500;
     color: #686868;
 }
-@media screen and (max-width:850px) {
-    .d-flex {
+@media screen and (max-width:900px) {
+    .row-grid-rodape {
         display: grid !important;
         grid-template-columns: 1fr;
     }
@@ -249,7 +254,7 @@ a {
     }
     #site-rodape {
         padding: 40px 20px;
-        width: calc(100% - 40px);
+        width: 100%;
     }
 }
 .swiper-container {

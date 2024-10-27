@@ -9,7 +9,7 @@
         </nav>
     </section>
     <hr class="bar-long">
-    <div class="d-flex">
+    <div class="row-grid-rodape">
         <div class="item">
             <h1 class="titulo">LINKS RÁPIDOS</h1>
             <div class="list-itens">

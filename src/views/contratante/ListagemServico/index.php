@@ -350,7 +350,7 @@ function GetCategoriasServicos ($conn) {
         </main>
         <!-- ================================================================================== -->
 
-        <?= include '../layouts/Footer.php'; ?>
+        <?php include '../layouts/Footer.php'; ?>
 
     </body>
 </html>

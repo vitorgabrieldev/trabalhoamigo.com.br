@@ -65,7 +65,7 @@
                     </header>
                     <form id="FormEntrarUsuario" class="bloco-form-content">
                         <header class="form-content-header">
-                            <span class="content-header-titulo">Que bom ver você de novo</span>
+                            <span class="content-header-titulo">Área do contratante</span>
                         </header>
                         <main class="content-form">
                             <article class="item-group-form">
@@ -81,18 +81,18 @@
                                 </div>
                             </article>
                             <article class="row-item-group-form">
-                                <a href="../EsqueciMinhaSenha/" class="link-item-form">Esqueci minha senha</a>
+                                <a href="../EsqueciMinhaSenha/" class="link-item-form contratante-color">Esqueci minha senha</a>
                             </article>
-                            <button type="submit" class="button-send-form">Entrar</button>
+                            <button type="submit" class="button-send-form contratante">Entrar</button>
                             <hr class="separator-item-form">
                             <article class="row-item-group-form-left">
                                 <span class="description-row-item-form">
                                     Não tem uma conta?
-                                    <a href="../CriarConta/" class="link-item-form">Inscreva-se agora</a>
+                                    <a href="../CriarConta/" class="link-item-form contratante-color">Inscreva-se agora</a>
                                 </span>
                             </article>
                             <article class="row-item-group-form-left">
-                                <a class="button_other_option" href="../../anunciante/EntrarConta/">Quero anunciar meus serviços</a>
+                                <a class="button_other_option contratante" href="../../anunciante/EntrarConta/">Quero anunciar meus serviços</a>
                             </article>
                         </main>
                     </form>

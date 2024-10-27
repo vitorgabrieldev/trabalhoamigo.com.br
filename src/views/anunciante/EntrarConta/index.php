@@ -3,9 +3,9 @@
 <head>
 
     <!-- Título da Página - SEO -->
-    <title>Entre em sua Conta rapidamente e Conecte-se com Freelancers | Trabalho Amigo</title>
+    <title>Entre em sua conta rapidamente em procure por serviço que melhor lhe atendem | Trabalho Amigo</title>
     <!-- Descrição da Página - SEO -->
-    <meta name="description" content="Crie sua conta gratuitamente no Trabalho Amigo e comece a conectar-se com freelancers para compartilhar e contratar serviços de forma prática e eficiente." />
+    <meta name="description" content="Acesse sua conta no Trabalho Amigo e conecte-se com freelancers e serviços de forma rápida e segura." />
 
     <!-- Metas tags de configurações das páginas -->
     <meta charset='utf-8'>
@@ -27,14 +27,9 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-        body {
-            overflow-y: hidden;
-        }
-    </style>
 </head>
-    <body>
 
+<body>
         <script>
             $.ajax({
                 url: `../../../controllers/anunciante/SecurityLogin.php`,
@@ -56,54 +51,68 @@
             });
         </script>
 
-        <section id="EntrarContaUsuario">
-            <div class="left">
-                </header>
-                <main class="corpo">
-                    <section class="content-titulo">
-                        <div>
-                            <img width="60px" src="../../../../public/img/logo/favicon.ico" alt="Logo Trabalho Amigo">
-                        </div>
-                        <h1 class="titulo color-blue">Entrar como Anunciante</h1>
-                        <p class="descricao">Gerencie seus anúncios e conquiste novos clientes 🚀</p>
-                    </section>
-                    <form id="FormEntrarUsuario">
-                        <section class="inputGroup">
-                            <div class="input-group">
-                                <input required="" type="text" name="text" autocomplete="off" class="input email">
-                                <label class="user-label">Email</label>
-                                <h4 class="errorMessage errorMessageEmail hidden">Preencha corretamente este campo!</h4>
-                            </div>
-                            <div class="input-group">
-                                <input required="" type="password" name="text" autocomplete="off" class="input senha">
-                                <label class="user-label">Senha</label>
-                                <a href="../EsqueciMinhaSenha/" class="esqueci_senha">Esqueci minha senha</a>
-                                <h4 class="errorMessage errorMessageSenha hidden">Preencha corretamente este campo!</h4>
-                            </div>
-                        </section>
-                        <br>                        
-                        <div class="rowBtn">
-                            <button type="submit" class="SendForm background-blue">    
-                                Acessar sua conta
-                            </button>
-                        </div>
-    
-                        <section class="NoLogin">
-                            <h2 class="titulo">Não tem cadastro? <a href="../CriarConta/index.html" class="link color-blue">Cadastre-se gratuitamente</a></h2>
-                        </section>
+        <section class="bloco-login">
+            <figure class="bloco-imagem">
+                <img src="../../../../public/img/EntrarUsuario/business-worldwide-connectivity-ux8btm9o1laugnr1.jpg" alt="Imagem Banner de Login" class="imagem">
+            </figure> 
+            <section class="bloco-form">
+                <div class="up-fixed">
+                    <header class="bloco-form-header">
+                        <figure class="form-header-figure">
+                            <img width="40px" src="../../../../public/img/logo/favicon.ico" alt="Iagem Logo">
+                        </figure>
+                        <span class="header-figure-titulo">Trabalhoamigo</span>
+                    </header>
+                    <form id="FormEntrarUsuario" class="bloco-form-content">
+                        <header class="form-content-header">
+                            <span class="content-header-titulo">Área do anunciante</span>
+                        </header>
+                        <main class="content-form">
+                            <article class="item-group-form">
+                                <label for="input_email">E-mail</label>
+                                <input class="input email" type="email" name="email" id="input_email" placeholder="Digite seu email" autocomplete="true">
+                            </article>
+                            <article class="item-group-form">
+                                <label for="input_senha">Senha</label>
+                                <input class="input senha" type="password" name="senha" id="input_senha" placeholder="Digite sua senha" autocomplete="false">
+                                <div class="input_senha_eye">
+                                    <i id="hide_icon_input_Senha" class="bi bi-eye-slash-fill hidden"></i>
+                                    <i id="show_icon_input_Senha" class="bi bi-eye-fill"></i>
+                                </div>
+                            </article>
+                            <article class="row-item-group-form">
+                                <a href="../EsqueciMinhaSenha/" class="link-item-form">Esqueci minha senha</a>
+                            </article>
+                            <button type="submit" class="button-send-form anunciante">Entrar</button>
+                            <hr class="separator-item-form">
+                            <article class="row-item-group-form-left">
+                                <span class="description-row-item-form">
+                                    Não tem uma conta?
+                                    <a href="../CriarConta/" class="link-item-form">Inscreva-se agora</a>
+                                </span>
+                            </article>
+                            <article class="row-item-group-form-left">
+                                <a class="button_other_option anunciante" href="../../contratante/EntrarConta/">Quero contratar serviços</a>
+                            </article>
+                        </main>
                     </form>
-                    <div class="SouAnunciante">
-                        <h2 class="titulo">Outras opções de entrada</h2>
-                        <a class="buttonLinkAnunciante background-light-blue" href="../../contratante/EntrarConta/">QUERO CONTRATAR SERVIÇOS</a>
-                    </div>
-                </main>
-            </div>
-            
-            <div class="background-loading-50 hidden">
-                <div class="loading-icon"></div>
-            </div>
+                </div>
+                <footer class="bloco-form-footer">
+                    <span class="form-footer-copy">
+                        © TrabalhoAmigo2024
+                    </span>
+                </footer>
+            </section>           
         </section>
+        
+        <div class="background-loading-50 hidden">
+                <div class="loading-icon"></div>
+        </div>
 
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     </body>
 </html>

@@ -87,6 +87,7 @@
 .content-header-titulo {
     font-size: 24px;
     font-weight: 600;
+    text-transform: uppercase;
 }
 
 .content-form {
@@ -174,6 +175,18 @@
 
 .button-send-form:hover {
     background: #3491f4;
+}
+
+.anunciante {
+    background: #3491f4 !important;
+}
+
+.contratante {
+    background: #f85218 !important;
+}
+
+.contratante-color {
+    color: #f85218 !important;
 }
 
 .row-item-group-form-left {

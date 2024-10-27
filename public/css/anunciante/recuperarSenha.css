@@ -135,3 +135,29 @@ body, html {
 .codeBtn {
     background: #fe4f1f;
 }
+
+
+/* Medias */
+@media screen and (max-width: 600px) {
+    #RecuperarSenha {
+        box-shadow: none;
+    }
+}
+
+@media screen and (max-width: 550px) {
+
+    body {
+        display: flex;
+        align-items: center;
+    }
+
+    #RecuperarSenha {
+        padding: 20px;
+        row-gap: 30px;
+    }
+
+    img {
+        width: 40px;
+        height: 40px;
+    }
+}

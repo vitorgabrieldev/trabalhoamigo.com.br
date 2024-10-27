@@ -440,3 +440,13 @@ var Delete = () => {
     });
     
 };
+
+
+$(document).ready(function() {
+    $('.input_senha_eye').on('click', function() {
+        const inputSenha = $(this).siblings('.input-senha');
+        const tipoAtual = inputSenha.attr('type');
+        inputSenha.attr('type', tipoAtual === 'password' ? 'text' : 'password');
+        $(this).find('i').toggleClass('hidden');
+    });
+});

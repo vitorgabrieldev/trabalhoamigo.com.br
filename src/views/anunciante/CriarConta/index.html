@@ -2,140 +2,206 @@
 <html lang="pt-br">
 
 <head>
+    <!-- SEO: Título e Descrição da Página -->
+    <title>Crie Sua Conta Gratuitamente | Trabalho Amigo</title>
+    <meta name="description" content="Crie sua conta gratuita no Trabalho Amigo e comece a se conectar com freelancers para compartilhar e contratar serviços facilmente.">
 
-    <!-- Título da Página - SEO -->
-    <title>Crie sua Conta Gratuitamente e Conecte-se com Freelancers | Trabalho Amigo</title>
-    <!-- Descrição da Página - SEO -->
-    <meta name="description" content="Crie sua conta gratuitamente no Trabalho Amigo e conecte-se com freelancers e comunidades para compartilhar e contratar serviços de forma simples e eficiente." />
-
-    <!-- Metas tags de configurações das páginas -->
+    <!-- Configurações de Metadados -->
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
 
-    <!-- Importação do Icone do Projeto -->
-    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
-
-    <link rel="stylesheet" href="../../../../public/css/anunciante/CriarConta.css">
-
-    <!-- Tags Globais do projeto -->
-    <script src="../../../../app.js" defer></script>
+    <!-- Importação de Scripts e Estilos Globais -->
     <link rel="stylesheet" href="../../../../app.css">
+    <script src="../../../../app.js" defer></script>
 
+    <!-- Estilos e Scripts Específicos da Página -->
+    <link rel="stylesheet" href="../../../../public/css/global/CriarConta.css">
     <script src="../../../../public/js/anunciante/conta.js" defer></script>
 
-    <!-- Importação da bibliotecas -->
+    <!-- Importação de Bibliotecas Externas -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 
 <body>
-    <section id="CriarContaUsuario">
-        <div class="right">
-            <main class="corpo">
-                <section class="content-titulo">
-                    <h1 class="titulo" style="color: #1a73e9;">Crie sua conta aqui</h1>
-                    <p class="descricao" style="color: #3583eb;">Crie sua conta gratuitamente em nossa plataforma</p>
+
+    <script>
+        $.ajax({
+            url: `../../../controllers/contratante/SecurityLogin.php`,
+            method: 'GET',
+            success: function (data) {
+                if (data == 'contratante') {
+                    window.location.href = "../PaginaInicial/";
+                } else if (data == 'anunciante') {
+                    window.location.href = "../PaginaInicial/";
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro na Autenticação.'
+                });
+            }
+        });
+    </script>
+
+    <section class="bloco-criarConta">
+        <figure class="bloco-imagem">
+            <img src="../../../../public/img/CriarUsuario/Free_business-2016_High_Quality_HD_Wallpaper_1366x768.jpg" alt="Imagem Banner de Login" class="imagem">
+        </figure>
+        <section class="bloco-form">
+            <div class="up-fixed">
+                <header class="bloco-form-header">
+                    <figure class="form-header-figure">
+                        <img width="40px" src="../../../../public/img/logo/favicon.ico" alt="Imagem Logo">
+                    </figure>
+                    <span class="header-figure-titulo">Trabalhoamigo</span>
+                </header>
+
+                <section class="option-type-user">
+                    <a class="type-user-item" href="../../contratante/CriarConta/">Contratante</a>
+                    <a class="type-user-item  active-type-user"">Anunciante</a>
                 </section>
-                <form id="FormCriarUsuario">
-                    <section class="inputGroup">
-                        <div class="input-group">
-                            <input required type="text" name="text" class="input nome" placeholder="Nome*">
-                            <label class="user-label"></label>
 
-                            <input required type="text" name="text" class="input nome" placeholder="Sobrenome*">
-                            <label class="user-label"></label>
+                <form id="FormCriarUsuario" class="bloco-form-content">
+                    <section class="input-double-row">
+                        <article class="item-group-form">
+                            <label for="input_primeiro_nome">Primeiro nome<span class="obrigatorio">*</span></label>
+                            <input class="input nome" type="text" name="input_primeiro_nome" id="input_primeiro_nome" placeholder="Digite seu primeiro nome" autocomplete="off" required>
+                        </article>
 
-                        </div>
-                        <div class="input-group">
-                            <input required type="email" name="email" class="input email" placeholder="Email*">
-                            <label class="user-label"></label>
-
-                            <input type="tel" name="telefone" class="input telefone mascara-telefone"
-                                placeholder="Telefone*">
-                            <label class="user-label"></label>
-
-                        </div>
-                        <div class="input-group">
-                            <input type="tel" name="celular" class="input celular mascara-telefone"
-                                placeholder="Celular (Opcional)">
-                            <label class="user-label"></label>
-
-                            <input type="tel" name="whatsapp" class="input whatsapp mascara-telefone"
-                                placeholder="WhatsApp (Opcional)">
-                            <label class="user-label"></label>
-
-                        </div>
-                        <div class="input-group">
-                            <input required="" type="text" name="cpf" class="mascara-cpf input-senha input cpf"
-                                placeholder="CPF*">
-                            <label class="user-label"></label>
-                        </div>
-                        <div class="input-group">
-                            <input required="" type="password" name="text" class="input-senha input senha"
-                                placeholder="Senha*">
-                            <label class="user-label"></label>
-
-                        </div>
-                        <div class="input-group">
-                            <input required="" type="password" name="text" class="input-senha input againsenha"
-                                placeholder="Confirma senha*">
-                            <label class="user-label"></label>
-
-                        </div>
-                        <div class="input-group">
-                            <input required type="text" name="text" class="input cep mascara-cep" placeholder="CEP*">
-                            <label class="user-label"></label>
-
-                            <input disabled required type="text" name="text" class="input cidade disabled-campo"
-                                placeholder="cidade*">
-                            <label class="user-label"></label>
-                        </div>
-                        <div class="input-group">
-                            <input disabled required type="text" name="text" class="input rua disabled-campo"
-                                placeholder="Rua*">
-                            <label class="user-label"></label>
-                            <input required type="text" name="text" class="input numero" placeholder="Número">
-                            <label class="user-label"></label>
-
-                        </div>
-                        <div class="input-group">
-                            <input disabled required="" type="text" name="text"
-                                class="input input-complem bairro disabled-campo" placeholder="Bairro*">
-                            <label class="user-label"></label>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" name="text" class="input-complem complemento"
-                                placeholder="Complemento(opcional)">
-                            <label class="user-label"></label>
-                        </div>
+                        <article class="item-group-form">
+                            <label for="input_ultimo_nome">Último nome<span class="obrigatorio">*</span></label>
+                            <input class="input nome" type="text" name="input_ultimo_nome" id="input_ultimo_nome" placeholder="Digite seu último nome" autocomplete="off" required>
+                        </article>
                     </section>
-                    <div class="row">
+
+                    <section class="input-single-row">
+                        <article class="item-group-form">
+                            <label for="input_email">E-mail<span class="obrigatorio">*</span></label>
+                            <input class="input email" type="email" name="input_email" id="input_email" placeholder="Digite seu e-mail" autocomplete="on" required>
+                        </article>
+                    </section>
+
+                    <section class="input-double-row">
+                        <article class="item-group-form">
+                            <label for="input_senha">Senha<span class="obrigatorio">*</span></label>
+                            <input class="input senha input-senha input senha" type="password" name="senha" id="input_senha" placeholder="Digite sua senha" autocomplete="new-password" required>
+                            <div class="input_senha_eye">
+                                <i id="hide_icon_input_Senha" class="bi bi-eye-slash-fill hidden"></i>
+                                <i id="show_icon_input_Senha" class="bi bi-eye-fill"></i>
+                            </div>
+                        </article>
+
+                        <article class="item-group-form">
+                            <label for="input_confirme_senha">Confirme sua senha<span class="obrigatorio">*</span></label>
+                            <input class="input confirme_senha input-senha input againsenha" type="password" name="confirme_senha" id="input_confirme_senha" placeholder="Repita sua senha" autocomplete="new-password" required>
+                            <div class="input_senha_eye">
+                                <i id="hide_icon_input_Senha" class="bi bi-eye-slash-fill hidden"></i>
+                                <i id="show_icon_input_Senha" class="bi bi-eye-fill"></i>
+                            </div>
+                        </article>
+                    </section>
+
+                    <section class="input-double-row">
+                        <article class="item-group-form">
+                            <label for="input_telefone">Telefone<span class="obrigatorio">*</span></label>
+                            <input class="input telefone input telefone mascara-telefone" type="tel" name="telefone" id="input_telefone" placeholder="Digite seu telefone" autocomplete="off" required>
+                        </article>
+
+                        <article class="item-group-form">
+                            <label for="input_celular">Celular</label>
+                            <input class="input celular input celular mascara-telefone" type="tel" name="celular" id="input_celular" placeholder="Digite seu celular" autocomplete="off">
+                        </article>
+                    </section>
+
+                    <section class="input-double-row">
+                        <article class="item-group-form">
+                            <label for="input_cpf">CPF<span class="obrigatorio">*</span></label>
+                            <input class="input cpf mascara-cpf input-senha input cpf" type="text" name="cpf" id="input_cpf" placeholder="Digite seu CPF" autocomplete="off" required>
+                        </article>
+
+                        <article class="item-group-form">
+                            <label for="input_whatsapp">WhatsApp</label>
+                            <input class="input whatsapp input whatsapp mascara-telefone" type="tel" name="whatsapp" id="input_whatsapp" placeholder="Digite seu WhatsApp" autocomplete="off">
+                        </article>
+                    </section>
+
+                    <br>
+                    <hr class="separator-item-form">
+                    <br>
+
+                    <section class="input-single-row">
+                        <article class="item-group-form">
+                            <label for="input_cep">CEP<span class="obrigatorio">*</span></label>
+                            <input class="input cep input cep mascara-cep" type="text" name="cep" id="input_cep" placeholder="Digite seu CEP" autocomplete="off" required>
+                        </article>
+                    </section>
+
+                    <section class="input-single-row">
+                        <article class="item-group-form">
+                            <label for="input_rua">Rua<span class="obrigatorio">*</span></label>
+                            <input class="input rua input rua disabled-campo" type="text" name="rua" id="input_rua" disabled autocomplete="off" required>
+                        </article>
+                    </section>
+
+                    <section class="input-double-row">
+                        <article class="item-group-form">
+                            <label for="input_bairro">Bairro<span class="obrigatorio">*</span></label>
+                            <input class="input bairro input input-complem bairro disabled-campo" type="text" name="bairro" id="input_bairro" disabled autocomplete="off" required>
+                        </article>
+
+                        <article class="item-group-form">
+                            <label for="input_numero">Número<span class="obrigatorio">*</span></label>
+                            <input class="input numero" type="text" name="numero" id="input_numero" placeholder="Digite seu número" autocomplete="off" required>
+                        </article>
+                    </section>
+
+                    <section class="input-single-row">
+                        <article class="item-group-form">
+                            <label for="input_cidade">Cidade<span class="obrigatorio">*</span></label>
+                            <input class="input cidade input cidade disabled-campo" type="text" name="cidade" id="input_cidade" disabled autocomplete="off" required>
+                        </article>
+                    </section>
+
+                    <section class="input-single-row">
+                        <article class="item-group-form">
+                            <label for="input_complemento">Complemento</label>
+                            <input class="input complemento input-complem complemento" type="text" name="complemento" id="input_complmento" placeholder="Digite seu complemento" autocomplete="off">
+                        </article>
+                    </section>
+
+                    <section class="check-box">
                         <div id="checkTerms">
                             <label class="container">
-                                <input type="checkbox">
+                                <input type="checkbox" style="display: none;">
                                 <div class="checkmark"></div>
                             </label>
-                            <p>Eu aceito <strong style="color: #FF8682; cursor: pointer;" id="termos-btn">Termos</strong> e <strong
-                                    style="color: #FF8682; cursor: pointer;" id="privacy-policy-btn">Politicas de Privicidade</strong></p>
+                            <p>Eu aceito <strong style="color: #FF8682; cursor: pointer;" id="termos-btn">Termos</strong> e <strong style="color: #FF8682; cursor: pointer;" id="privacy-policy-btn">Políticas de Privacidade</strong></p>
                         </div>
-                    </div>
-                    <div class="rowBtn">
-                        <button type="submit" class="SendForm" style="background-color: #1a73e9;">Cadastrar</button>
-                    </div>
-                </form>
-                <section>
-                    <h2 class="titulo">Já possui uma conta? <a style="color: #FA511D;" href="../EntrarConta/"
-                            class="link">Entre em sua conta</a></h2>
-                </section>
-                <div class="SouAnunciante" style="margin-top: 20px;">
-                    <a style="background-color: #3b8bf3;" class="buttonLinkAnunciante" href="../../contratante/CriarConta/">QUERO CONTRATAR SERVIÇOS</a>
-                </div>
-            </main>
-        </div>
-    </section>
-</body>
+                    </section>
 
+                    <button type="submit" class="button-send-form anunciante SendForm">Cadastrar-se</button>
+                    <hr class="separator-item-form">
+                    <article class="row-item-group-form-left">
+                        <span class="description-row-item-form">
+                            Já possui uma conta?
+                            <a href="../EntrarConta/" class="link-item-form anunciante-color">Acesse-a rapidamente</a>
+                        </span>
+                    </article>
+                </form>
+            </div>
+        </section>
+    </section>
+
+    <div class="background-loading-50 hidden">
+        <div class="loading-icon"></div>
+    </div>
+
+</body>
 </html>

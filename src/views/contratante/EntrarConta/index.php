@@ -74,7 +74,7 @@
                             </article>
                             <article class="item-group-form">
                                 <label for="input_senha">Senha</label>
-                                <input class="input senha" type="password" name="senha" id="input_senha" placeholder="Digite sua senha" autocomplete="false">
+                                <input class="input senha input-senha" type="password" name="senha" id="input_senha" placeholder="Digite sua senha" autocomplete="false">
                                 <div class="input_senha_eye">
                                     <i id="hide_icon_input_Senha" class="bi bi-eye-slash-fill hidden"></i>
                                     <i id="show_icon_input_Senha" class="bi bi-eye-fill"></i>

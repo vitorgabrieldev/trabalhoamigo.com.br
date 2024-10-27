@@ -95,12 +95,15 @@ $('#FormCriarUsuario').on('submit', function (e) {
     } else {
         $(".SendForm").html(`<section class="loading-container"><div class='loading-form-animation'></div></section>`);
 
+        $(".background-loading-50").removeClass('hidden');
+
         $.ajax({
             url: '../../../controllers/contratante/CreateAccount.php',
             type: 'POST',
             data: formData, 
             success: function (response) {
                 $(".SendForm").html("Cadastrar");
+                $(".background-loading-50").addClass('hidden');
 
                 if (response.success) {
                     Swal.fire({
@@ -118,6 +121,7 @@ $('#FormCriarUsuario').on('submit', function (e) {
                 }
             },
             error: function (xhr, status, error) {
+                $(".background-loading-50").addClass('hidden');
                 $(".SendForm").html("Cadastrar");
                 Swal.fire({
                     icon: 'error',
@@ -134,10 +138,14 @@ $('.input.cep').on('blur', function () {
     const cep = $(this).val().trim().replace(/\D/g, ''); // Remove caracteres não numéricos
     if (cep.length >= 1) {
         if (cep.length === 8) {
+
+            $(".background-loading-50").removeClass('hidden');
+
             $.ajax({
                 url: `https://viacep.com.br/ws/${cep}/json/`,
                 method: 'GET',
                 success: function (data) {
+                    $(".background-loading-50").addClass('hidden');
                     if (data.erro) {
                         Swal.fire({
                             icon: 'error',
@@ -150,15 +158,10 @@ $('.input.cep').on('blur', function () {
                         $('.input.bairro').val(data.bairro);
                         $('.input.cidade').val(data.localidade);
                         $('.input.uf').val(data.uf);
-    
-                        // Remove as labels dos campos preenchidos
-                        $('.input.rua').siblings('label').hide();
-                        $('.input.bairro').siblings('label').hide();
-                        $('.input.cidade').siblings('label').hide();
-                        $('.input.uf').siblings('label').hide();
                     }
                 },
                 error: function () {
+                    $(".background-loading-50").addClass('hidden');
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro',

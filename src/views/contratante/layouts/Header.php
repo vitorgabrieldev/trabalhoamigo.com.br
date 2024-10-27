@@ -572,6 +572,16 @@ $(document).ready(function() {
     border-radius: 10px;
 }
 
+@media screen and (max-width: 500px) {
+    .modal-content-alterar-endereco {
+        width: 100%;
+        max-width: auto;
+        height: 100%;
+        max-height: auto;
+        border-radius: 0;
+    }
+}
+
 .modal-content-alterar-endereco h2 {
     margin-bottom: 15px
 }
@@ -750,6 +760,14 @@ function closeModalPerfil() {
     overflow-y: auto; /* Permite rolagem vertical se necessário */
 }
 
+@media screen and (max-width: 500px) {
+    .modal-content-editar-perfil {
+        width: 100%;
+        max-width: auto;
+        max-height: 100%;
+        border-radius: 0;
+    }
+}
 
 .modal-content-editar-perfil h2 {
     margin-bottom: 15px;

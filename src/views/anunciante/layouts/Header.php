@@ -1135,8 +1135,13 @@ $(document).ready(function() {
     <hr>
     <div class="info-profile">
         <div class="row-offcanvas">
-            <img src="../../../../public/uploads/usuarios/usuario_67182ec1a85a06.21845643.png" alt="Imagem usuário">
-            <span class="username">Vitor Gabriel de Oliveira</span>    
+            <?php
+                $userImage = (isset($_SESSION['img']) && strlen($_SESSION['img']) > 1) 
+                ? '../../../../public/uploads/usuarios/'.$_SESSION['img'] 
+                : '../../../../public/img/UserProfile-default.png';
+            ?>
+            <img src="<?= $userImage; ?>" alt="Imagem usuário">
+            <span class="username"><?= $_SESSION['primeiro_nome'] ?></span>    
         </div>
         <div class="row-offcanvas">
             <a onclick="openModalPerfilOffcanvas()" href="#">

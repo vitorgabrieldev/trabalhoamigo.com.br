@@ -87,7 +87,6 @@ if (!isset($_SESSION)) {
     </main>
 
 
-    <?php include '../layouts/Footer.php'; ?>
 
 </body>
 </html>

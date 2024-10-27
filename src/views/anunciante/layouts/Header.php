@@ -1230,7 +1230,7 @@ $(document).ready(function() {
     }
 
     .offcanvas-header {
-        padding: 40px 40px 20px 40px;
+        padding: 40px 20px 20px 20px;
     }
 
     .offcanvas-title {
@@ -1249,7 +1249,7 @@ $(document).ready(function() {
     }  
     
     .offcanvas-body {
-        padding: 20px 40px;
+        padding: 20px 20px;
         display: flex;
         flex-direction: column;
         gap: 5px;

@@ -220,7 +220,7 @@
     color: #FA511D;
     border-left: 1px solid #ADB0B5;
 }
-#bloco-busca .row .resultado {
+#bloco-busca .row-flex .resultado {
     color: #9E9E9E;
     font-size: 15px;
     font-weight: 500;
@@ -228,7 +228,7 @@
     align-items: center;
     gap: 5px;
 }
-#bloco-busca .row .resultado .isLoading {
+#bloco-busca .row-flex .resultado .isLoading {
     width: 15px;
     height: 15px;
     border: 2px solid #1a1919;
@@ -245,12 +245,12 @@
     }
 }
 
-#bloco-busca .row .resultado .number {
+#bloco-busca .row-flex .resultado .number {
     color: #5B5B5B;
     font-size: 15px;
     font-weight: 700;
 }
-#bloco-busca .row .ordenar{
+#bloco-busca .row-flex .ordenar{
     display: flex;
     align-items: center;
     gap: 5px;

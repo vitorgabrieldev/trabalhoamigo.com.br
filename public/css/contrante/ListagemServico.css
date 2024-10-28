@@ -202,6 +202,9 @@
     border-radius: 6px;
     min-width: 300px;
 }
+.row-flex .titulo {
+    margin-bottom: 0;
+}
 #bloco-busca .row .input-box .button_busca {
     height: 100%;
     border: none;

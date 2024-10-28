@@ -255,12 +255,12 @@
     align-items: center;
     gap: 5px;
 }
-#bloco-busca .row .ordenar .titulo {
+#bloco-busca .row-flex .ordenar .titulo {
     color: #797979;
     font-size: 14px;
     font-weight: 600;
 }
-#bloco-busca .row .ordenar .selectOrdenacao {
+#bloco-busca .row-flex .ordenar .selectOrdenacao {
     background: transparent;
     border: none;
     outline: none;
@@ -272,7 +272,7 @@
     align-items: center;
     cursor: pointer;
 }
-#bloco-busca .row .ordenar .optionSelectOrdenacao {
+#bloco-busca .row-flex .ordenar .optionSelectOrdenacao {
     border-radius: 12px;
     font-size: 15px;
     font-weight: 500;

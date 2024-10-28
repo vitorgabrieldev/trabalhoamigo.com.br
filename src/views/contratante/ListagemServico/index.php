@@ -212,7 +212,7 @@ function GetCategoriasServicos ($conn) {
                         <button type="submit" class="button_busca">Buscar</button>
                     </form>
                 </div>
-                <div class="row">
+                <div class="row-flex">
                     <h2 id="qtdServicos" class="resultado">
                        <strong> <?php echo getTotalServicos(getDatabaseConnection()); ?></strong> Serviços encontrados!
                     </h2>

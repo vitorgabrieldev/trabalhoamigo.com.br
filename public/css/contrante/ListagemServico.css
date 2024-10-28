@@ -181,6 +181,10 @@
     display: flex;
     justify-content: space-between;
 }
+.row-flex {
+    display: flex;
+    justify-content: space-between;
+}
 #bloco-busca .row .input-box {
     border: 1px solid #ADB0B5;
     border-radius: 6px;

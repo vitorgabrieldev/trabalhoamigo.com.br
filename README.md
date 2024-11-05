@@ -1,86 +1,87 @@
-# Trabalho Amigo - Plataforma de compartilhamento de serviços entre comunidade
+# Trabalho Amigo - Community service sharing platform
 
-**Nosso projeto conecta pessoas que precisam de serviços a profissionais que podem oferecê-los. A plataforma permite que os usuários encontrem prestadores de diversas áreas, desde tarefas simples até serviços especializados. Os profissionais são avaliados pelos clientes, garantindo uma contratação segura e confiável. Assim, facilitamos o encontro entre quem busca um serviço e quem está disponível para realizá-lo.**
+**Our project connects people who need services to professionals who can offer them. The platform allows users to find providers in different areas, from simple tasks to specialized services. Professionals are evaluated by clients, ensuring safe and reliable hiring. Thus, we facilitate the meeting between those looking for a service and those available to provide it.**
 
 > [!IMPORTANT]
-> **O projeto ainda não está completo**, pois no momento está em fase de desenvolvimento como parte de um trabalho de conclusão de curso. Estamos focados em construir as funcionalidades principais e validar a viabilidade da plataforma. A versão atual serve como um protótipo, e futuras expansões e melhorias estão planejadas para quando o projeto estiver em estágio mais avançado, incluindo otimizações na interface, integração de novos serviços e aprimoramento das ferramentas de avaliação e segurança para os usuários.
+> **The project is not yet complete**, as it is currently in the development phase as part of a course conclusion work. We are focused on building the core functionalities and validating the viability of the platform. The current version serves as a prototype, and future expansions and improvements are planned for when the project is at a more advanced stage, including interface optimizations, integration of new services and improvement of evaluation and security tools for users.
 
-# Passos para instalção do projeto
-**Para configurar o projeto localmente, siga as etapas abaixo:**
+# Steps to install the project
+**To configure the project locally, follow the steps below:**
 
-## 1. Pré-requisitos
-**Antes de começar, certifique-se de ter as seguintes ferramentas instaladas em seu sistema:**
+## 1. Prerequisites
+**Before you begin, make sure you have the following tools installed on your system:**
 
 [![Git](https://img.shields.io/badge/Git-E34F26?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
 [![Apache](https://img.shields.io/badge/Apache-CA2136?style=for-the-badge&logo=apache&logoColor=white)](https://www.apache.org/)
 [![Visual Studio Code](https://img.shields.io/badge/-Visual%20Studio%20Code-333333?style=flat&logo=visual-studio-code&logoColor=007ACC)](https://code.visualstudio.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-## 2. Clonando o Repositório
-**Abra o terminal e execute o comando para clonar o repositório do projeto:**
+## 2. Cloning the Repository
+**Open the terminal and run the command to clone the project repository:**
 ``` bash
   git clone https://github.com/vitorgabrieldevk/trabalhoamigo.com.br
 ```
 
-## 3. Iniciando Servidor
-**Com o apache ligado e o servidor mysql em execução, realiza a importação do banco de dados pelo arquivo: 'Database.sql'**
+## 3. Starting Server
+**With Apache turned on and the MySQL server running, import the database from the file: 'Database.sql'**
 ``` sql
   mysql -u root -p trabalhoamigo < /path/para/Database.sql
 ```
 > [!NOTE]
-> Substitua o '/path/para/Database.sql' para o caminho no qual se encontra o arquivo, caso esteja usando servidor `Xampp`, será
+> Replace '/path/para/Database.sql' with the path where the file is located, if you are using the `Xampp` server, it will be
 > ``` sql
 >   mysql -u root -p trabalhoamigo < C:/xampp/htdocs/trabalhoamigo.com.br/Database.sql
 > ```
 
-## 4. Rodando o projeto
-> [!NOTE]
-> Não é necessário rodar nenhum comando de instação como yarn, npm ou composer, visto que não há dependências externas.
+## 4. Running the project
+``` bash
+   composer install
+```
 
-**Agora basta abrir em seu navegador a url:**
+**Now just open the url in your browser:**
 ``` bash
   localhost/trabalhoamigo.com.br/
 ```
 
 ```mermaid
 graph TD;
-    A[Início] --> B{Usuário Tem Conta?};
-    B -->|Sim| C[Fazer Login];
-    B -->|Não| D[Criar Conta];
 
-    C --> E[Verificar Credenciais];
-    E -->|Válidas| F[Contratante Entra na Plataforma];
-    E -->|Inválidas| G[Mostrar Erro de Login];
+    A[Start] --> B{Does User Have an Account?};
+    B -->|Yes| C[Log In];
+    B -->|No| D[Create Account];
 
-    D --> H[Preencher Informações da Conta];
-    H --> I[Confirmar Criação da Conta];
+    C --> E[Verify Credentials];
+    E -->|Valid| F[User Enters Platform];
+    E -->|Invalid| G[Show Login Error];
+
+    D --> H[Fill Out Account Information];
+    H --> I[Confirm Account Creation];
     
-    I --> J[Login Automático];
-    J --> F[Contratante Entra na Plataforma];
+    I --> J[Automatic Login];
+    J --> F[User Enters Platform];
 
-    F --> K[Buscar Serviço];
-    K --> L[Enviar Proposta para Anunciante];
+    F --> K[Search for Service];
+    K --> L[Send Proposal to Service Provider];
 
-    L --> M[Anunciante Visualiza Propostas];
-    M --> N{Aceitar Proposta?};
+    L --> M[Provider Views Proposals];
+    M --> N{Accept Proposal?};
 
-    N -->|Sim| O[Acesso ao Contato do Contratante];
-    O --> P[Criar Contrato];
+    N -->|Yes| O[Access Contractor Contact Information];
+    O --> P[Create Contract];
     
-    P --> Q[Contrato Contém:];
-    Q --> R[Informações do Contratante];
-    Q --> S[Informações do Anunciante];
-    Q --> T[Descrição do Serviço];
-    Q --> U[Preço e Condições];
+    P --> Q[Contract Contains:];
+    Q --> R[Contractor Information];
+    Q --> S[Provider Information];
+    Q --> T[Service Description];
+    Q --> U[Price and Terms];
     
-    N -->|Não| V[Encerrar Proposta];
+    N -->|No| V[End Proposal];
 
-    O --> W[Contratante Recebe Contato do Anunciante];
-    V --> X[Fim];
+    O --> W[Contractor Receives Provider's Contact Information];
+    V --> X[End];
     
-    W --> Y[Fim];
+    W --> Y[End];
     T --> Y;
-
 ```
 
 ## Tecnologias Utilizadas
@@ -89,17 +90,17 @@ graph TD;
 |-------------------|-----------------------------------------------------------------------------------------------------|
 | **Backend**       | [![PHP](https://img.shields.io/badge/PHP-7B7B7B?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/) |
 | **Frontend**      | [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/pt-BR/docs/Web/HTML)  <br> [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/pt-BR/docs/Web/CSS) <br> [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript) |
-| **Banco de Dados**| [![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)  |
-| **Servidor Web**  | [![Apache](https://img.shields.io/badge/Apache-CA2136?style=for-the-badge&logo=apache&logoColor=white)](https://httpd.apache.org/)  |
+| **Database**| [![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)  |
+| **Web Server**  | [![Apache](https://img.shields.io/badge/Apache-CA2136?style=for-the-badge&logo=apache&logoColor=white)](https://httpd.apache.org/)  |
 
 #
 
 > [!WARNING]
-> **Decorrente de alguns problemas durante o desenvolvimento, não implementamos uma versão web responsiva, portanto, não é possível acessar o prótipo pelo celular no momento, queremos expandir essa experiência para um sistema de webview App e uma interface mais intuitiva e responsiva para que usuário mobile possam acessar**.
+> **Due to some problems during development, we did not implement a responsive web version, therefore, it is not possible to access the prototype via cell phone at the moment. We want to expand this experience to a webview App system and a more intuitive and responsive interface so that mobile users can access**.
 
 #
 
-## Colaboradores:
+## Collaborators:
 
 <table>
   <tr>

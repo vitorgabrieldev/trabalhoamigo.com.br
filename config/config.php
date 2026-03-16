@@ -2,36 +2,36 @@
 
 // Configurações do banco de dados
 if (!defined('DB_SERVER')) {
-    define('DB_SERVER', '185.173.111.184');
+    define('DB_SERVER', getenv('DB_SERVER') ?: '185.173.111.184');
 }
 if (!defined('DB_USERNAME')) {
-    define('DB_USERNAME', 'u858577505_trabalhoamigo');
+    define('DB_USERNAME', getenv('DB_USERNAME') ?: 'u858577505_trabalhoamigo');
 }
 if (!defined('DB_PASSWORD')) {
-    define('DB_PASSWORD', '@#Trabalhoamigo023@_');
+    define('DB_PASSWORD', getenv('DB_PASSWORD') ?: '@#Trabalhoamigo023@_');
 }
 if (!defined('DB_NAME')) {
-    define('DB_NAME', 'u858577505_trabalhoamigo');
+    define('DB_NAME', getenv('DB_NAME') ?: 'u858577505_trabalhoamigo');
 }
 
 // Configurações do SMTP
 if (!defined('SMTP_HOST')) {
-    define('SMTP_HOST', 'smtp.gmail.com');
+    define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.gmail.com');
 }
 if (!defined('SMTP_PORT')) {
-    define('SMTP_PORT', 587);
+    define('SMTP_PORT', getenv('SMTP_PORT') ?: 587);
 }
 if (!defined('SMTP_USERNAME')) {
-    define('SMTP_USERNAME', 'vitorgabrieldeoliveira.desktop@gmail.com');
+    define('SMTP_USERNAME', getenv('SMTP_USERNAME') ?: 'vitorgabrieldeoliveira.desktop@gmail.com');
 }
 if (!defined('SMTP_PASSWORD')) {
-    define('SMTP_PASSWORD', 'qzsm gfmr fhzc okhi');
+    define('SMTP_PASSWORD', getenv('SMTP_PASSWORD') ?: 'qzsm gfmr fhzc okhi');
 }
 if (!defined('SMTP_FROM')) {
-    define('SMTP_FROM', 'vitorgabrieldeoliveira.desktop@gmail.com');
+    define('SMTP_FROM', getenv('SMTP_FROM') ?: 'vitorgabrieldeoliveira.desktop@gmail.com');
 }
 if (!defined('SMTP_FROM_NAME')) {
-    define('SMTP_FROM_NAME', 'Trabalho Amigo');
+    define('SMTP_FROM_NAME', getenv('SMTP_FROM_NAME') ?: 'Trabalho Amigo');
 }
 
 // Função de conexão

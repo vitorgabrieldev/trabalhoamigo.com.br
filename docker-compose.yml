@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html/trabalhoamigo.com.br
+    environment:
+      DB_SERVER: db
+      DB_USERNAME: trabalhoamigo
+      DB_PASSWORD: trabalhoamigo
+      DB_NAME: trabalhoamigo
+      TZ: America/Sao_Paulo
+    depends_on:
+      - db
+    command: bash -lc "if [ ! -d vendor ]; then composer install --no-interaction; fi && apache2-foreground"
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: trabalhoamigo
+      MYSQL_USER: trabalhoamigo
+      MYSQL_PASSWORD: trabalhoamigo
+      MYSQL_ROOT_PASSWORD: root
+      TZ: America/Sao_Paulo
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./Database.sql:/docker-entrypoint-initdb.d/Database.sql:ro
+
+volumes:
+  db_data:

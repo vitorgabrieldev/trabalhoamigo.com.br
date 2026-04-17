@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth'
-import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -11,16 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Briefcase, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { getInitials } from '@/lib/utils'
 import { authApi } from '@/lib/api'
-import { clearTokens } from '@/lib/auth'
-import { useRouter } from 'next/navigation'
 
 export function PublicHeader() {
   const { user, clearAuth } = useAuthStore()
   const router = useRouter()
+  const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const handleLogout = async () => {
@@ -31,114 +30,146 @@ export function PublicHeader() {
     router.push('/login')
   }
 
+  const isLogin = pathname === '/login'
+  const isRegister = pathname?.startsWith('/register')
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-100">
+      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-          <Briefcase className="h-6 w-6" />
-          <span>Trabalho Amigo</span>
+        <Link href="/" className="font-bold text-lg tracking-tight text-gray-900 uppercase">
+          Trabalho Amigo
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link href="/services" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
-            Serviços
-          </Link>
+        <nav className="hidden lg:flex items-center gap-6">
           {user ? (
             <>
-              <Link href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
-                Dashboard
+              <Link href="/services" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                Procurar serviço
               </Link>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar_url} />
-                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                        {getInitials(user.first_name, user.last_name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium">{user.first_name}</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings">Perfil</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">Dashboard</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Link href="/proposals" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                Listagem de proposta
+              </Link>
+              <Link href="/contracts" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                Histórico de transações
+              </Link>
+              <Link href="/dashboard" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                Ajuda
+              </Link>
             </>
           ) : (
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" asChild>
-                <Link href="/login">Entrar</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/register/contractor">Criar Conta</Link>
-              </Button>
-            </div>
+            <>
+              <Link href="/services" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                Procurar serviço
+              </Link>
+              <Link href="/dashboard" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                Ajuda
+              </Link>
+            </>
           )}
         </nav>
 
-        {/* Mobile Toggle */}
-        <button
-          className="md:hidden p-2"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t bg-white px-4 py-4 space-y-3">
-          <Link
-            href="/services"
-            className="block text-sm font-medium text-gray-600 hover:text-primary"
-            onClick={() => setMobileOpen(false)}
-          >
-            Serviços
-          </Link>
+        {/* Right side */}
+        <div className="flex items-center gap-3">
           {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 focus:outline-none">
+                  <Avatar className="h-9 w-9 ring-2 ring-primary/20">
+                    <AvatarImage src={user.avatar_url} />
+                    <AvatarFallback className="bg-primary text-white text-xs font-medium">
+                      {getInitials(user.first_name, user.last_name)}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64 p-2">
+                <div className="px-2 py-3 mb-1">
+                  <p className="text-sm font-semibold text-gray-900">
+                    Olá, {user.first_name} {user.last_name}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
+                </div>
+                <Link
+                  href="/dashboard"
+                  className="block w-full text-center text-sm bg-primary text-white rounded-lg py-2 px-4 font-medium hover:bg-primary/90 transition-colors mb-2"
+                >
+                  Gerenciar conta
+                </Link>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/settings">Perfil</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/proposals">Propostas</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/contracts">Contratos</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
             <>
               <Link
-                href="/dashboard"
-                className="block text-sm font-medium text-gray-600 hover:text-primary"
-                onClick={() => setMobileOpen(false)}
+                href={isRegister ? '/login' : '/register/provider'}
+                className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
               >
-                Dashboard
+                {isRegister ? 'Entrar' : 'Sou prestador'}
               </Link>
               <Link
-                href="/settings"
-                className="block text-sm font-medium text-gray-600 hover:text-primary"
-                onClick={() => setMobileOpen(false)}
+                href={isLogin ? '/register' : '/login'}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-full hover:bg-gray-700 transition-colors"
               >
-                Perfil
+                {isLogin ? 'Cadastra-se' : 'Entrar'}
               </Link>
-              <button
-                onClick={handleLogout}
-                className="block text-sm font-medium text-red-600 hover:text-red-700"
-              >
+            </>
+          )}
+
+          {/* Mobile toggle */}
+          <button
+            className="lg:hidden p-2 text-gray-600"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="lg:hidden border-t bg-white px-4 py-4 space-y-3">
+          <Link href="/services" className="block text-sm text-gray-700 hover:text-primary py-1" onClick={() => setMobileOpen(false)}>
+            Procurar serviço
+          </Link>
+          {user && (
+            <>
+              <Link href="/proposals" className="block text-sm text-gray-700 hover:text-primary py-1" onClick={() => setMobileOpen(false)}>
+                Propostas
+              </Link>
+              <Link href="/contracts" className="block text-sm text-gray-700 hover:text-primary py-1" onClick={() => setMobileOpen(false)}>
+                Contratos
+              </Link>
+              <Link href="/dashboard" className="block text-sm text-gray-700 hover:text-primary py-1" onClick={() => setMobileOpen(false)}>
+                Dashboard
+              </Link>
+              <button onClick={handleLogout} className="block text-sm text-red-600 py-1">
                 Sair
               </button>
             </>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" asChild>
-                <Link href="/login">Entrar</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/register/contractor">Criar Conta</Link>
-              </Button>
+          )}
+          {!user && (
+            <div className="flex flex-col gap-2 pt-2">
+              <Link href="/register/provider" className="text-center px-4 py-2 text-sm border border-gray-300 rounded-full" onClick={() => setMobileOpen(false)}>
+                Sou prestador
+              </Link>
+              <Link href="/login" className="text-center px-4 py-2 text-sm bg-gray-900 text-white rounded-full" onClick={() => setMobileOpen(false)}>
+                Entrar
+              </Link>
             </div>
           )}
         </div>

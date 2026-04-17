@@ -14,32 +14,37 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
+        $middleware->api(prepend: [
+            \App\Http\Middleware\HandleCors::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // JSON error responses for API
         $exceptions->render(function (\Throwable $e, Request $request) {
-            if ($request->is('api/*')) {
-                $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+            if (! $request->is('api/*')) {
+                return null;
+            }
 
-                if ($e instanceof \Illuminate\Validation\ValidationException) {
-                    return response()->json([
-                        'message' => 'Dados inválidos.',
-                        'errors' => $e->errors(),
-                    ], 422);
-                }
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return response()->json([
+                    'message' => 'Dados inválidos.',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
 
-                if ($e instanceof \Illuminate\Auth\AuthenticationException) {
-                    return response()->json(['message' => 'Não autenticado.'], 401);
-                }
+            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                return response()->json(['message' => 'Não autenticado.'], 401);
+            }
 
-                if ($e instanceof NotFoundHttpException) {
-                    return response()->json(['message' => 'Recurso não encontrado.'], 404);
-                }
+            if ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                return response()->json(['message' => 'Não autorizado.'], 403);
+            }
 
-                if ($e instanceof \RuntimeException && $e->getCode() >= 400) {
-                    return response()->json(['message' => $e->getMessage()], $e->getCode());
-                }
+            if ($e instanceof NotFoundHttpException) {
+                return response()->json(['message' => 'Recurso não encontrado.'], 404);
+            }
+
+            if ($e instanceof \RuntimeException && $e->getCode() >= 400 && $e->getCode() < 600) {
+                return response()->json(['message' => $e->getMessage()], (int) $e->getCode());
             }
 
             return null;

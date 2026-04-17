@@ -23,12 +23,12 @@ class ServiceController extends Controller
         $services = QueryBuilder::for(
             Service::visible()->with(['user:id,uuid,first_name,last_name,avatar_url', 'category:id,uuid,name,slug'])
         )
-            ->allowedFilters([
+            ->allowedFilters(
                 AllowedFilter::exact('category_uuid', 'category.uuid'),
                 AllowedFilter::exact('is_community'),
                 AllowedFilter::scope('search'),
-            ])
-            ->allowedSorts(['base_price', 'created_at'])
+            )
+            ->allowedSorts('base_price', 'created_at')
             ->defaultSort('-created_at')
             ->paginate(20);
 
@@ -49,7 +49,7 @@ class ServiceController extends Controller
         $services = QueryBuilder::for(
             Service::where('user_id', $request->user()->id)->with('category')
         )
-            ->allowedFilters([AllowedFilter::exact('status')])
+            ->allowedFilters(AllowedFilter::exact('status'))
             ->defaultSort('-created_at')
             ->paginate(20);
 

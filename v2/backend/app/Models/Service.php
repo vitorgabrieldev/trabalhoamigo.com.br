@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Service extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'uuid',
@@ -56,13 +57,21 @@ class Service extends Model
 
     public function scopeSearch($query, string $term)
     {
-        return $query->whereRaw(
-            "search_vector @@ plainto_tsquery('portuguese', ?)",
-            [$term]
-        )->orderByRaw(
-            "ts_rank(search_vector, plainto_tsquery('portuguese', ?)) DESC",
-            [$term]
-        );
+        if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
+            return $query->whereRaw(
+                "search_vector @@ plainto_tsquery('portuguese', ?)",
+                [$term]
+            )->orderByRaw(
+                "ts_rank(search_vector, plainto_tsquery('portuguese', ?)) DESC",
+                [$term]
+            );
+        }
+
+        // SQLite fallback (development/testing)
+        return $query->where(function ($q) use ($term) {
+            $q->where('title', 'like', "%{$term}%")
+              ->orWhere('description', 'like', "%{$term}%");
+        });
     }
 
     public function user(): BelongsTo

@@ -25,7 +25,7 @@ class ContractController extends Controller
             : Contract::where('contractor_id', $user->id);
 
         $contracts = QueryBuilder::for($query->with(['service.category', 'contractor', 'provider']))
-            ->allowedFilters([AllowedFilter::exact('status')])
+            ->allowedFilters(AllowedFilter::exact('status'))
             ->defaultSort('-created_at')
             ->paginate(15);
 

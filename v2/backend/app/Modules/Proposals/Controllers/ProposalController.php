@@ -23,8 +23,8 @@ class ProposalController extends Controller
         $proposals = QueryBuilder::for(
             Proposal::where('contractor_id', $request->user()->id)->with(['service.category', 'scheduleSlots'])
         )
-            ->allowedFilters([AllowedFilter::exact('status')])
-            ->allowedSorts(['created_at', 'offered_price'])
+            ->allowedFilters(AllowedFilter::exact('status'))
+            ->allowedSorts('created_at', 'offered_price')
             ->defaultSort('-created_at')
             ->paginate(15);
 
@@ -38,7 +38,7 @@ class ProposalController extends Controller
             Proposal::where('provider_id', $request->user()->id)
                 ->with(['service', 'contractor', 'scheduleSlots'])
         )
-            ->allowedFilters([AllowedFilter::exact('status')])
+            ->allowedFilters(AllowedFilter::exact('status'))
             ->defaultSort('-created_at')
             ->paginate(15);
 

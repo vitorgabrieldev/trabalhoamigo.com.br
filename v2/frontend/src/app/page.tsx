@@ -4,18 +4,26 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Search, ArrowRight } from 'lucide-react'
+import { Search, ArrowRight, Star, TrendingUp, MapPin } from 'lucide-react'
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { ServiceCarousel } from '@/components/services/ServiceCarousel'
+import { HeroCanvas } from '@/components/ui/hero-canvas'
+import { CategorySelect } from '@/components/ui/category-select'
 import { servicesApi, categoriesApi } from '@/lib/api'
 import type { Service, Category, PaginatedResponse } from '@/types'
+
+const QUICK_FILTERS = [
+  { label: 'Melhores avaliações', icon: Star, href: '/services?sort=-average_rating' },
+  { label: 'Mais relevantes', icon: TrendingUp, href: '/services' },
+  { label: 'Próximos de mim', icon: MapPin, href: '/services?nearby=1' },
+]
 
 export default function LandingPage() {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [categoryUuid, setCategoryUuid] = useState('')
 
-  /* ── Data fetching ─────────────────────────────────────────────────── */
+  /* ── Data ─────────────────────────────────────────────────────────── */
   const { data: latestData, isLoading: loadingLatest } = useQuery({
     queryKey: ['landing-latest'],
     queryFn: () =>
@@ -32,22 +40,21 @@ export default function LandingPage() {
         .then((r) => r.data as PaginatedResponse<Service>),
   })
 
-  const { data: categoriesData } = useQuery({
+  const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['categories'],
     queryFn: async () => {
       const res = await categoriesApi.list()
       const body = res.data
       if (Array.isArray(body)) return body as Category[]
       if (body?.data && Array.isArray(body.data)) return body.data as Category[]
-      return [] as Category[]
+      return []
     },
   })
 
-  const latest = latestData?.data ?? []
-  const byPrice = priceData?.data ?? []
-  const categories = categoriesData ?? []
+  const latest = (latestData?.data ?? []).slice(0, 6)
+  const byPrice = (priceData?.data ?? []).slice(0, 6)
 
-  /* ── Search handler ─────────────────────────────────────────────────── */
+  /* ── Search ────────────────────────────────────────────────────────── */
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     const params = new URLSearchParams()
@@ -60,88 +67,80 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       <PublicHeader />
 
-      {/* ── Hero ────────────────────────────────────────────────────────── */}
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
       <section
         className="relative text-white overflow-hidden"
         style={{
-          minHeight: '420px',
+          minHeight: '440px',
           background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 45%, #0f3460 100%)',
         }}
       >
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
+        {/* Interactive canvas */}
+        <HeroCanvas />
+
+        {/* Subtle vignette so text stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 pointer-events-none" />
 
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-20 sm:py-28">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-3 tracking-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-3 tracking-tight drop-shadow">
             Procure por serviços
           </h1>
           <p className="text-white/60 text-sm sm:text-base mb-8 max-w-md">
             Conecte-se com profissionais verificados perto de você
           </p>
 
-          {/* Search bar — wider */}
+          {/* Search bar — full container width */}
           <form
             onSubmit={handleSearch}
-            className="flex items-stretch w-full max-w-3xl bg-white rounded-xl overflow-hidden shadow-2xl shadow-black/30"
+            className="flex items-stretch w-full bg-white rounded-xl overflow-hidden shadow-2xl shadow-black/40"
+            style={{ maxWidth: 'min(820px, calc(100vw - 2rem))' }}
           >
-            <select
-              value={categoryUuid}
-              onChange={(e) => setCategoryUuid(e.target.value)}
-              className="px-4 py-3.5 text-gray-600 text-sm border-r border-gray-200 focus:outline-none bg-white cursor-pointer min-w-[140px] sm:min-w-[170px]"
-            >
-              <option value="">Categorias</option>
-              {categories.map((c) => (
-                <option key={c.uuid} value={c.uuid}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            {/* Custom category select */}
+            <div className="flex-shrink-0 h-14">
+              <CategorySelect
+                categories={categories}
+                value={categoryUuid}
+                onChange={setCategoryUuid}
+                className="h-14 rounded-none"
+              />
+            </div>
+
+            {/* Search input */}
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="O que você precisa? ex: encanador, designer…"
-              className="flex-1 px-4 py-3.5 text-gray-700 text-sm focus:outline-none bg-white placeholder:text-gray-400 min-w-0"
+              placeholder="Buscar serviços..."
+              className="flex-1 px-5 py-0 h-14 text-gray-700 text-sm focus:outline-none bg-white placeholder:text-gray-400 min-w-0"
             />
+
+            {/* Submit */}
             <button
               type="submit"
-              className="bg-primary text-white px-5 sm:px-8 py-3.5 text-sm font-semibold hover:bg-primary/90 active:bg-primary/80 transition-colors cursor-pointer whitespace-nowrap flex items-center gap-2 flex-shrink-0"
+              className="flex-shrink-0 h-14 bg-primary text-white px-5 sm:px-8 text-sm font-semibold hover:bg-primary/90 active:bg-primary/80 transition-colors cursor-pointer flex items-center gap-2"
             >
               <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">Buscar Serviços</span>
+              <span className="hidden sm:inline">Buscar</span>
             </button>
           </form>
 
-          {/* Category chips */}
-          {categories.length > 0 && (
-            <div className="flex items-center gap-2 mt-5 flex-wrap justify-center max-w-2xl">
-              <span className="text-white/40 text-xs">Ou filtre por:</span>
-              {categories.map((c) => (
-                <button
-                  key={c.uuid}
-                  type="button"
-                  onClick={() => {
-                    setCategoryUuid(c.uuid)
-                    router.push(`/services?category=${c.uuid}`)
-                  }}
-                  className="px-3 py-1 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white text-xs rounded-full border border-white/15 transition-colors cursor-pointer"
-                >
-                  {c.name}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Quick filter chips */}
+          <div className="flex items-center gap-2 mt-5 flex-wrap justify-center">
+            {QUICK_FILTERS.map(({ label, icon: Icon, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white text-xs rounded-full border border-white/15 transition-colors cursor-pointer font-medium"
+              >
+                <Icon className="h-3 w-3" />
+                {label}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── Carousels ───────────────────────────────────────────────────── */}
+      {/* ── Carousels ─────────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <ServiceCarousel
           title="Recomendações com base nos seus últimos vistos"
@@ -165,13 +164,11 @@ export default function LandingPage() {
         />
       </div>
 
-      {/* ── Category map ────────────────────────────────────────────────── */}
+      {/* ── Category map ──────────────────────────────────────────────── */}
       {categories.length > 0 && (
         <section className="bg-gray-50 border-t border-gray-100 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-base font-bold text-gray-900 mb-6">
-              Mapa de categorias
-            </h2>
+            <h2 className="text-base font-bold text-gray-900 mb-6">Mapa de categorias</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-8 gap-y-3">
               {categories.map((cat) => (
                 <Link
@@ -187,7 +184,7 @@ export default function LandingPage() {
         </section>
       )}
 
-      {/* ── CTA ─────────────────────────────────────────────────────────── */}
+      {/* ── CTA ───────────────────────────────────────────────────────── */}
       <section className="bg-primary py-16 sm:py-20 text-white text-center">
         <div className="max-w-lg mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">Pronto para começar?</h2>
@@ -211,7 +208,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────────────── */}
+      {/* ── Footer ────────────────────────────────────────────────────── */}
       <footer className="bg-gray-900 text-white pt-14 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
@@ -224,7 +221,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Plataforma — real pages only */}
+            {/* Plataforma */}
             <div>
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
                 Plataforma
@@ -301,7 +298,6 @@ export default function LandingPage() {
             <p className="text-xs text-gray-500 order-2 sm:order-1">
               © {new Date().getFullYear()} Trabalho Amigo. Todos os direitos reservados.
             </p>
-            {/* Quote */}
             <p className="text-xs text-gray-500 italic order-1 sm:order-2 text-center sm:text-right max-w-sm">
               &ldquo;Todo grande trabalho começa com uma primeira conexão.&rdquo;
             </p>

@@ -11,6 +11,7 @@ use App\Modules\Services\Services\ServiceManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ServiceController extends Controller
@@ -21,14 +22,36 @@ class ServiceController extends Controller
     public function index(): JsonResponse
     {
         $services = QueryBuilder::for(
-            Service::visible()->with(['user:id,uuid,first_name,last_name,avatar_url', 'category:id,uuid,name,slug'])
+            Service::visible()
+                ->withAvg('reviews', 'stars')
+                ->with(['user:id,uuid,first_name,last_name,avatar_url,created_at', 'user.address', 'category:id,uuid,name,slug'])
         )
             ->allowedFilters(
-                AllowedFilter::exact('category_uuid', 'category.uuid'),
+                AllowedFilter::callback('category_uuid', function ($query, $value) {
+                    $uuids = is_array($value) ? $value : explode(',', (string) $value);
+                    $query->whereHas('category', fn ($q) => $q->whereIn('uuid', array_filter($uuids)));
+                }),
                 AllowedFilter::exact('is_community'),
+                AllowedFilter::exact('accepts_offer'),
                 AllowedFilter::scope('search'),
+                AllowedFilter::callback('price_min', fn ($q, $v) => $q->where('base_price', '>=', (float) $v)),
+                AllowedFilter::callback('price_max', fn ($q, $v) => $q->where('base_price', '<=', (float) $v)),
+                AllowedFilter::callback('min_rating', fn ($q, $v) => $q->having('reviews_avg_stars', '>=', (float) $v)),
+                AllowedFilter::callback('city', fn ($q, $v) =>
+                    $q->whereHas('user.address', fn ($aq) => $aq->where('city', 'like', "%{$v}%"))
+                ),
+                AllowedFilter::callback('state', fn ($q, $v) =>
+                    $q->whereHas('user.address', fn ($aq) => $aq->whereRaw('UPPER(state) = ?', [strtoupper($v)]))
+                ),
+                AllowedFilter::callback('neighborhood', fn ($q, $v) =>
+                    $q->whereHas('user.address', fn ($aq) => $aq->where('neighborhood', 'like', "%{$v}%"))
+                ),
             )
-            ->allowedSorts('base_price', 'created_at')
+            ->allowedSorts(
+                'base_price',
+                'created_at',
+                AllowedSort::field('average_rating', 'reviews_avg_stars'),
+            )
             ->defaultSort('-created_at')
             ->paginate(20);
 

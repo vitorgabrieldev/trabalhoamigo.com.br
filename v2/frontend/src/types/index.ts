@@ -44,6 +44,7 @@ export interface Service {
   accepts_offer: boolean
   is_community: boolean
   image_url?: string
+  images?: string[]
   status: 'active' | 'inactive' | 'pending'
   average_rating?: number
   reviews_count?: number

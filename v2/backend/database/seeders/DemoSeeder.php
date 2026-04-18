@@ -85,29 +85,35 @@ class DemoSeeder extends Seeder
             // Carlos — prestador de pintura
             $svcPintura = $this->service($carlos, $catPintura, 'Pintura residencial completa',
                 'Pintura interna e externa com tinta de qualidade premium. Inclui preparo da superfície, massa corrida e duas demãos.',
-                350.00, true, false),
+                350.00, true, false,
+                'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&h=600&fit=crop&auto=format'),
 
             $svcPinturaComunitaria = $this->service($carlos, $catPintura, 'Pintura de quarto (comunitário)',
                 'Pintura gratuita de um quarto para famílias em necessidade. Projeto social — sem custo.',
-                null, false, true),
+                null, false, true,
+                'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=600&fit=crop&auto=format'),
 
             // Fernanda — elétrica e hidráulica
             $svcEletrica = $this->service($fernanda, $catElétrica, 'Instalação elétrica residencial',
                 'Instalação e manutenção de circuitos elétricos, troca de tomadas, disjuntores e quadros de distribuição.',
-                200.00, false, false),
+                200.00, false, false,
+                'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&h=600&fit=crop&auto=format'),
 
             $svcHidraulica = $this->service($fernanda, $catHidráulica, 'Conserto de vazamentos',
                 'Identificação e reparo de vazamentos em tubulações, registros e torneiras. Atendimento emergencial disponível.',
-                150.00, true, false),
+                150.00, true, false,
+                'https://images.unsplash.com/photo-1607400201889-565b1ee75f8e?w=800&h=600&fit=crop&auto=format'),
 
             // Ricardo — limpeza
             $svcLimpeza = $this->service($ricardo, $catLimpeza, 'Limpeza pós-obra',
                 'Limpeza completa de imóvel após obras ou reformas. Inclui remoção de entulho, limpeza de pisos, vidros e esquadrias.',
-                500.00, false, false),
+                500.00, false, false,
+                'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop&auto=format'),
 
             $svcLimpezaCom = $this->service($ricardo, $catLimpeza, 'Limpeza básica doméstica (comunitário)',
                 'Limpeza básica para idosos e pessoas com dificuldade de locomoção. Serviço comunitário gratuito.',
-                null, false, true),
+                null, false, true,
+                'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=600&fit=crop&auto=format'),
         ];
 
         // ─── Cenários de Proposta + Contrato ─────────────────────────────────────
@@ -265,7 +271,7 @@ class DemoSeeder extends Seeder
 
     // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-    private function service(User $provider, Category $category, string $title, string $desc, ?float $price, bool $acceptsOffer, bool $isCommunity): int
+    private function service(User $provider, Category $category, string $title, string $desc, ?float $price, bool $acceptsOffer, bool $isCommunity, ?string $imageUrl = null): int
     {
         return DB::table('services')->insertGetId([
             'uuid'          => Str::uuid(),
@@ -276,6 +282,7 @@ class DemoSeeder extends Seeder
             'base_price'    => $price,
             'accepts_offer' => $acceptsOffer,
             'is_community'  => $isCommunity,
+            'image_url'     => $imageUrl,
             'status'        => 'active',
             'created_at'    => now(),
             'updated_at'    => now(),

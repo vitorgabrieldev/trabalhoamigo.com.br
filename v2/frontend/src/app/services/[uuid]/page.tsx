@@ -269,7 +269,7 @@ export default function ServiceDetailPage({
                     ))}
 
                     {/* Review pagination */}
-                    {reviews.meta.last_page > 1 && (
+                    {reviews?.meta && reviews.meta.last_page > 1 && (
                       <div className="flex items-center justify-center gap-2 pt-2">
                         <Button
                           variant="ghost"

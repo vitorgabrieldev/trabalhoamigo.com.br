@@ -109,7 +109,7 @@ export default function DevicesPage() {
 
           {!isLoading && sessions && sessions.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-6">
-              Nenhuma sessão ativa.
+              Não há nada aqui :\
             </p>
           )}
 

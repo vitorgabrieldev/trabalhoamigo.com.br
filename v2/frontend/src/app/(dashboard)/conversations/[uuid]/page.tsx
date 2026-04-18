@@ -125,7 +125,7 @@ export default function ConversationPage({
           })
         ) : (
           <div className="text-center py-12 text-sm text-muted-foreground">
-            Nenhuma mensagem ainda. Inicie a conversa!
+            Não há nada aqui :\
           </div>
         )}
         <div ref={messagesEndRef} />

@@ -53,7 +53,7 @@ export default function ProposalsPage() {
         ) : (
           <div className="text-center py-16 border-2 border-dashed rounded-xl">
             <FileText className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">Nenhuma proposta recebida</p>
+            <p className="text-gray-500 font-medium">Não há nada aqui :\</p>
           </div>
         )}
       </div>
@@ -114,7 +114,7 @@ export default function ProposalsPage() {
       ) : (
         <div className="text-center py-16 border-2 border-dashed rounded-xl">
           <FileText className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">Nenhuma proposta enviada</p>
+          <p className="text-gray-500 font-medium">Não há nada aqui :\</p>
           <p className="text-sm text-muted-foreground mt-1">
             Explore os serviços disponíveis e faça uma proposta
           </p>

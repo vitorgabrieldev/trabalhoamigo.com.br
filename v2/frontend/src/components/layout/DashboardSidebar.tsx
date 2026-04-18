@@ -18,6 +18,7 @@ import {
   Search,
   X,
 } from 'lucide-react'
+import { Logo } from '@/components/ui/logo'
 
 interface NavItem {
   href: string
@@ -102,9 +103,8 @@ export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
     <aside className="flex flex-col h-full bg-white border-r w-64">
       {/* Header */}
       <div className="flex items-center justify-between h-16 px-6 border-b">
-        <Link href="/" className="flex items-center gap-2 font-bold text-primary">
-          <Briefcase className="h-5 w-5" />
-          <span className="text-sm">Trabalho Amigo</span>
+        <Link href="/">
+          <Logo size={30} />
         </Link>
         {onClose && (
           <button onClick={onClose} className="lg:hidden p-1 rounded hover:bg-gray-100">

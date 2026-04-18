@@ -73,7 +73,7 @@ export default function MyServicesPage() {
       {!isLoading && services && services.length === 0 && (
         <div className="text-center py-16 border-2 border-dashed rounded-xl">
           <Tag className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">Nenhum serviço cadastrado</p>
+          <p className="text-gray-500 font-medium">Não há nada aqui :\</p>
           <p className="text-sm text-muted-foreground mt-1">
             Comece criando seu primeiro serviço
           </p>

@@ -47,7 +47,7 @@ export default function ConversationsPage() {
       {!isLoading && conversations && conversations.length === 0 && (
         <div className="text-center py-16 border-2 border-dashed rounded-xl">
           <MessageCircle className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">Nenhuma conversa ainda</p>
+          <p className="text-gray-500 font-medium">Não há nada aqui :\</p>
           <p className="text-sm text-muted-foreground mt-1">
             Quando você fizer ou receber propostas, as conversas aparecerão aqui
           </p>

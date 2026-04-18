@@ -88,7 +88,7 @@ export function ScheduleSlotPicker({
           {slots.length === 0 && (
             <div className="text-center py-6 border-2 border-dashed rounded-lg">
               <Calendar className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Nenhum horário adicionado</p>
+              <p className="text-sm text-gray-500">Não há nada aqui :\</p>
               <Button type="button" variant="outline" size="sm" className="mt-2" onClick={addSlot}>
                 Adicionar horário
               </Button>

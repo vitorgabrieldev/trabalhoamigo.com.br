@@ -9,6 +9,7 @@ import {
   TrendingUp,
   ArrowRight,
   Clock,
+  Plus,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -181,7 +182,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="text-center py-8 text-sm text-muted-foreground">
-                Nenhuma proposta ainda
+                Não há nada aqui :\
               </div>
             )}
           </CardContent>
@@ -228,42 +229,22 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="text-center py-8 text-sm text-muted-foreground">
-                Nenhum contrato ainda
+                Não há nada aqui :\
               </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick actions */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Ações rápidas</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex flex-wrap gap-3">
-            <Button asChild variant="outline" size="sm">
-              <Link href="/services">Buscar serviços</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/proposals">Ver propostas</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/contracts">Ver contratos</Link>
-            </Button>
-            {isProvider && (
-              <>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/dashboard/services">Meus serviços</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/services/new">Criar serviço</Link>
-                </Button>
-              </>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {isProvider && (
+        <Link
+          href="/services/new"
+          className="fixed bottom-6 right-6 h-14 w-14 bg-primary text-white rounded-full shadow-lg hover:bg-primary/90 transition-all hover:scale-105 flex items-center justify-center z-50"
+          aria-label="Criar serviço"
+        >
+          <Plus className="h-6 w-6" />
+        </Link>
+      )}
     </div>
   )
 }

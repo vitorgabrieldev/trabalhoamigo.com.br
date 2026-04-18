@@ -83,7 +83,7 @@ export default function RegisterPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Crie sua conta gratuitamente</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Crie sua conta</h1>
           <p className="mt-2 text-sm text-gray-500 leading-relaxed">
             Inicie seu acesso agora mesmo sem pagar nada e descubra um ambiente desenvolvido para
             atender às suas necessidades, com recursos exclusivos e suporte dedicado.

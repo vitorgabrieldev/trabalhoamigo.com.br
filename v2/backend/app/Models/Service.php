@@ -57,7 +57,7 @@ class Service extends Model
 
     public function scopeSearch($query, string $term)
     {
-        // Split into meaningful words — drop tokens of 1-2 chars (stop words)
+        // Tokenise: split on whitespace, drop stop words (≤ 2 chars)
         $words = array_values(array_filter(
             preg_split('/\s+/', mb_strtolower(trim($term))),
             fn ($w) => mb_strlen($w) > 2
@@ -68,32 +68,69 @@ class Service extends Model
         }
 
         if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
-            // Build OR tsquery: plainto_tsquery(w1) || plainto_tsquery(w2) ...
-            // plainto_tsquery applies Portuguese stemming to each word.
-            $placeholders = implode(' || ', array_fill(0, count($words), "plainto_tsquery('portuguese', ?)"));
+            $n = count($words);
 
-            return $query
-                ->where(function ($q) use ($words, $placeholders) {
-                    // Layer 1 — FTS exact stems (OR across words)
-                    $q->whereRaw("search_vector @@ ({$placeholders})", $words);
+            // ── Layer 1: FTS (OR per word, Portuguese stemming) ───────────────
+            // plainto_tsquery('portuguese', w) handles morphology:
+            //   "pintando" → "pint", "casas" → "cas"
+            $ftsParts   = implode(' || ', array_fill(0, $n, "plainto_tsquery('portuguese', ?)"));
 
-                    // Layer 2 — pg_trgm word similarity for typos / partial words
-                    foreach ($words as $word) {
-                        $q->orWhereRaw('word_similarity(?, title) > 0.3', [$word])
-                          ->orWhereRaw('word_similarity(?, description) > 0.2', [$word]);
-                    }
-                })
-                ->orderByRaw(
-                    // Rank: FTS relevance primary, trigram similarity secondary
-                    "ts_rank(search_vector, ({$placeholders})) DESC",
-                    $words
-                );
+            // ── Layer 2: similarity() — full query vs title ───────────────────
+            // Good for short queries; uses GIN trgm index.
+
+            // ── Layer 3: word_similarity() — each word vs title / description ─
+            // Finds the best matching substring; tolerates partial words & typos.
+
+            // ── Layer 4: Levenshtein — edit distance per title token ──────────
+            // Compares each search word against every space-split token in title.
+            // Catches single-char typos ("pintira" → "pintura").
+
+            // Candidate filter — any of the 4 layers can surface a result
+            $query->where(function ($q) use ($words, $ftsParts, $term, $n) {
+                // L1
+                $q->whereRaw("search_vector @@ ({$ftsParts})", $words);
+
+                // L2
+                $q->orWhereRaw('similarity(?, title) > 0.1', [$term]);
+
+                // L3 + L4 per word
+                foreach ($words as $word) {
+                    $q->orWhereRaw('word_similarity(?, title)       > 0.3', [$word])
+                      ->orWhereRaw('word_similarity(?, description) > 0.2', [$word])
+                      // L4: edit distance ≤ 2 against any token inside title
+                      ->orWhereRaw(
+                          "EXISTS (
+                              SELECT 1
+                              FROM   unnest(regexp_split_to_array(lower(title), '\\s+')) AS tok
+                              WHERE  length(tok) > 2
+                              AND    levenshtein_less_equal(?, tok, 2) <= 2
+                          )",
+                          [$word]
+                      );
+                }
+            });
+
+            // Combined relevance score (higher = more relevant)
+            // L1 weight 4 · L2 weight 2 · L3 weight 3 (title) + 1 (desc)
+            $wordSimTitle = implode(', ', array_fill(0, $n, 'word_similarity(?, title)'));
+            $wordSimDesc  = implode(', ', array_fill(0, $n, 'word_similarity(?, description)'));
+
+            $query->orderByRaw(
+                "( ts_rank(search_vector, ({$ftsParts}))      * 4
+                 + similarity(?, title)                        * 2
+                 + GREATEST({$wordSimTitle})                   * 3
+                 + GREATEST({$wordSimDesc})                    * 1
+                 ) DESC",
+                array_merge($words, [$term], $words, $words)
+            );
+
+            return $query;
         }
 
-        // SQLite fallback — OR LIKE across all words
+        // ── SQLite fallback (development) ─────────────────────────────────────
         return $query->where(function ($q) use ($words) {
             foreach ($words as $word) {
-                $q->orWhere('title', 'like', "%{$word}%")
+                $q->orWhere('title',       'like', "%{$word}%")
                   ->orWhere('description', 'like', "%{$word}%");
             }
         });

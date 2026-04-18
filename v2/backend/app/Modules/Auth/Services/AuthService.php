@@ -18,15 +18,16 @@ class AuthService
     public function register(array $data): array
     {
         $user = User::create([
-            'uuid' => Str::uuid(),
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-            'cpf' => $data['cpf'] ?? null,
-            'phone' => $data['phone'] ?? null,
-            'whatsapp' => $data['whatsapp'] ?? null,
-            'role' => $data['role'],
+            'uuid'              => Str::uuid(),
+            'first_name'        => $data['first_name'],
+            'last_name'         => $data['last_name'],
+            'email'             => $data['email'],
+            'password'          => $data['password'],
+            'cpf'               => $data['cpf'] ?? null,
+            'phone'             => $data['phone'] ?? null,
+            'whatsapp'          => $data['whatsapp'] ?? null,
+            'role'              => 'contractor',
+            'needs_onboarding'  => true,
         ]);
 
         if (isset($data['address'])) {
@@ -84,19 +85,28 @@ class AuthService
         } else {
             $nameParts = explode(' ', $socialUser->getName(), 2);
             $user = User::create([
-                'uuid'               => Str::uuid(),
-                'first_name'         => $nameParts[0],
-                'last_name'          => $nameParts[1] ?? '',
-                'email'              => $socialUser->getEmail(),
-                'google_id'          => $socialUser->getId(),
-                'avatar_url'         => $socialUser->getAvatar(),
-                'email_verified_at'  => now(),
-                'role'               => 'contractor',
-                'password'           => Hash::make(Str::random(32)),
+                'uuid'              => Str::uuid(),
+                'first_name'        => $nameParts[0],
+                'last_name'         => $nameParts[1] ?? '',
+                'email'             => $socialUser->getEmail(),
+                'google_id'         => $socialUser->getId(),
+                'avatar_url'        => $socialUser->getAvatar(),
+                'email_verified_at' => now(),
+                'role'              => 'contractor',
+                'needs_onboarding'  => true,
+                'password'          => Hash::make(Str::random(32)),
             ]);
         }
 
         return $this->issueTokens($user, 'Google OAuth', $request);
+    }
+
+    public function completeOnboarding(User $user, string $role): void
+    {
+        $user->update([
+            'role'             => $role,
+            'needs_onboarding' => false,
+        ]);
     }
 
     public function refresh(string $refreshToken, $request): array

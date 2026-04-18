@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Alert } from '@/components/ui/alert'
 import { Spinner } from '@/components/ui/spinner'
 import { authApi, meApi } from '@/lib/api'
-import { setTokens } from '@/lib/auth'
+import { setTokens, setNeedsOnboarding } from '@/lib/auth'
 import { useAuthStore } from '@/store/auth'
 import type { User } from '@/types'
 
@@ -25,7 +25,6 @@ const registerSchema = z
     email: z.string().email('E-mail inválido'),
     password: z.string().min(8, 'Senha deve ter pelo menos 8 caracteres'),
     password_confirmation: z.string(),
-    role: z.enum(['provider', 'contractor']),
   })
   .refine((d) => d.password === d.password_confirmation, {
     message: 'As senhas não coincidem',
@@ -43,15 +42,10 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { role: 'contractor' },
   })
-
-  const selectedRole = watch('role')
 
   const onSubmit = async (data: RegisterForm) => {
     setError(null)
@@ -60,8 +54,9 @@ export default function RegisterPage() {
       const { access_token, refresh_token } = res.data
       setTokens(access_token, refresh_token)
       const profileRes = await meApi.getProfile()
+      setNeedsOnboarding(true)
       setAuth(profileRes.data as User, access_token, refresh_token)
-      router.push('/dashboard')
+      router.push('/auth/onboarding')
     } catch (err: unknown) {
       const axiosErr = err as {
         response?: { data?: { message?: string; errors?: Record<string, string[]> } }
@@ -171,34 +166,6 @@ export default function RegisterPage() {
             {errors.email && (
               <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
             )}
-          </div>
-
-          <div>
-            <Label className="text-sm font-medium text-gray-700">Tipo de conta</Label>
-            <div className="grid grid-cols-2 gap-3 mt-1">
-              {(['contractor', 'provider'] as const).map((role) => (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => setValue('role', role)}
-                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors cursor-pointer ${
-                    selectedRole === role
-                      ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="text-center">
-                    <div className="text-base mb-0.5">{role === 'contractor' ? '🔍' : '🛠️'}</div>
-                    <div className="text-xs font-semibold">
-                      {role === 'contractor' ? 'Contratante' : 'Prestador'}
-                    </div>
-                    <div className="text-[10px] text-gray-400 font-normal">
-                      {role === 'contractor' ? 'Busco serviços' : 'Ofereço serviços'}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
           </div>
 
           <div>

@@ -40,6 +40,15 @@ class AuthController extends Controller
         return response()->json($result);
     }
 
+    public function completeOnboarding(Request $request): JsonResponse
+    {
+        $request->validate(['role' => 'required|in:provider,contractor']);
+
+        $this->authService->completeOnboarding($request->user(), $request->role);
+
+        return response()->json(['message' => 'Perfil configurado com sucesso.']);
+    }
+
     public function googleRedirect(): RedirectResponse
     {
         return Socialite::driver('google')->stateless()->redirect();

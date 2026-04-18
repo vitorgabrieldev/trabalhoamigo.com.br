@@ -3,7 +3,7 @@
 import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { setTokens } from '@/lib/auth'
+import { setTokens, setNeedsOnboarding } from '@/lib/auth'
 import { meApi } from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
 import type { User } from '@/types'
@@ -27,8 +27,10 @@ function GoogleCallbackContent() {
 
     meApi.getProfile()
       .then((res) => {
-        setAuth(res.data as User, accessToken, refreshToken)
-        router.replace('/dashboard')
+        const user = res.data as User
+        setNeedsOnboarding(!!user.needs_onboarding)
+        setAuth(user, accessToken, refreshToken)
+        router.replace(user.needs_onboarding ? '/auth/onboarding' : '/dashboard')
       })
       .catch(() => {
         router.replace('/login?error=Erro ao carregar perfil.')

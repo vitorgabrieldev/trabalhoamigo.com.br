@@ -12,6 +12,7 @@ export interface User {
   cpf?: string
   stripe_onboarding_completed?: boolean
   totp_enabled: boolean
+  needs_onboarding?: boolean
   created_at: string
   address?: Address
   average_rating?: number

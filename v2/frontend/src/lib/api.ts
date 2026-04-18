@@ -106,11 +106,13 @@ export const authApi = {
     email: string
     password: string
     password_confirmation: string
-    role: 'provider' | 'contractor'
     cpf?: string
     phone?: string
     address?: object
   }) => api.post('/auth/register', data),
+
+  completeOnboarding: (role: 'provider' | 'contractor') =>
+    api.post('/auth/onboarding', { role }),
 
   logout: () => api.post('/auth/logout'),
 

@@ -24,6 +24,15 @@ export function clearTokens(): void {
   localStorage.removeItem(ACCESS_TOKEN_KEY)
   localStorage.removeItem(REFRESH_TOKEN_KEY)
   Cookies.remove(ACCESS_TOKEN_KEY)
+  Cookies.remove('needs_onboarding')
+}
+
+export function setNeedsOnboarding(value: boolean): void {
+  if (value) {
+    Cookies.set('needs_onboarding', '1', { expires: 1, sameSite: 'lax' })
+  } else {
+    Cookies.remove('needs_onboarding')
+  }
 }
 
 export function isTokenExpired(token: string): boolean {

@@ -33,6 +33,7 @@ class User extends Authenticatable implements JWTSubject
         'totp_secret',
         'totp_enabled',
         'google_id',
+        'needs_onboarding',
     ];
 
     protected $hidden = [
@@ -50,6 +51,7 @@ class User extends Authenticatable implements JWTSubject
             'password' => 'hashed',
             'totp_enabled' => 'boolean',
             'stripe_onboarding_completed' => 'boolean',
+            'needs_onboarding' => 'boolean',
         ];
     }
 

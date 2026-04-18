@@ -22,7 +22,7 @@ class RegisterRequest extends FormRequest
             'cpf' => ['nullable', 'string', 'size:14', 'unique:users,cpf'],
             'phone' => ['nullable', 'string', 'max:20'],
             'whatsapp' => ['nullable', 'string', 'max:20'],
-            'role' => ['required', 'in:provider,contractor'],
+            'role' => ['nullable', 'in:provider,contractor'],
 
             // Address (optional on register, can be added later)
             'address' => ['nullable', 'array'],

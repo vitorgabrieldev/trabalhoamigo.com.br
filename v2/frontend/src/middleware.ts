@@ -23,13 +23,24 @@ function isProtected(pathname: string): boolean {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('access_token')?.value
+  const needsOnboarding = request.cookies.get('needs_onboarding')?.value === '1'
 
-  // Logged in users visiting guest-only pages → redirect to dashboard
+  // Unauthenticated on onboarding → login
+  if (!token && pathname === '/auth/onboarding') {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Authenticated + onboarding pending → block access to protected areas
+  if (token && needsOnboarding && isProtected(pathname)) {
+    return NextResponse.redirect(new URL('/auth/onboarding', request.url))
+  }
+
+  // Logged in users visiting guest-only pages → dashboard
   if (token && GUEST_ONLY.includes(pathname)) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // Unauthenticated users visiting protected pages → redirect to login
+  // Unauthenticated users visiting protected pages → login
   if (!token && isProtected(pathname)) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
@@ -44,6 +55,7 @@ export const config = {
     '/',
     '/login',
     '/register',
+    '/auth/onboarding',
     '/dashboard/:path*',
     '/services/new',
     '/services/:uuid/edit',

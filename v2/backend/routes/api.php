@@ -38,6 +38,7 @@ Route::middleware('auth:api')->group(function () {
 
     // Auth management
     Route::prefix('auth')->group(function () {
+        Route::post('/onboarding', [AuthController::class, 'completeOnboarding']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/sessions', [AuthController::class, 'sessions']);
         Route::delete('/sessions/{sessionUuid}', [AuthController::class, 'revokeSession']);

@@ -83,7 +83,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 pointer-events-none" />
 
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-20 sm:py-28">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-3 tracking-tight drop-shadow">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-3 tracking-tight">
             Procure por serviços
           </h1>
           <p className="text-white/60 text-sm sm:text-base mb-8 max-w-md">

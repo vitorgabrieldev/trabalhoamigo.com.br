@@ -103,110 +103,24 @@ function FilterSection({
   )
 }
 
-function ServicesContent() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+interface SidebarProps {
+  draft: Filters
+  applied: Filters
+  dirty: boolean
+  activeFilters: boolean
+  categories: Category[]
+  showAllCategories: boolean
+  setShowAllCategories: React.Dispatch<React.SetStateAction<boolean>>
+  setDraft: React.Dispatch<React.SetStateAction<Filters>>
+  applyFilters: () => void
+  clearFilters: () => void
+}
 
-  const [search, setSearch] = useState(() => searchParams.get('search') ?? '')
-  const [applied, setApplied] = useState<Filters>(() => filtersFromParams(searchParams))
-  const [draft, setDraft] = useState<Filters>(() => filtersFromParams(searchParams))
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-  const [showAllCategories, setShowAllCategories] = useState(false)
-
-  // ── sync applied + search → URL ──────────────────────────────────────────
-  const isFirstRender = useRef(true)
-  useEffect(() => {
-    if (isFirstRender.current) { isFirstRender.current = false; return }
-    const p = new URLSearchParams()
-    if (search)                          p.set('search', search)
-    if (applied.categoryUuids.length)    p.set('categories', applied.categoryUuids.join(','))
-    if (applied.sort !== '-created_at')  p.set('sort', applied.sort)
-    if (applied.priceMin)                p.set('price_min', applied.priceMin)
-    if (applied.priceMax)                p.set('price_max', applied.priceMax)
-    if (applied.city)                    p.set('city', applied.city)
-    if (applied.stateUF)                 p.set('state', applied.stateUF)
-    if (applied.neighborhood)            p.set('neighborhood', applied.neighborhood)
-    if (applied.minRating > 0)           p.set('min_rating', String(applied.minRating))
-    if (applied.communityOnly)           p.set('community', '1')
-    if (applied.acceptsOfferOnly)        p.set('accepts_offer', '1')
-    const qs = p.toString()
-    router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false })
-  }, [applied, search]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── categories ────────────────────────────────────────────────────────────
-  const { data: categoriesData } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => categoriesApi.list().then((r) => {
-      const body = r.data
-      if (Array.isArray(body)) return body as Category[]
-      if (body?.data && Array.isArray(body.data)) return body.data as Category[]
-      return [] as Category[]
-    }),
-  })
-  const categories = Array.isArray(categoriesData) ? categoriesData : []
-
-  // ── infinite query (uses applied, not draft) ──────────────────────────────
-  const queryFilters = {
-    ...(search ? { 'filter[search]': search } : {}),
-    ...(applied.categoryUuids.length ? { 'filter[category_uuid]': applied.categoryUuids.join(',') } : {}),
-    ...(applied.priceMin ? { 'filter[price_min]': applied.priceMin } : {}),
-    ...(applied.priceMax ? { 'filter[price_max]': applied.priceMax } : {}),
-    ...(applied.city ? { 'filter[city]': applied.city } : {}),
-    ...(applied.stateUF ? { 'filter[state]': applied.stateUF } : {}),
-    ...(applied.neighborhood ? { 'filter[neighborhood]': applied.neighborhood } : {}),
-    ...(applied.minRating > 0 ? { 'filter[min_rating]': applied.minRating } : {}),
-    ...(applied.communityOnly ? { 'filter[is_community]': 1 } : {}),
-    ...(applied.acceptsOfferOnly ? { 'filter[accepts_offer]': 1 } : {}),
-    sort: applied.sort,
-  }
-
-  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['services-infinite', queryFilters],
-      queryFn: ({ pageParam }) =>
-        servicesApi.list({ ...queryFilters, page: pageParam }).then((r) => r.data as PaginatedResponse<Service>),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) =>
-        lastPage.meta.current_page < lastPage.meta.last_page
-          ? lastPage.meta.current_page + 1
-          : undefined,
-    })
-
-  const services = data?.pages.flatMap((p) => p.data) ?? []
-  const total = data?.pages[0]?.meta.total
-
-  // ── intersection observer ─────────────────────────────────────────────────
-  const sentinelRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const el = sentinelRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage()
-      },
-      { rootMargin: '200px' },
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
-
-  // ── handlers ──────────────────────────────────────────────────────────────
-  const applyFilters = useCallback(() => {
-    setApplied({ ...draft })
-    setMobileFiltersOpen(false)
-  }, [draft])
-
-  const clearFilters = useCallback(() => {
-    setDraft({ ...EMPTY_FILTERS })
-    setApplied({ ...EMPTY_FILTERS })
-  }, [])
-
-  const dirty = isDirty(draft, applied)
-  const activeFilters = hasActiveFilters(applied)
-
-  // ── sidebar ───────────────────────────────────────────────────────────────
-  const Sidebar = () => (
+function Sidebar({
+  draft, applied, dirty, activeFilters, categories, showAllCategories,
+  setShowAllCategories, setDraft, applyFilters, clearFilters,
+}: SidebarProps) {
+  return (
     <aside className="w-64 shrink-0">
       {/* Apply / Clear buttons — TOP of sidebar */}
       <div className="flex gap-2 mb-5">
@@ -377,6 +291,114 @@ function ServicesContent() {
       </FilterSection>
     </aside>
   )
+}
+
+function ServicesContent() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const [search, setSearch] = useState(() => searchParams.get('search') ?? '')
+  const [applied, setApplied] = useState<Filters>(() => filtersFromParams(searchParams))
+  const [draft, setDraft] = useState<Filters>(() => filtersFromParams(searchParams))
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [showAllCategories, setShowAllCategories] = useState(false)
+
+  // ── sync applied + search → URL ──────────────────────────────────────────
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    const p = new URLSearchParams()
+    if (search)                          p.set('search', search)
+    if (applied.categoryUuids.length)    p.set('categories', applied.categoryUuids.join(','))
+    if (applied.sort !== '-created_at')  p.set('sort', applied.sort)
+    if (applied.priceMin)                p.set('price_min', applied.priceMin)
+    if (applied.priceMax)                p.set('price_max', applied.priceMax)
+    if (applied.city)                    p.set('city', applied.city)
+    if (applied.stateUF)                 p.set('state', applied.stateUF)
+    if (applied.neighborhood)            p.set('neighborhood', applied.neighborhood)
+    if (applied.minRating > 0)           p.set('min_rating', String(applied.minRating))
+    if (applied.communityOnly)           p.set('community', '1')
+    if (applied.acceptsOfferOnly)        p.set('accepts_offer', '1')
+    const qs = p.toString()
+    router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false })
+  }, [applied, search]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── categories ────────────────────────────────────────────────────────────
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoriesApi.list().then((r) => {
+      const body = r.data
+      if (Array.isArray(body)) return body as Category[]
+      if (body?.data && Array.isArray(body.data)) return body.data as Category[]
+      return [] as Category[]
+    }),
+  })
+  const categories = Array.isArray(categoriesData) ? categoriesData : []
+
+  // ── infinite query (uses applied, not draft) ──────────────────────────────
+  const queryFilters = {
+    ...(search ? { 'filter[search]': search } : {}),
+    ...(applied.categoryUuids.length ? { 'filter[category_uuid]': applied.categoryUuids.join(',') } : {}),
+    ...(applied.priceMin ? { 'filter[price_min]': applied.priceMin } : {}),
+    ...(applied.priceMax ? { 'filter[price_max]': applied.priceMax } : {}),
+    ...(applied.city ? { 'filter[city]': applied.city } : {}),
+    ...(applied.stateUF ? { 'filter[state]': applied.stateUF } : {}),
+    ...(applied.neighborhood ? { 'filter[neighborhood]': applied.neighborhood } : {}),
+    ...(applied.minRating > 0 ? { 'filter[min_rating]': applied.minRating } : {}),
+    ...(applied.communityOnly ? { 'filter[is_community]': 1 } : {}),
+    ...(applied.acceptsOfferOnly ? { 'filter[accepts_offer]': 1 } : {}),
+    sort: applied.sort,
+  }
+
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['services-infinite', queryFilters],
+      queryFn: ({ pageParam }) =>
+        servicesApi.list({ ...queryFilters, page: pageParam }).then((r) => r.data as PaginatedResponse<Service>),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.meta.current_page < lastPage.meta.last_page
+          ? lastPage.meta.current_page + 1
+          : undefined,
+    })
+
+  const services = data?.pages.flatMap((p) => p.data) ?? []
+  const total = data?.pages[0]?.meta.total
+
+  // ── intersection observer ─────────────────────────────────────────────────
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage()
+      },
+      { rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  // ── handlers ──────────────────────────────────────────────────────────────
+  const applyFilters = useCallback(() => {
+    setApplied({ ...draft })
+    setMobileFiltersOpen(false)
+  }, [draft])
+
+  const clearFilters = useCallback(() => {
+    setDraft({ ...EMPTY_FILTERS })
+    setApplied({ ...EMPTY_FILTERS })
+  }, [])
+
+  const dirty = isDirty(draft, applied)
+  const activeFilters = hasActiveFilters(applied)
+
+  const sidebarProps: SidebarProps = {
+    draft, applied, dirty, activeFilters, categories, showAllCategories,
+    setShowAllCategories, setDraft, applyFilters, clearFilters,
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -387,7 +409,7 @@ function ServicesContent() {
           {/* Sidebar — desktop */}
           <div className="hidden lg:block">
             <div className="sticky top-24 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-              <Sidebar />
+              <Sidebar {...sidebarProps} />
             </div>
           </div>
 
@@ -521,7 +543,7 @@ function ServicesContent() {
                 <X className="h-5 w-5 text-gray-500" />
               </button>
             </div>
-            <Sidebar />
+            <Sidebar {...sidebarProps} />
           </div>
         </div>
       )}

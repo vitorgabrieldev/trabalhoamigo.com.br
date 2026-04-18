@@ -73,7 +73,7 @@ class AuthService
             ?? User::withTrashed()->where('email', $socialUser->getEmail())->first();
 
         if ($user && $user->deleted_at) {
-            throw new \RuntimeException('Conta desativada.', 403);
+            $user->restore();
         }
 
         if ($user) {

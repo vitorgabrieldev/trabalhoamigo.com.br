@@ -52,6 +52,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('me')->group(function () {
         Route::get('/', [UserController::class, 'profile']);
         Route::patch('/', [UserController::class, 'updateProfile']);
+        Route::delete('/', [UserController::class, 'deleteAccount']);
         Route::put('/address', [UserController::class, 'updateAddress']);
         Route::post('/stripe/onboarding', [UserController::class, 'stripeOnboarding']);
         Route::get('/stripe/status', [UserController::class, 'stripeStatus']);

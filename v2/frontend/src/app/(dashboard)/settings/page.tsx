@@ -13,10 +13,12 @@ import { Spinner } from '@/components/ui/spinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { meApi } from '@/lib/api'
+import { clearTokens } from '@/lib/auth'
 import { useAuthStore } from '@/store/auth'
 import { getInitials } from '@/lib/utils'
 import type { User } from '@/types'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 
 const schema = z.object({
   first_name: z.string().min(2, 'Mínimo 2 caracteres'),
@@ -29,9 +31,23 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export default function ProfileSettingsPage() {
-  const { user, setUser } = useAuthStore()
+  const router = useRouter()
+  const { user, setUser, clearAuth } = useAuthStore()
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+
+  const handleDeleteAccount = useCallback(async () => {
+    setDeleting(true)
+    try {
+      await meApi.deleteAccount()
+      clearAuth()
+      clearTokens()
+      router.replace('/')
+    } catch {
+      setDeleting(false)
+    }
+  }, [clearAuth, router])
 
   const { data: profile } = useQuery({
     queryKey: ['me'],
@@ -184,6 +200,27 @@ export default function ProfileSettingsPage() {
               {profile?.totp_enabled ? 'Ativado' : 'Desativado'}
             </span>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-red-200">
+        <CardHeader>
+          <CardTitle className="text-base text-red-600">Zona de perigo</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-900">Excluir conta</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Sua conta será desativada imediatamente.
+            </p>
+          </div>
+          <button
+            onClick={handleDeleteAccount}
+            disabled={deleting}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 cursor-pointer"
+          >
+            {deleting ? 'Excluindo...' : 'Excluir conta'}
+          </button>
         </CardContent>
       </Card>
     </div>

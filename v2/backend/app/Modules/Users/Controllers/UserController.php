@@ -81,6 +81,13 @@ class UserController extends Controller
         ]);
     }
 
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $request->user()->delete();
+
+        return response()->json(['message' => 'Conta excluída.']);
+    }
+
     public function show(string $uuid): JsonResponse
     {
         $user = \App\Models\User::where('uuid', $uuid)

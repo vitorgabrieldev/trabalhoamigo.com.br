@@ -155,6 +155,8 @@ export const meApi = {
     state: string
   }) => api.put('/me/address', data),
 
+  deleteAccount: () => api.delete('/me'),
+
   stripeOnboarding: () => api.post('/me/stripe/onboarding'),
 
   stripeStatus: () => api.get('/me/stripe/status'),

@@ -18,6 +18,7 @@ class UserProfileResource extends JsonResource
             'whatsapp' => $this->whatsapp,
             'avatar_url' => $this->avatar_url,
             'role' => $this->role,
+            'needs_onboarding' => $this->needs_onboarding,
             'totp_enabled' => $this->totp_enabled,
             'email_verified_at' => $this->email_verified_at?->toIso8601String(),
 

@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef, Suspense } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { Search, SlidersHorizontal, X, Star, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Star, ChevronDown, ChevronUp, Loader2, SlidersHorizontal as FiltersIcon } from 'lucide-react'
 import { ServiceCard } from '@/components/services/ServiceCard'
 import { PublicHeader } from '@/components/layout/PublicHeader'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -19,6 +19,63 @@ const SORT_OPTIONS = [
 ]
 
 const CATEGORIES_LIMIT = 8
+
+interface Filters {
+  categoryUuids: string[]
+  sort: string
+  priceMin: string
+  priceMax: string
+  city: string
+  stateUF: string
+  neighborhood: string
+  minRating: number
+  communityOnly: boolean
+  acceptsOfferOnly: boolean
+}
+
+const EMPTY_FILTERS: Filters = {
+  categoryUuids: [],
+  sort: '-created_at',
+  priceMin: '',
+  priceMax: '',
+  city: '',
+  stateUF: '',
+  neighborhood: '',
+  minRating: 0,
+  communityOnly: false,
+  acceptsOfferOnly: false,
+}
+
+function parseList(v: string | null): string[] {
+  if (!v) return []
+  return v.split(',').filter(Boolean)
+}
+
+function filtersFromParams(searchParams: URLSearchParams): Filters {
+  return {
+    categoryUuids: parseList(searchParams.get('categories')),
+    sort: searchParams.get('sort') ?? '-created_at',
+    priceMin: searchParams.get('price_min') ?? '',
+    priceMax: searchParams.get('price_max') ?? '',
+    city: searchParams.get('city') ?? '',
+    stateUF: searchParams.get('state') ?? '',
+    neighborhood: searchParams.get('neighborhood') ?? '',
+    minRating: parseInt(searchParams.get('min_rating') ?? '0', 10),
+    communityOnly: searchParams.get('community') === '1',
+    acceptsOfferOnly: searchParams.get('accepts_offer') === '1',
+  }
+}
+
+function isDirty(draft: Filters, applied: Filters): boolean {
+  return JSON.stringify(draft) !== JSON.stringify(applied)
+}
+
+function hasActiveFilters(f: Filters): boolean {
+  return (
+    f.categoryUuids.length > 0 || f.sort !== '-created_at' || !!f.priceMin || !!f.priceMax ||
+    !!f.city || !!f.stateUF || !!f.neighborhood || f.minRating > 0 || f.communityOnly || f.acceptsOfferOnly
+  )
+}
 
 function FilterSection({
   title,
@@ -37,20 +94,13 @@ function FilterSection({
         className="flex items-center justify-between w-full mb-3 group cursor-pointer"
       >
         <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">{title}</p>
-        {open ? (
-          <ChevronUp className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-600" />
-        ) : (
-          <ChevronDown className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-600" />
-        )}
+        {open
+          ? <ChevronUp className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-600" />
+          : <ChevronDown className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-600" />}
       </button>
       {open && children}
     </div>
   )
-}
-
-function parseList(v: string | null): string[] {
-  if (!v) return []
-  return v.split(',').filter(Boolean)
 }
 
 function ServicesContent() {
@@ -58,42 +108,33 @@ function ServicesContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  // ── filter state (from URL) ───────────────────────────────────────────────
   const [search, setSearch] = useState(() => searchParams.get('search') ?? '')
-  const [categoryUuids, setCategoryUuids] = useState<string[]>(() => parseList(searchParams.get('categories')))
-  const [sort, setSort] = useState(() => searchParams.get('sort') ?? '-created_at')
-  const [priceMin, setPriceMin] = useState(() => searchParams.get('price_min') ?? '')
-  const [priceMax, setPriceMax] = useState(() => searchParams.get('price_max') ?? '')
-  const [city, setCity] = useState(() => searchParams.get('city') ?? '')
-  const [stateUF, setStateUF] = useState(() => searchParams.get('state') ?? '')
-  const [neighborhood, setNeighborhood] = useState(() => searchParams.get('neighborhood') ?? '')
-  const [minRating, setMinRating] = useState(() => parseInt(searchParams.get('min_rating') ?? '0', 10))
-  const [communityOnly, setCommunityOnly] = useState(() => searchParams.get('community') === '1')
-  const [acceptsOfferOnly, setAcceptsOfferOnly] = useState(() => searchParams.get('accepts_offer') === '1')
+  const [applied, setApplied] = useState<Filters>(() => filtersFromParams(searchParams))
+  const [draft, setDraft] = useState<Filters>(() => filtersFromParams(searchParams))
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [showAllCategories, setShowAllCategories] = useState(false)
 
-  // ── sync filters → URL ────────────────────────────────────────────────────
+  // ── sync applied + search → URL ──────────────────────────────────────────
   const isFirstRender = useRef(true)
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
     const p = new URLSearchParams()
-    if (search)                 p.set('search', search)
-    if (categoryUuids.length)   p.set('categories', categoryUuids.join(','))
-    if (sort !== '-created_at') p.set('sort', sort)
-    if (priceMin)               p.set('price_min', priceMin)
-    if (priceMax)               p.set('price_max', priceMax)
-    if (city)                   p.set('city', city)
-    if (stateUF)                p.set('state', stateUF)
-    if (neighborhood)           p.set('neighborhood', neighborhood)
-    if (minRating > 0)          p.set('min_rating', String(minRating))
-    if (communityOnly)          p.set('community', '1')
-    if (acceptsOfferOnly)       p.set('accepts_offer', '1')
+    if (search)                          p.set('search', search)
+    if (applied.categoryUuids.length)    p.set('categories', applied.categoryUuids.join(','))
+    if (applied.sort !== '-created_at')  p.set('sort', applied.sort)
+    if (applied.priceMin)                p.set('price_min', applied.priceMin)
+    if (applied.priceMax)                p.set('price_max', applied.priceMax)
+    if (applied.city)                    p.set('city', applied.city)
+    if (applied.stateUF)                 p.set('state', applied.stateUF)
+    if (applied.neighborhood)            p.set('neighborhood', applied.neighborhood)
+    if (applied.minRating > 0)           p.set('min_rating', String(applied.minRating))
+    if (applied.communityOnly)           p.set('community', '1')
+    if (applied.acceptsOfferOnly)        p.set('accepts_offer', '1')
     const qs = p.toString()
     router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false })
-  }, [search, categoryUuids, sort, priceMin, priceMax, city, stateUF, neighborhood, minRating, communityOnly, acceptsOfferOnly]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [applied, search]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── categories fetch ──────────────────────────────────────────────────────
+  // ── categories ────────────────────────────────────────────────────────────
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoriesApi.list().then((r) => {
@@ -105,53 +146,44 @@ function ServicesContent() {
   })
   const categories = Array.isArray(categoriesData) ? categoriesData : []
 
-  // ── infinite services query ───────────────────────────────────────────────
-  const filters = {
+  // ── infinite query (uses applied, not draft) ──────────────────────────────
+  const queryFilters = {
     ...(search ? { 'filter[search]': search } : {}),
-    ...(categoryUuids.length ? { 'filter[category_uuid]': categoryUuids.join(',') } : {}),
-    ...(priceMin ? { 'filter[price_min]': priceMin } : {}),
-    ...(priceMax ? { 'filter[price_max]': priceMax } : {}),
-    ...(city ? { 'filter[city]': city } : {}),
-    ...(stateUF ? { 'filter[state]': stateUF } : {}),
-    ...(neighborhood ? { 'filter[neighborhood]': neighborhood } : {}),
-    ...(minRating > 0 ? { 'filter[min_rating]': minRating } : {}),
-    ...(communityOnly ? { 'filter[is_community]': 1 } : {}),
-    ...(acceptsOfferOnly ? { 'filter[accepts_offer]': 1 } : {}),
-    sort,
+    ...(applied.categoryUuids.length ? { 'filter[category_uuid]': applied.categoryUuids.join(',') } : {}),
+    ...(applied.priceMin ? { 'filter[price_min]': applied.priceMin } : {}),
+    ...(applied.priceMax ? { 'filter[price_max]': applied.priceMax } : {}),
+    ...(applied.city ? { 'filter[city]': applied.city } : {}),
+    ...(applied.stateUF ? { 'filter[state]': applied.stateUF } : {}),
+    ...(applied.neighborhood ? { 'filter[neighborhood]': applied.neighborhood } : {}),
+    ...(applied.minRating > 0 ? { 'filter[min_rating]': applied.minRating } : {}),
+    ...(applied.communityOnly ? { 'filter[is_community]': 1 } : {}),
+    ...(applied.acceptsOfferOnly ? { 'filter[accepts_offer]': 1 } : {}),
+    sort: applied.sort,
   }
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['services-infinite', filters],
-    queryFn: ({ pageParam }) =>
-      servicesApi.list({ ...filters, page: pageParam }).then((r) => r.data as PaginatedResponse<Service>),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.meta.current_page < lastPage.meta.last_page
-        ? lastPage.meta.current_page + 1
-        : undefined,
-  })
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['services-infinite', queryFilters],
+      queryFn: ({ pageParam }) =>
+        servicesApi.list({ ...queryFilters, page: pageParam }).then((r) => r.data as PaginatedResponse<Service>),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.meta.current_page < lastPage.meta.last_page
+          ? lastPage.meta.current_page + 1
+          : undefined,
+    })
 
   const services = data?.pages.flatMap((p) => p.data) ?? []
   const total = data?.pages[0]?.meta.total
 
-  // ── intersection observer (infinite scroll trigger) ───────────────────────
+  // ── intersection observer ─────────────────────────────────────────────────
   const sentinelRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = sentinelRef.current
     if (!el) return
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage()
-        }
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage()
       },
       { rootMargin: '200px' },
     )
@@ -159,42 +191,69 @@ function ServicesContent() {
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  // ── handlers ─────────────────────────────────────────────────────────────
-  const toggleCategory = useCallback((uuid: string) => {
-    setCategoryUuids((prev) =>
-      prev.includes(uuid) ? prev.filter((u) => u !== uuid) : [...prev, uuid]
-    )
-  }, [])
+  // ── handlers ──────────────────────────────────────────────────────────────
+  const applyFilters = useCallback(() => {
+    setApplied({ ...draft })
+    setMobileFiltersOpen(false)
+  }, [draft])
 
   const clearFilters = useCallback(() => {
-    setSearch('')
-    setCategoryUuids([])
-    setSort('-created_at')
-    setPriceMin('')
-    setPriceMax('')
-    setCity('')
-    setStateUF('')
-    setNeighborhood('')
-    setMinRating(0)
-    setCommunityOnly(false)
-    setAcceptsOfferOnly(false)
+    setDraft({ ...EMPTY_FILTERS })
+    setApplied({ ...EMPTY_FILTERS })
   }, [])
 
-  const hasFilters =
-    !!search || categoryUuids.length > 0 || sort !== '-created_at' || !!priceMin || !!priceMax ||
-    !!city || !!stateUF || !!neighborhood || minRating > 0 || communityOnly || acceptsOfferOnly
+  const dirty = isDirty(draft, applied)
+  const activeFilters = hasActiveFilters(applied)
 
   // ── sidebar ───────────────────────────────────────────────────────────────
   const Sidebar = () => (
     <aside className="w-64 shrink-0">
+      {/* Apply / Clear buttons — TOP of sidebar */}
+      <div className="flex gap-2 mb-5">
+        <button
+          onClick={applyFilters}
+          className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            dirty
+              ? 'bg-primary text-white hover:bg-primary/90 shadow-sm shadow-primary/30'
+              : 'bg-gray-100 text-gray-400 cursor-default'
+          }`}
+          disabled={!dirty}
+        >
+          Aplicar filtros
+        </button>
+        {activeFilters && (
+          <button
+            onClick={clearFilters}
+            className="px-3 py-2 rounded-lg text-xs text-gray-500 border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Pending changes indicator */}
+      {dirty && (
+        <p className="text-[10px] text-primary/70 mb-4 -mt-2 flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary/70 inline-block" />
+          Filtros alterados — clique em Aplicar
+        </p>
+      )}
+
       <FilterSection title="Categorias">
         <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
           {(showAllCategories ? categories : categories.slice(0, CATEGORIES_LIMIT)).map((cat) => (
             <label key={cat.uuid} className="flex items-center gap-1.5 cursor-pointer py-0.5 min-w-0">
               <input
                 type="checkbox"
-                checked={categoryUuids.includes(cat.uuid)}
-                onChange={() => toggleCategory(cat.uuid)}
+                checked={draft.categoryUuids.includes(cat.uuid)}
+                onChange={() =>
+                  setDraft((d) => ({
+                    ...d,
+                    categoryUuids: d.categoryUuids.includes(cat.uuid)
+                      ? d.categoryUuids.filter((u) => u !== cat.uuid)
+                      : [...d.categoryUuids, cat.uuid],
+                  }))
+                }
                 className="accent-primary shrink-0"
               />
               <span className="text-xs text-gray-700 truncate">{cat.name}</span>
@@ -219,8 +278,9 @@ function ServicesContent() {
             <p className="text-[10px] text-gray-400 mb-1">Mínimo</p>
             <div className="relative">
               <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">R$</span>
-              <input type="number" min="0" value={priceMin}
-                onChange={(e) => setPriceMin(e.target.value)} placeholder="0"
+              <input type="number" min="0" value={draft.priceMin}
+                onChange={(e) => setDraft((d) => ({ ...d, priceMin: e.target.value }))}
+                placeholder="0"
                 className="w-full border border-gray-200 rounded-lg pl-7 pr-2 py-2 text-xs focus:outline-none focus:border-primary" />
             </div>
           </div>
@@ -229,8 +289,9 @@ function ServicesContent() {
             <p className="text-[10px] text-gray-400 mb-1">Máximo</p>
             <div className="relative">
               <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">R$</span>
-              <input type="number" min="0" value={priceMax}
-                onChange={(e) => setPriceMax(e.target.value)} placeholder="∞"
+              <input type="number" min="0" value={draft.priceMax}
+                onChange={(e) => setDraft((d) => ({ ...d, priceMax: e.target.value }))}
+                placeholder="∞"
                 className="w-full border border-gray-200 rounded-lg pl-7 pr-2 py-2 text-xs focus:outline-none focus:border-primary" />
             </div>
           </div>
@@ -241,21 +302,23 @@ function ServicesContent() {
         <div className="space-y-2.5">
           <div>
             <p className="text-[10px] text-gray-400 mb-1">Estado (UF)</p>
-            <input type="text" value={stateUF}
-              onChange={(e) => setStateUF(e.target.value.toUpperCase().slice(0, 2))}
+            <input type="text" value={draft.stateUF}
+              onChange={(e) => setDraft((d) => ({ ...d, stateUF: e.target.value.toUpperCase().slice(0, 2) }))}
               placeholder="ex: SP" maxLength={2}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-primary uppercase" />
           </div>
           <div>
             <p className="text-[10px] text-gray-400 mb-1">Cidade</p>
-            <input type="text" value={city}
-              onChange={(e) => setCity(e.target.value)} placeholder="ex: São Paulo"
+            <input type="text" value={draft.city}
+              onChange={(e) => setDraft((d) => ({ ...d, city: e.target.value }))}
+              placeholder="ex: São Paulo"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-primary" />
           </div>
           <div>
             <p className="text-[10px] text-gray-400 mb-1">Bairro</p>
-            <input type="text" value={neighborhood}
-              onChange={(e) => setNeighborhood(e.target.value)} placeholder="ex: Jardim América"
+            <input type="text" value={draft.neighborhood}
+              onChange={(e) => setDraft((d) => ({ ...d, neighborhood: e.target.value }))}
+              placeholder="ex: Jardim América"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-primary" />
           </div>
         </div>
@@ -265,8 +328,9 @@ function ServicesContent() {
         <div className="space-y-1.5">
           {[0, 3, 4, 5].map((stars) => (
             <label key={stars} className="flex items-center gap-2 cursor-pointer py-0.5">
-              <input type="radio" name="minRating" checked={minRating === stars}
-                onChange={() => setMinRating(stars)} className="accent-primary" />
+              <input type="radio" name="minRating" checked={draft.minRating === stars}
+                onChange={() => setDraft((d) => ({ ...d, minRating: stars }))}
+                className="accent-primary" />
               {stars === 0 ? (
                 <span className="text-sm text-gray-700">Qualquer</span>
               ) : (
@@ -285,13 +349,15 @@ function ServicesContent() {
       <FilterSection title="Tipo">
         <div className="space-y-1.5">
           <label className="flex items-center gap-2 cursor-pointer py-0.5">
-            <input type="checkbox" checked={communityOnly}
-              onChange={(e) => setCommunityOnly(e.target.checked)} className="accent-primary" />
+            <input type="checkbox" checked={draft.communityOnly}
+              onChange={(e) => setDraft((d) => ({ ...d, communityOnly: e.target.checked }))}
+              className="accent-primary" />
             <span className="text-sm text-gray-700">Apenas comunitários</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer py-0.5">
-            <input type="checkbox" checked={acceptsOfferOnly}
-              onChange={(e) => setAcceptsOfferOnly(e.target.checked)} className="accent-primary" />
+            <input type="checkbox" checked={draft.acceptsOfferOnly}
+              onChange={(e) => setDraft((d) => ({ ...d, acceptsOfferOnly: e.target.checked }))}
+              className="accent-primary" />
             <span className="text-sm text-gray-700">Aceita proposta</span>
           </label>
         </div>
@@ -301,20 +367,14 @@ function ServicesContent() {
         <div className="space-y-1.5">
           {SORT_OPTIONS.map((opt) => (
             <label key={opt.value} className="flex items-center gap-2 cursor-pointer py-0.5">
-              <input type="radio" name="sort" checked={sort === opt.value}
-                onChange={() => setSort(opt.value)} className="accent-primary" />
+              <input type="radio" name="sort" checked={draft.sort === opt.value}
+                onChange={() => setDraft((d) => ({ ...d, sort: opt.value }))}
+                className="accent-primary" />
               <span className="text-sm text-gray-700">{opt.label}</span>
             </label>
           ))}
         </div>
       </FilterSection>
-
-      {hasFilters && (
-        <button onClick={clearFilters}
-          className="w-full text-xs text-primary border border-primary rounded-lg py-2 hover:bg-primary/5 transition-colors flex items-center justify-center gap-1 cursor-pointer mt-1">
-          <X className="h-3 w-3" /> Limpar filtros
-        </button>
-      )}
     </aside>
   )
 
@@ -346,39 +406,40 @@ function ServicesContent() {
                 />
               </div>
               <button
-                className="lg:hidden flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 bg-white cursor-pointer"
+                className="lg:hidden flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 bg-white cursor-pointer relative"
                 onClick={() => setMobileFiltersOpen(true)}
               >
                 <SlidersHorizontal className="h-4 w-4" />
                 Filtros
-                {hasFilters && (
-                  <span className="bg-primary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                    {categoryUuids.length + (priceMin ? 1 : 0) + (priceMax ? 1 : 0) + (city ? 1 : 0) + (stateUF ? 1 : 0) + (neighborhood ? 1 : 0) + (minRating > 0 ? 1 : 0) + (communityOnly ? 1 : 0) + (acceptsOfferOnly ? 1 : 0)}
+                {(activeFilters || dirty) && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                    {draft.categoryUuids.length + (draft.priceMin ? 1 : 0) + (draft.priceMax ? 1 : 0) + (draft.city ? 1 : 0) + (draft.stateUF ? 1 : 0) + (draft.neighborhood ? 1 : 0) + (draft.minRating > 0 ? 1 : 0) + (draft.communityOnly ? 1 : 0) + (draft.acceptsOfferOnly ? 1 : 0)}
                   </span>
                 )}
               </button>
             </div>
 
-            {/* Active filter chips */}
-            {hasFilters && (
+            {/* Active applied filter chips */}
+            {activeFilters && (
               <div className="flex items-center gap-2 mb-4 flex-wrap">
-                {categoryUuids.map((uuid) => {
+                {applied.categoryUuids.map((uuid) => {
                   const cat = categories.find((c) => c.uuid === uuid)
                   return cat ? (
-                    <button key={uuid} onClick={() => toggleCategory(uuid)}
+                    <button key={uuid}
+                      onClick={() => { setDraft((d) => ({ ...d, categoryUuids: d.categoryUuids.filter((u) => u !== uuid) })); setApplied((a) => ({ ...a, categoryUuids: a.categoryUuids.filter((u) => u !== uuid) })) }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full hover:bg-primary/20 cursor-pointer">
                       {cat.name} <X className="h-3 w-3" />
                     </button>
                   ) : null
                 })}
-                {priceMin && <button onClick={() => setPriceMin('')} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">Mín R${priceMin} <X className="h-3 w-3" /></button>}
-                {priceMax && <button onClick={() => setPriceMax('')} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">Máx R${priceMax} <X className="h-3 w-3" /></button>}
-                {stateUF && <button onClick={() => setStateUF('')} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">{stateUF} <X className="h-3 w-3" /></button>}
-                {city && <button onClick={() => setCity('')} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">{city} <X className="h-3 w-3" /></button>}
-                {neighborhood && <button onClick={() => setNeighborhood('')} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">{neighborhood} <X className="h-3 w-3" /></button>}
-                {minRating > 0 && <button onClick={() => setMinRating(0)} className="inline-flex items-center gap-1 px-2.5 py-1 bg-yellow-50 text-yellow-700 text-xs rounded-full hover:bg-yellow-100 cursor-pointer">{minRating}★+ <X className="h-3 w-3" /></button>}
-                {communityOnly && <button onClick={() => setCommunityOnly(false)} className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs rounded-full hover:bg-green-100 cursor-pointer">Comunitário <X className="h-3 w-3" /></button>}
-                {acceptsOfferOnly && <button onClick={() => setAcceptsOfferOnly(false)} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">Aceita proposta <X className="h-3 w-3" /></button>}
+                {applied.priceMin && <button onClick={() => { setDraft((d) => ({ ...d, priceMin: '' })); setApplied((a) => ({ ...a, priceMin: '' })) }} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">Mín R${applied.priceMin} <X className="h-3 w-3" /></button>}
+                {applied.priceMax && <button onClick={() => { setDraft((d) => ({ ...d, priceMax: '' })); setApplied((a) => ({ ...a, priceMax: '' })) }} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">Máx R${applied.priceMax} <X className="h-3 w-3" /></button>}
+                {applied.stateUF && <button onClick={() => { setDraft((d) => ({ ...d, stateUF: '' })); setApplied((a) => ({ ...a, stateUF: '' })) }} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">{applied.stateUF} <X className="h-3 w-3" /></button>}
+                {applied.city && <button onClick={() => { setDraft((d) => ({ ...d, city: '' })); setApplied((a) => ({ ...a, city: '' })) }} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">{applied.city} <X className="h-3 w-3" /></button>}
+                {applied.neighborhood && <button onClick={() => { setDraft((d) => ({ ...d, neighborhood: '' })); setApplied((a) => ({ ...a, neighborhood: '' })) }} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">{applied.neighborhood} <X className="h-3 w-3" /></button>}
+                {applied.minRating > 0 && <button onClick={() => { setDraft((d) => ({ ...d, minRating: 0 })); setApplied((a) => ({ ...a, minRating: 0 })) }} className="inline-flex items-center gap-1 px-2.5 py-1 bg-yellow-50 text-yellow-700 text-xs rounded-full hover:bg-yellow-100 cursor-pointer">{applied.minRating}★+ <X className="h-3 w-3" /></button>}
+                {applied.communityOnly && <button onClick={() => { setDraft((d) => ({ ...d, communityOnly: false })); setApplied((a) => ({ ...a, communityOnly: false })) }} className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs rounded-full hover:bg-green-100 cursor-pointer">Comunitário <X className="h-3 w-3" /></button>}
+                {applied.acceptsOfferOnly && <button onClick={() => { setDraft((d) => ({ ...d, acceptsOfferOnly: false })); setApplied((a) => ({ ...a, acceptsOfferOnly: false })) }} className="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 cursor-pointer">Aceita proposta <X className="h-3 w-3" /></button>}
                 <button onClick={clearFilters} className="text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer ml-1">Limpar tudo</button>
               </div>
             )}
@@ -390,14 +451,12 @@ function ServicesContent() {
               </p>
             )}
 
-            {/* Error */}
             {isError && (
               <Alert variant="destructive" className="mb-5">
                 Erro ao carregar serviços: {(error as { message?: string })?.message ?? 'Tente novamente.'}
               </Alert>
             )}
 
-            {/* Initial loading skeletons */}
             {isLoading && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {Array.from({ length: 12 }).map((_, i) => (
@@ -414,12 +473,11 @@ function ServicesContent() {
               </div>
             )}
 
-            {/* Empty */}
             {!isLoading && services.length === 0 && (
               <div className="text-center py-24">
                 <p className="text-gray-400 text-base">Nenhum serviço encontrado.</p>
                 <p className="text-gray-400 text-sm mt-1">Tente ajustar os filtros.</p>
-                {hasFilters && (
+                {activeFilters && (
                   <button onClick={clearFilters} className="mt-4 text-sm text-primary hover:underline cursor-pointer">
                     Limpar filtros
                   </button>
@@ -427,7 +485,6 @@ function ServicesContent() {
               </div>
             )}
 
-            {/* Grid */}
             {services.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {services.map((service) => (
@@ -436,17 +493,14 @@ function ServicesContent() {
               </div>
             )}
 
-            {/* Infinite scroll sentinel */}
             <div ref={sentinelRef} className="h-1" />
 
-            {/* Loading more spinner */}
             {isFetchingNextPage && (
               <div className="flex items-center justify-center py-10">
                 <Loader2 className="h-7 w-7 animate-spin text-primary" />
               </div>
             )}
 
-            {/* End of results */}
             {!isLoading && !hasNextPage && services.length > 0 && (
               <p className="text-center text-xs text-gray-400 py-10">
                 Você viu todos os {services.length.toLocaleString('pt-BR')} serviços

@@ -32,6 +32,7 @@ class User extends Authenticatable implements JWTSubject
         'stripe_customer_id',
         'totp_secret',
         'totp_enabled',
+        'google_id',
     ];
 
     protected $hidden = [

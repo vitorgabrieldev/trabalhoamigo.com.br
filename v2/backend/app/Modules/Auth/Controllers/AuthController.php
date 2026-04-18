@@ -10,7 +10,9 @@ use App\Modules\Auth\Services\AuthService;
 use App\Modules\Auth\Resources\AuthResource;
 use App\Modules\Auth\Resources\SessionResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -36,6 +38,30 @@ class AuthController extends Controller
         );
 
         return response()->json($result);
+    }
+
+    public function googleRedirect(): RedirectResponse
+    {
+        return Socialite::driver('google')->stateless()->redirect();
+    }
+
+    public function googleCallback(Request $request): RedirectResponse
+    {
+        $frontendUrl = config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000'));
+
+        try {
+            $socialUser = Socialite::driver('google')->stateless()->user();
+            $result     = $this->authService->loginWithGoogle($socialUser, $request);
+
+            $query = http_build_query([
+                'access_token'  => $result['access_token'],
+                'refresh_token' => $result['refresh_token'],
+            ]);
+
+            return redirect("{$frontendUrl}/auth/google/callback?{$query}");
+        } catch (\Throwable $e) {
+            return redirect("{$frontendUrl}/login?error=" . urlencode($e->getMessage()));
+        }
     }
 
     public function refresh(Request $request): JsonResponse

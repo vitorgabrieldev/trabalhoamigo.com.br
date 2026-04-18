@@ -7,6 +7,7 @@ use App\Models\UserSession;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -63,6 +64,39 @@ class AuthService
         }
 
         return $this->issueTokens($user, $deviceName, $request);
+    }
+
+    public function loginWithGoogle(SocialiteUser $socialUser, $request): array
+    {
+        $user = User::withTrashed()->where('google_id', $socialUser->getId())->first()
+            ?? User::withTrashed()->where('email', $socialUser->getEmail())->first();
+
+        if ($user && $user->deleted_at) {
+            throw new \RuntimeException('Conta desativada.', 403);
+        }
+
+        if ($user) {
+            $user->update([
+                'google_id'          => $socialUser->getId(),
+                'avatar_url'         => $user->avatar_url ?? $socialUser->getAvatar(),
+                'email_verified_at'  => $user->email_verified_at ?? now(),
+            ]);
+        } else {
+            $nameParts = explode(' ', $socialUser->getName(), 2);
+            $user = User::create([
+                'uuid'               => Str::uuid(),
+                'first_name'         => $nameParts[0],
+                'last_name'          => $nameParts[1] ?? '',
+                'email'              => $socialUser->getEmail(),
+                'google_id'          => $socialUser->getId(),
+                'avatar_url'         => $socialUser->getAvatar(),
+                'email_verified_at'  => now(),
+                'role'               => 'contractor',
+                'password'           => Hash::make(Str::random(32)),
+            ]);
+        }
+
+        return $this->issueTokens($user, 'Google OAuth', $request);
     }
 
     public function refresh(string $refreshToken, $request): array

@@ -21,7 +21,7 @@ export default function ContractsPage() {
   const { data: contracts, isLoading, isError } = useQuery({
     queryKey: ['contracts', tab],
     queryFn: () =>
-      contractsApi.list(statusFilter).then((r) => r.data as Contract[]),
+      contractsApi.list(statusFilter).then((r) => r.data.data as Contract[]),
   })
 
   const viewAs = isProvider ? 'provider' : 'contractor'

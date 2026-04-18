@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const GUEST_ONLY = ['/', '/login', '/register']
+
 const PROTECTED_PATHS = [
   '/dashboard',
-  '/services/new',
-  '/services/',
   '/proposals',
   '/contracts',
   '/conversations',
   '/settings',
   '/calendar',
+  '/services/new',
 ]
 
 function isProtected(pathname: string): boolean {
-  // Allow public services listing and detail (not dashboard services)
-  if (pathname === '/services' || pathname.match(/^\/services\/[^/]+$/) && !pathname.includes('/edit')) {
+  if (pathname === '/services' || (pathname.match(/^\/services\/[^/]+$/) && !pathname.includes('/edit'))) {
     return false
   }
   return PROTECTED_PATHS.some((p) => pathname === p || pathname.startsWith(p))
@@ -22,15 +22,18 @@ function isProtected(pathname: string): boolean {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const token = request.cookies.get('access_token')?.value
 
-  if (isProtected(pathname)) {
-    const token = request.cookies.get('access_token')?.value
+  // Logged in users visiting guest-only pages → redirect to dashboard
+  if (token && GUEST_ONLY.includes(pathname)) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
 
-    if (!token) {
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(loginUrl)
-    }
+  // Unauthenticated users visiting protected pages → redirect to login
+  if (!token && isProtected(pathname)) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
   return NextResponse.next()
@@ -38,6 +41,9 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/',
+    '/login',
+    '/register',
     '/dashboard/:path*',
     '/services/new',
     '/services/:uuid/edit',

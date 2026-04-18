@@ -28,7 +28,7 @@ export default function MyServicesPage() {
 
   const { data: services, isLoading, isError } = useQuery({
     queryKey: ['my-services'],
-    queryFn: () => servicesApi.listMy().then((r) => r.data as Service[]),
+    queryFn: () => servicesApi.listMy().then((r) => r.data.data as Service[]),
   })
 
   const { mutate: deleteService, isPending: isDeleting } = useMutation({

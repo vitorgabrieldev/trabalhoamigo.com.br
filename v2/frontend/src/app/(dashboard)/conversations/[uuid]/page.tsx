@@ -28,7 +28,7 @@ export default function ConversationPage({
 
   const { data: messages, isLoading, isError } = useQuery({
     queryKey: ['messages', uuid],
-    queryFn: () => messagingApi.getMessages(uuid).then((r) => r.data as Message[]),
+    queryFn: () => messagingApi.getMessages(uuid).then((r) => r.data.data as Message[]),
     refetchInterval: 5000,
   })
 

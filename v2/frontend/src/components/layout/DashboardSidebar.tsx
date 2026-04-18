@@ -15,6 +15,7 @@ import {
   CreditCard,
   Shield,
   MapPin,
+  Search,
   X,
 } from 'lucide-react'
 
@@ -30,6 +31,11 @@ const navItems: NavItem[] = [
     href: '/dashboard',
     label: 'Dashboard',
     icon: <LayoutDashboard className="h-4 w-4" />,
+  },
+  {
+    href: '/services',
+    label: 'Buscar Serviços',
+    icon: <Search className="h-4 w-4" />,
   },
   {
     href: '/dashboard/services',

@@ -16,13 +16,13 @@ export default function ProposalsPage() {
 
   const { data: sentProposals, isLoading: loadingSent, isError: errSent } = useQuery({
     queryKey: ['proposals-sent'],
-    queryFn: () => proposalsApi.listSent().then((r) => r.data as Proposal[]),
+    queryFn: () => proposalsApi.listSent().then((r) => r.data.data as Proposal[]),
     enabled: !isProvider,
   })
 
   const { data: receivedProposals, isLoading: loadingReceived, isError: errReceived } = useQuery({
     queryKey: ['proposals-received'],
-    queryFn: () => proposalsApi.listReceived().then((r) => r.data as Proposal[]),
+    queryFn: () => proposalsApi.listReceived().then((r) => r.data.data as Proposal[]),
     enabled: isProvider,
   })
 

@@ -66,25 +66,25 @@ export default function DashboardPage() {
 
   const { data: myServices, isLoading: loadingServices } = useQuery({
     queryKey: ['my-services'],
-    queryFn: () => servicesApi.listMy().then((r) => r.data as Service[]),
+    queryFn: () => servicesApi.listMy().then((r) => r.data.data as Service[]),
     enabled: isProvider,
   })
 
   const { data: sentProposals, isLoading: loadingSent } = useQuery({
     queryKey: ['proposals-sent'],
-    queryFn: () => proposalsApi.listSent().then((r) => r.data as Proposal[]),
+    queryFn: () => proposalsApi.listSent().then((r) => r.data.data as Proposal[]),
     enabled: !isProvider,
   })
 
   const { data: receivedProposals, isLoading: loadingReceived } = useQuery({
     queryKey: ['proposals-received'],
-    queryFn: () => proposalsApi.listReceived().then((r) => r.data as Proposal[]),
+    queryFn: () => proposalsApi.listReceived().then((r) => r.data.data as Proposal[]),
     enabled: isProvider,
   })
 
   const { data: contracts, isLoading: loadingContracts } = useQuery({
     queryKey: ['contracts'],
-    queryFn: () => contractsApi.list().then((r) => r.data as Contract[]),
+    queryFn: () => contractsApi.list().then((r) => r.data.data as Contract[]),
   })
 
   const proposals = isProvider ? receivedProposals : sentProposals

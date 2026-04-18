@@ -15,11 +15,11 @@ export default function CalendarPage() {
 
   const { data: calendarData, isError } = useQuery({
     queryKey: ['calendar', year, month],
-    queryFn: () => meApi.getCalendar(year, month).then((r) => r.data as CalendarEvent[]),
+    queryFn: () => meApi.getCalendar(year, month).then((r) => r.data.days as CalendarEvent[]),
   })
 
   // Map CalendarEvent to the format expected by ProviderCalendar
-  const events = (calendarData ?? []).flatMap((ce) => [
+  const events = (Array.isArray(calendarData) ? calendarData : []).flatMap((ce) => [
     ...ce.contracts.map((c) => ({
       date: ce.date,
       type: 'contract' as const,

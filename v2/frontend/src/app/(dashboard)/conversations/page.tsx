@@ -14,7 +14,7 @@ import type { Conversation } from '@/types'
 export default function ConversationsPage() {
   const { data: conversations, isLoading, isError } = useQuery({
     queryKey: ['conversations'],
-    queryFn: () => messagingApi.listConversations().then((r) => r.data as Conversation[]),
+    queryFn: () => messagingApi.listConversations().then((r) => r.data.data as Conversation[]),
   })
 
   return (

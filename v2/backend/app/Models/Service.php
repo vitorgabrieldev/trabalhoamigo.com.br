@@ -57,20 +57,45 @@ class Service extends Model
 
     public function scopeSearch($query, string $term)
     {
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
-            return $query->whereRaw(
-                "search_vector @@ plainto_tsquery('portuguese', ?)",
-                [$term]
-            )->orderByRaw(
-                "ts_rank(search_vector, plainto_tsquery('portuguese', ?)) DESC",
-                [$term]
-            );
+        // Split into meaningful words — drop tokens of 1-2 chars (stop words)
+        $words = array_values(array_filter(
+            preg_split('/\s+/', mb_strtolower(trim($term))),
+            fn ($w) => mb_strlen($w) > 2
+        ));
+
+        if (empty($words)) {
+            return $query;
         }
 
-        // SQLite fallback (development/testing)
-        return $query->where(function ($q) use ($term) {
-            $q->where('title', 'like', "%{$term}%")
-              ->orWhere('description', 'like', "%{$term}%");
+        if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
+            // Build OR tsquery: plainto_tsquery(w1) || plainto_tsquery(w2) ...
+            // plainto_tsquery applies Portuguese stemming to each word.
+            $placeholders = implode(' || ', array_fill(0, count($words), "plainto_tsquery('portuguese', ?)"));
+
+            return $query
+                ->where(function ($q) use ($words, $placeholders) {
+                    // Layer 1 — FTS exact stems (OR across words)
+                    $q->whereRaw("search_vector @@ ({$placeholders})", $words);
+
+                    // Layer 2 — pg_trgm word similarity for typos / partial words
+                    foreach ($words as $word) {
+                        $q->orWhereRaw('word_similarity(?, title) > 0.3', [$word])
+                          ->orWhereRaw('word_similarity(?, description) > 0.2', [$word]);
+                    }
+                })
+                ->orderByRaw(
+                    // Rank: FTS relevance primary, trigram similarity secondary
+                    "ts_rank(search_vector, ({$placeholders})) DESC",
+                    $words
+                );
+        }
+
+        // SQLite fallback — OR LIKE across all words
+        return $query->where(function ($q) use ($words) {
+            foreach ($words as $word) {
+                $q->orWhere('title', 'like', "%{$word}%")
+                  ->orWhere('description', 'like', "%{$word}%");
+            }
         });
     }
 

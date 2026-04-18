@@ -1,12 +1,11 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ProviderCalendar } from '@/components/calendar/ProviderCalendar'
 import { Alert } from '@/components/ui/alert'
 import { meApi } from '@/lib/api'
 import type { CalendarEvent } from '@/types'
-import { useState } from 'react'
 
 export default function CalendarPage() {
   const today = new Date()
@@ -15,11 +14,10 @@ export default function CalendarPage() {
 
   const { data: calendarData, isError } = useQuery({
     queryKey: ['calendar', year, month],
-    queryFn: () => meApi.getCalendar(year, month).then((r) => r.data.days as CalendarEvent[]),
+    queryFn: () => meApi.getCalendar(year, month).then((r) => r.data.days as Record<string, CalendarEvent>),
   })
 
-  // Map CalendarEvent to the format expected by ProviderCalendar
-  const events = (Array.isArray(calendarData) ? calendarData : []).flatMap((ce) => [
+  const events = Object.values(calendarData ?? {}).flatMap((ce) => [
     ...ce.contracts.map((c) => ({
       date: ce.date,
       type: 'contract' as const,
@@ -33,7 +31,7 @@ export default function CalendarPage() {
     })),
   ])
 
-  const handleMonthChange = useCallback((y: number, m: number) => {
+  const handlePeriodChange = useCallback((y: number, m: number) => {
     setYear(y)
     setMonth(m)
   }, [])
@@ -53,7 +51,7 @@ export default function CalendarPage() {
         </Alert>
       )}
 
-      <ProviderCalendar events={events} onMonthChange={handleMonthChange} />
+      <ProviderCalendar events={events} onPeriodChange={handlePeriodChange} />
 
       {/* Legend */}
       <div className="flex items-center gap-4 text-sm">

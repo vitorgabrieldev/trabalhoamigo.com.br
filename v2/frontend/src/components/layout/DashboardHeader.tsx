@@ -58,7 +58,7 @@ export function DashboardHeader({ title }: DashboardHeaderProps) {
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                <button className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user.avatar_url} />
                     <AvatarFallback className="bg-primary/10 text-primary text-xs">

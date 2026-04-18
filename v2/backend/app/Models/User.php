@@ -32,6 +32,7 @@ class User extends Authenticatable implements JWTSubject
         'stripe_customer_id',
         'totp_secret',
         'totp_enabled',
+        'totp_last_timestamp',
         'google_id',
         'needs_onboarding',
     ];
@@ -50,6 +51,7 @@ class User extends Authenticatable implements JWTSubject
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'totp_enabled' => 'boolean',
+            'totp_last_timestamp' => 'integer',
             'stripe_onboarding_completed' => 'boolean',
             'needs_onboarding' => 'boolean',
         ];

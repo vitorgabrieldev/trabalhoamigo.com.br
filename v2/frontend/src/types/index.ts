@@ -13,6 +13,8 @@ export interface User {
   stripe_onboarding_completed?: boolean
   totp_enabled: boolean
   needs_onboarding?: boolean
+  email_verified_at?: string | null
+  google_linked?: boolean
   created_at: string
   address?: Address
   average_rating?: number

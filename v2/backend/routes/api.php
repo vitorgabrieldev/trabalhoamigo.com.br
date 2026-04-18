@@ -17,11 +17,12 @@ Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle']);
 
 // ─── Auth (public) ────────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,5');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,5');
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/google/redirect', [AuthController::class, 'googleRedirect']);
     Route::get('/google/callback', [AuthController::class, 'googleCallback']);
+    Route::post('/google/verify-totp', [AuthController::class, 'verifyGoogleTotp'])->middleware('throttle:10,5');
 });
 
 // ─── Public ───────────────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/', [UserController::class, 'profile']);
         Route::patch('/', [UserController::class, 'updateProfile']);
         Route::delete('/', [UserController::class, 'deleteAccount']);
+        Route::post('/avatar', [UserController::class, 'uploadAvatar']);
         Route::put('/address', [UserController::class, 'updateAddress']);
         Route::post('/stripe/onboarding', [UserController::class, 'stripeOnboarding']);
         Route::get('/stripe/status', [UserController::class, 'stripeStatus']);

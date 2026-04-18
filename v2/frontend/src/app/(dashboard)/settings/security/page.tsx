@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import Image from 'next/image'
+import { QRCodeSVG } from 'qrcode.react'
 import { Shield, ShieldCheck, ShieldOff, KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -44,7 +44,7 @@ export default function SecuritySettingsPage() {
   const { mutate: setupTotp, isPending: settingUp } = useMutation({
     mutationFn: () => authApi.setupTotp(),
     onSuccess: (res) => {
-      setQrCodeUrl(res.data.qr_code_url)
+      setQrCodeUrl(res.data.qr_url)
       setSecret(res.data.secret)
       setError(null)
       setSetupOpen(true)
@@ -172,7 +172,7 @@ export default function SecuritySettingsPage() {
             {qrCodeUrl && (
               <div className="flex justify-center">
                 <div className="border rounded-lg p-3 bg-white">
-                  <Image src={qrCodeUrl} alt="QR Code 2FA" width={180} height={180} />
+                  <QRCodeSVG value={qrCodeUrl} size={180} />
                 </div>
               </div>
             )}

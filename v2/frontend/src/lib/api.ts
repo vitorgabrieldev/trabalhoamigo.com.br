@@ -124,6 +124,9 @@ export const authApi = {
 
   revokeAllSessions: () => api.delete('/auth/sessions'),
 
+  verifyGoogleTotp: (temp_token: string, code: string) =>
+    api.post('/auth/google/verify-totp', { temp_token, code }),
+
   setupTotp: () => api.post('/auth/totp/setup'),
 
   confirmTotp: (code: string) => api.post('/auth/totp/confirm', { code }),
@@ -154,6 +157,12 @@ export const meApi = {
     city: string
     state: string
   }) => api.put('/me/address', data),
+
+  uploadAvatar: (file: File) => {
+    const form = new FormData()
+    form.append('avatar', file)
+    return api.post('/me/avatar', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
 
   deleteAccount: () => api.delete('/me'),
 

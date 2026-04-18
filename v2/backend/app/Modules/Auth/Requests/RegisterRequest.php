@@ -3,6 +3,7 @@
 namespace App\Modules\Auth\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class RegisterRequest extends FormRequest
@@ -17,9 +18,9 @@ class RegisterRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:60'],
             'last_name' => ['required', 'string', 'max:80'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->whereNull('deleted_at')],
             'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'cpf' => ['nullable', 'string', 'size:14', 'unique:users,cpf'],
+            'cpf' => ['nullable', 'string', 'size:14', Rule::unique('users', 'cpf')->whereNull('deleted_at')],
             'phone' => ['nullable', 'string', 'max:20'],
             'whatsapp' => ['nullable', 'string', 'max:20'],
             'role' => ['nullable', 'in:provider,contractor'],

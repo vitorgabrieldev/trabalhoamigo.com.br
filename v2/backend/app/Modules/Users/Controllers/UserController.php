@@ -81,6 +81,21 @@ class UserController extends Controller
         ]);
     }
 
+    public function uploadAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $user = $request->user();
+        $path = $request->file('avatar')->store("avatars/{$user->uuid}", 'public');
+        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+
+        $user->update(['avatar_url' => $url]);
+
+        return response()->json(['avatar_url' => $url]);
+    }
+
     public function deleteAccount(Request $request): JsonResponse
     {
         $request->user()->delete();

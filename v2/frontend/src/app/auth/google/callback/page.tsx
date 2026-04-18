@@ -14,6 +14,14 @@ function GoogleCallbackContent() {
   const { setAuth } = useAuthStore()
 
   useEffect(() => {
+    const totpRequired = searchParams.get('totp_required')
+    const tempToken = searchParams.get('temp_token')
+
+    if (totpRequired === '1' && tempToken) {
+      window.location.href = `/login?totp_google=${encodeURIComponent(tempToken)}`
+      return
+    }
+
     const accessToken = searchParams.get('access_token')
     const refreshToken = searchParams.get('refresh_token')
     const error = searchParams.get('error')
@@ -30,7 +38,7 @@ function GoogleCallbackContent() {
         const user = res.data as User
         setNeedsOnboarding(!!user.needs_onboarding)
         setAuth(user, accessToken, refreshToken)
-        router.replace(user.needs_onboarding ? '/auth/onboarding' : '/dashboard')
+        window.location.href = user.needs_onboarding ? '/auth/onboarding' : '/dashboard'
       })
       .catch(() => {
         router.replace('/login?error=Erro ao carregar perfil.')

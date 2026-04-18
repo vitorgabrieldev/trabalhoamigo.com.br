@@ -56,7 +56,7 @@ export default function RegisterPage() {
       const profileRes = await meApi.getProfile()
       setNeedsOnboarding(true)
       setAuth(profileRes.data as User, access_token, refresh_token)
-      router.push('/auth/onboarding')
+      window.location.href = '/auth/onboarding'
     } catch (err: unknown) {
       const axiosErr = err as {
         response?: { data?: { message?: string; errors?: Record<string, string[]> } }

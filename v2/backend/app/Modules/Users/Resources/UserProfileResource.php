@@ -39,6 +39,7 @@ class UserProfileResource extends JsonResource
                 'state' => $this->address->state,
             ] : null),
 
+            'google_linked' => !is_null($this->google_id),
             'created_at' => $this->created_at->toIso8601String(),
         ];
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -26,6 +26,54 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>
 
+const MAX_ATTEMPTS = 10
+const ATTEMPT_COOLDOWN_MS = 30_000
+const LOCKOUT_MS = 5 * 60_000
+
+function formatCooldown(seconds: number) {
+  if (seconds < 60) return `Aguarde ${seconds}s`
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `Bloqueado por ${m}:${s.toString().padStart(2, '0')}`
+}
+
+function useCooldown() {
+  const [attempts, setAttempts] = useState(0)
+  const [cooldownUntil, setCooldownUntil] = useState(0)
+  const [secondsLeft, setSecondsLeft] = useState(0)
+
+  useEffect(() => {
+    if (cooldownUntil <= Date.now()) {
+      setSecondsLeft(0)
+      return
+    }
+    setSecondsLeft(Math.ceil((cooldownUntil - Date.now()) / 1000))
+    const id = setInterval(() => {
+      const left = Math.ceil((cooldownUntil - Date.now()) / 1000)
+      setSecondsLeft(left > 0 ? left : 0)
+    }, 1000)
+    return () => clearInterval(id)
+  }, [cooldownUntil])
+
+  const recordFailure = () => {
+    const next = attempts + 1
+    if (next >= MAX_ATTEMPTS) {
+      setAttempts(0)
+      setCooldownUntil(Date.now() + LOCKOUT_MS)
+    } else {
+      setAttempts(next)
+      setCooldownUntil(Date.now() + ATTEMPT_COOLDOWN_MS)
+    }
+  }
+
+  const forceLockedOut = () => {
+    setAttempts(0)
+    setCooldownUntil(Date.now() + LOCKOUT_MS)
+  }
+
+  return { secondsLeft, recordFailure, forceLockedOut }
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -33,6 +81,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [requireTotp, setRequireTotp] = useState(false)
   const [error, setError] = useState<string | null>(searchParams.get('error'))
+
+  const googleTotpToken = searchParams.get('totp_google')
+  const [googleTotpCode, setGoogleTotpCode] = useState('')
+  const [googleTotpLoading, setGoogleTotpLoading] = useState(false)
+
+  const loginCooldown = useCooldown()
+  const totpCooldown = useCooldown()
 
   const {
     register,
@@ -50,23 +105,115 @@ export default function LoginPage() {
       setAuth(profileRes.data as User, access_token, refresh_token)
       router.push('/dashboard')
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { status?: number; data?: { message?: string } } }
-      if (
-        axiosErr.response?.status === 422 &&
-        axiosErr.response?.data?.message?.toLowerCase().includes('totp')
-      ) {
+      const axiosErr = err as { response?: { status?: number; data?: { message?: string; requires_totp?: boolean } } }
+      if (axiosErr.response?.data?.requires_totp) {
         setRequireTotp(true)
-        setError('Digite o código de autenticação de dois fatores.')
+        setError('Digite o código do seu aplicativo autenticador.')
         return
       }
+      if (axiosErr.response?.status === 429) {
+        loginCooldown.forceLockedOut()
+        setError('Muitas tentativas. Tente novamente em 5 minutos.')
+        return
+      }
+      loginCooldown.recordFailure()
       setError(axiosErr.response?.data?.message ?? 'E-mail ou senha incorretos.')
     }
+  }
+
+  const handleGoogleTotp = async () => {
+    if (!googleTotpToken || googleTotpCode.length < 6) return
+    setError(null)
+    setGoogleTotpLoading(true)
+    try {
+      const res = await authApi.verifyGoogleTotp(googleTotpToken, googleTotpCode)
+      const { access_token, refresh_token } = res.data
+      setTokens(access_token, refresh_token)
+      const profileRes = await meApi.getProfile()
+      setAuth(profileRes.data as User, access_token, refresh_token)
+      window.location.href = '/dashboard'
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number; data?: { message?: string } } }
+      setGoogleTotpLoading(false)
+      if (axiosErr.response?.status === 429) {
+        totpCooldown.forceLockedOut()
+        setError('Muitas tentativas. Tente novamente em 5 minutos.')
+        return
+      }
+      totpCooldown.recordFailure()
+      setError(axiosErr.response?.data?.message ?? 'Código inválido.')
+    }
+  }
+
+  if (googleTotpToken) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-120">
+          <div className="mb-8">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 text-gray-900 mb-4 hover:text-primary transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-900">Verificação de dois fatores</h1>
+            <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+              Sua conta está protegida com autenticação de dois fatores. Digite o código do seu
+              aplicativo autenticador para continuar.
+            </p>
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="mb-5">
+              {error}
+            </Alert>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="google_totp" className="text-sm font-medium text-gray-700">
+                Código de autenticação (2FA)
+              </Label>
+              <Input
+                id="google_totp"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="000000"
+                value={googleTotpCode}
+                onChange={(e) => setGoogleTotpCode(e.target.value.replace(/\D/g, ''))}
+                className="mt-1 h-11 tracking-widest text-center text-lg border-gray-200"
+                autoFocus
+                disabled={totpCooldown.secondsLeft > 0}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleTotp}
+              disabled={googleTotpLoading || totpCooldown.secondsLeft > 0 || googleTotpCode.length < 6}
+              className="w-full h-11 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {totpCooldown.secondsLeft > 0 ? (
+                formatCooldown(totpCooldown.secondsLeft)
+              ) : googleTotpLoading ? (
+                <>
+                  <Spinner size="sm" />
+                  Verificando...
+                </>
+              ) : (
+                'Confirmar'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-120">
-        {/* Title */}
         <div className="mb-8">
           <Link
             href="/"
@@ -89,29 +236,16 @@ export default function LoginPage() {
           </Alert>
         )}
 
-        {/* Google button */}
         <button
           type="button"
           onClick={() => { window.location.href = `${API_URL}/api/auth/google/redirect` }}
           className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-lg py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors mb-6 cursor-pointer"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
-            <path
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              fill="#4285F4"
-            />
-            <path
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              fill="#34A853"
-            />
-            <path
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              fill="#FBBC05"
-            />
-            <path
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              fill="#EA4335"
-            />
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
           </svg>
           Entrar com o Google
         </button>
@@ -184,6 +318,7 @@ export default function LoginPage() {
                 maxLength={6}
                 placeholder="000000"
                 className="mt-1 h-11 tracking-widest text-center text-lg border-gray-200"
+                disabled={loginCooldown.secondsLeft > 0}
                 {...register('totp_code')}
               />
             </div>
@@ -191,30 +326,15 @@ export default function LoginPage() {
 
           <p className="text-xs text-gray-400 leading-relaxed">
             Este site é protegido por{' '}
-            <a
-              href="https://www.google.com/recaptcha/about/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-gray-600"
-            >
+            <a href="https://www.google.com/recaptcha/about/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">
               reCAPTCHA
             </a>{' '}
             e pela{' '}
-            <a
-              href="https://policies.google.com/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-gray-600"
-            >
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">
               política de privacidade
             </a>{' '}
             do Google e por{' '}
-            <a
-              href="https://policies.google.com/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-gray-600"
-            >
+            <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">
               termos de serviços
             </a>{' '}
             aplicados.
@@ -222,10 +342,12 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || loginCooldown.secondsLeft > 0}
             className="w-full h-11 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
           >
-            {isSubmitting ? (
+            {loginCooldown.secondsLeft > 0 ? (
+              formatCooldown(loginCooldown.secondsLeft)
+            ) : isSubmitting ? (
               <>
                 <Spinner size="sm" />
                 Entrando...

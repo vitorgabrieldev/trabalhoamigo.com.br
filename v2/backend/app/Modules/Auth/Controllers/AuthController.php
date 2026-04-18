@@ -31,13 +31,24 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $result = $this->authService->login(
-            $request->validated(),
-            $request->header('X-Device-Name', 'Unknown'),
-            $request
-        );
+        try {
+            $result = $this->authService->login(
+                $request->validated(),
+                $request->header('X-Device-Name', 'Unknown'),
+                $request
+            );
 
-        return response()->json($result);
+            return response()->json($result);
+        } catch (\RuntimeException $e) {
+            if ($e->getCode() === 422 && str_contains($e->getMessage(), '2FA')) {
+                return response()->json([
+                    'message'       => $e->getMessage(),
+                    'requires_totp' => true,
+                ], 422);
+            }
+
+            return response()->json(['message' => $e->getMessage()], (int) $e->getCode() ?: 400);
+        }
     }
 
     public function completeOnboarding(Request $request): JsonResponse
@@ -62,6 +73,14 @@ class AuthController extends Controller
             $socialUser = Socialite::driver('google')->stateless()->user();
             $result     = $this->authService->loginWithGoogle($socialUser, $request);
 
+            if (isset($result['totp_required'])) {
+                $query = http_build_query([
+                    'totp_required' => '1',
+                    'temp_token'    => $result['temp_token'],
+                ]);
+                return redirect("{$frontendUrl}/auth/google/callback?{$query}");
+            }
+
             $query = http_build_query([
                 'access_token'  => $result['access_token'],
                 'refresh_token' => $result['refresh_token'],
@@ -70,6 +89,25 @@ class AuthController extends Controller
             return redirect("{$frontendUrl}/auth/google/callback?{$query}");
         } catch (\Throwable $e) {
             return redirect("{$frontendUrl}/login?error=" . urlencode($e->getMessage()));
+        }
+    }
+
+    public function verifyGoogleTotp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'temp_token' => 'required|string',
+            'code'       => 'required|string|size:6',
+        ]);
+
+        try {
+            $result = $this->authService->verifyGoogleTotp(
+                $request->temp_token,
+                $request->code,
+                $request
+            );
+            return response()->json($result);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], (int) $e->getCode() ?: 400);
         }
     }
 

@@ -5,6 +5,7 @@ namespace App\Modules\Auth\Services;
 use App\Models\User;
 use App\Models\UserSession;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
@@ -17,6 +18,12 @@ class AuthService
 
     public function register(array $data): array
     {
+        // Remove any soft-deleted record with the same email so the unique DB constraint doesn't block insertion
+        User::withTrashed()
+            ->where('email', $data['email'])
+            ->whereNotNull('deleted_at')
+            ->forceDelete();
+
         $user = User::create([
             'uuid'              => Str::uuid(),
             'first_name'        => $data['first_name'],
@@ -57,11 +64,17 @@ class AuthService
                 throw new \RuntimeException('Código 2FA obrigatório.', 422);
             }
 
-            $valid = $this->google2fa->verifyKey($user->totp_secret, $credentials['totp_code']);
+            $timestamp = $this->google2fa->verifyKeyNewer(
+                $user->totp_secret,
+                $credentials['totp_code'],
+                $user->totp_last_timestamp ?? 0
+            );
 
-            if (! $valid) {
-                throw new \RuntimeException('Código 2FA inválido.', 422);
+            if ($timestamp === false) {
+                throw new \RuntimeException('Código 2FA inválido ou já utilizado.', 422);
             }
+
+            $user->update(['totp_last_timestamp' => $timestamp]);
         }
 
         return $this->issueTokens($user, $deviceName, $request);
@@ -69,12 +82,18 @@ class AuthService
 
     public function loginWithGoogle(SocialiteUser $socialUser, $request): array
     {
-        $user = User::withTrashed()->where('google_id', $socialUser->getId())->first()
-            ?? User::withTrashed()->where('email', $socialUser->getEmail())->first();
+        // Permanently remove any soft-deleted record with the same google_id or email
+        // so the DB unique constraint doesn't block creating a fresh account
+        User::withTrashed()
+            ->whereNotNull('deleted_at')
+            ->where(function ($q) use ($socialUser) {
+                $q->where('google_id', $socialUser->getId())
+                  ->orWhere('email', $socialUser->getEmail());
+            })
+            ->forceDelete();
 
-        if ($user && $user->deleted_at) {
-            $user->restore();
-        }
+        $user = User::where('google_id', $socialUser->getId())->first()
+            ?? User::where('email', $socialUser->getEmail())->first();
 
         if ($user) {
             $user->update([
@@ -97,6 +116,40 @@ class AuthService
                 'password'          => Hash::make(Str::random(32)),
             ]);
         }
+
+        if ($user->totp_enabled) {
+            $tempToken = Str::random(64);
+            Cache::put("totp_pending:{$tempToken}", $user->id, now()->addMinutes(5));
+            return ['totp_required' => true, 'temp_token' => $tempToken];
+        }
+
+        return $this->issueTokens($user, 'Google OAuth', $request);
+    }
+
+    public function verifyGoogleTotp(string $tempToken, string $code, $request): array
+    {
+        $userId = Cache::get("totp_pending:{$tempToken}");
+        if (! $userId) {
+            throw new \RuntimeException('Token inválido ou expirado.', 422);
+        }
+
+        $user = User::find($userId);
+        if (! $user) {
+            throw new \RuntimeException('Usuário não encontrado.', 404);
+        }
+
+        $timestamp = $this->google2fa->verifyKeyNewer(
+            $user->totp_secret,
+            $code,
+            $user->totp_last_timestamp ?? 0
+        );
+
+        if ($timestamp === false) {
+            throw new \RuntimeException('Código 2FA inválido ou já utilizado.', 422);
+        }
+
+        $user->update(['totp_last_timestamp' => $timestamp]);
+        Cache::forget("totp_pending:{$tempToken}");
 
         return $this->issueTokens($user, 'Google OAuth', $request);
     }
@@ -165,24 +218,32 @@ class AuthService
 
     public function confirmTotp(User $user, string $code): void
     {
-        $valid = $this->google2fa->verifyKey($user->totp_secret, $code);
+        $timestamp = $this->google2fa->verifyKeyNewer(
+            $user->totp_secret,
+            $code,
+            $user->totp_last_timestamp ?? 0
+        );
 
-        if (! $valid) {
+        if ($timestamp === false) {
             throw new \RuntimeException('Código inválido para ativar 2FA.', 422);
         }
 
-        $user->update(['totp_enabled' => true]);
+        $user->update(['totp_enabled' => true, 'totp_last_timestamp' => $timestamp]);
     }
 
     public function disableTotp(User $user, string $code): void
     {
-        $valid = $this->google2fa->verifyKey($user->totp_secret, $code);
+        $timestamp = $this->google2fa->verifyKeyNewer(
+            $user->totp_secret,
+            $code,
+            $user->totp_last_timestamp ?? 0
+        );
 
-        if (! $valid) {
+        if ($timestamp === false) {
             throw new \RuntimeException('Código inválido.', 422);
         }
 
-        $user->update(['totp_enabled' => false, 'totp_secret' => null]);
+        $user->update(['totp_enabled' => false, 'totp_secret' => null, 'totp_last_timestamp' => null]);
     }
 
     private function issueTokens(User $user, string $deviceName, $request): array

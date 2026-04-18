@@ -9,9 +9,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert } from '@/components/ui/alert'
 import { messagingApi } from '@/lib/api'
 import { formatDateTime, getInitials } from '@/lib/utils'
+import { useAuthStore } from '@/store/auth'
 import type { Conversation } from '@/types'
 
 export default function ConversationsPage() {
+  const { user } = useAuthStore()
+  const isProvider = user?.role === 'provider'
+
   const { data: conversations, isLoading, isError } = useQuery({
     queryKey: ['conversations'],
     queryFn: () => messagingApi.listConversations().then((r) => r.data.data as Conversation[]),
@@ -22,7 +26,7 @@ export default function ConversationsPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Mensagens</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Suas conversas com contratantes e prestadores
+          {isProvider ? 'Suas conversas com contratantes' : 'Suas conversas com prestadores'}
         </p>
       </div>
 

@@ -52,7 +52,8 @@ export default function LandingPage() {
   })
 
   const latest = (latestData?.data ?? []).slice(0, 6)
-  const byPrice = (priceData?.data ?? []).slice(0, 6)
+  const popular = [...(latestData?.data ?? [])].reverse()
+  const byPrice = priceData?.data ?? []
 
   /* ── Search ────────────────────────────────────────────────────────── */
   const handleSearch = (e: React.FormEvent) => {
@@ -152,7 +153,7 @@ export default function LandingPage() {
         <ServiceCarousel
           title="Populares"
           viewAllHref="/services?sort=popular"
-          services={[...latest].reverse()}
+          services={popular}
           isLoading={loadingLatest}
         />
 

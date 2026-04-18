@@ -9,6 +9,7 @@ import {
   TrendingUp,
   ArrowRight,
   Clock,
+  CalendarClock,
   Plus,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -93,6 +94,11 @@ export default function DashboardPage() {
   const pendingProposals = proposals?.filter((p) => p.status === 'pending') ?? []
   const activeContracts = contracts?.filter((c) => c.status === 'active') ?? []
   const recentContracts = contracts?.slice(0, 5) ?? []
+  const now = new Date()
+  const upcomingAppointments = (contracts ?? [])
+    .filter((c) => c.scheduled_at && new Date(c.scheduled_at) > now && c.status === 'active')
+    .sort((a, b) => new Date(a.scheduled_at!).getTime() - new Date(b.scheduled_at!).getTime())
+    .slice(0, 5)
 
   return (
     <div className="space-y-6">
@@ -235,6 +241,61 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Upcoming appointments */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-3">
+          <div className="flex items-center gap-2">
+            <CalendarClock className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base">Próximos agendamentos</CardTitle>
+          </div>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/calendar" className="text-xs">Ver calendário</Link>
+          </Button>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {loadingContracts ? (
+            <div className="space-y-3">
+              {[1, 2].map((i) => <Skeleton key={i} className="h-14 w-full" />)}
+            </div>
+          ) : upcomingAppointments.length > 0 ? (
+            <div className="space-y-2">
+              {upcomingAppointments.map((c) => {
+                const date = new Date(c.scheduled_at!)
+                const isToday = date.toDateString() === now.toDateString()
+                const isTomorrow = date.toDateString() === new Date(now.getTime() + 86400000).toDateString()
+                const dayLabel = isToday ? 'Hoje' : isTomorrow ? 'Amanhã' : date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })
+                const timeLabel = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                const otherUser = isProvider ? c.contractor : c.provider
+                return (
+                  <Link
+                    key={c.uuid}
+                    href={`/contracts/${c.uuid}`}
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-gray-100"
+                  >
+                    <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg shrink-0 ${isToday ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className="text-[10px] font-semibold uppercase leading-none">{dayLabel.split(' ')[0]}</span>
+                      <span className="text-lg font-bold leading-tight">{isToday || isTomorrow ? timeLabel.split(':')[0] : date.getDate()}</span>
+                      {!isToday && !isTomorrow && <span className="text-[9px] leading-none">{date.toLocaleDateString('pt-BR', { month: 'short' })}</span>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{c.proposal?.service?.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {isToday || isTomorrow ? `${dayLabel} às ${timeLabel}` : timeLabel} · {otherUser?.first_name} {otherUser?.last_name}
+                      </p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-gray-300 shrink-0" />
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-sm text-muted-foreground">
+              Não há nada aqui :\
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {isProvider && (
         <Link

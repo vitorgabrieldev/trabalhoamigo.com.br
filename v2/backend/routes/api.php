@@ -27,6 +27,9 @@ Route::prefix('auth')->group(function () {
 // ─── Public ───────────────────────────────────────────────────────────────────
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/services', [ServiceController::class, 'index']);
+// Specific routes BEFORE the {service} wildcard to avoid routing conflicts
+Route::middleware('auth:api')->get('/services/my', [ServiceController::class, 'myServices']);
+Route::middleware('auth:api')->get('/services/community/availability', [ServiceController::class, 'communityAvailability']);
 Route::get('/services/{service}', [ServiceController::class, 'show']);
 Route::get('/services/{serviceUuid}/reviews', [ReviewController::class, 'forService']);
 Route::get('/users/{uuid}', [UserController::class, 'show']);
@@ -61,8 +64,6 @@ Route::middleware('auth:api')->group(function () {
 
     // Services (provider actions)
     Route::prefix('services')->group(function () {
-        Route::get('/my', [ServiceController::class, 'myServices']);
-        Route::get('/community/availability', [ServiceController::class, 'communityAvailability']);
         Route::post('/', [ServiceController::class, 'store']);
         Route::patch('/{service}', [ServiceController::class, 'update']);
         Route::delete('/{service}', [ServiceController::class, 'destroy']);

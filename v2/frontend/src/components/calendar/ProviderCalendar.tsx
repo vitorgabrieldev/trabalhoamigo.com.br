@@ -177,9 +177,11 @@ export function ProviderCalendar({ events = [], onPeriodChange }: ProviderCalend
               {dayEvents.map((event, eIdx) => (
                 <div
                   key={eIdx}
+                  onClick={() => handleEventClick(event)}
                   className={cn(
                     'text-xs px-1.5 py-1 rounded truncate',
-                    event.type === 'contract' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700',
+                    event.type === 'contract' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
+                    event.contract_uuid && 'cursor-pointer',
                   )}
                 >
                   {event.title}

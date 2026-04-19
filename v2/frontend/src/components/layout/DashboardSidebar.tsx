@@ -37,6 +37,7 @@ const navItems: NavItem[] = [
     href: '/services',
     label: 'Buscar Serviços',
     icon: <Search className="h-4 w-4" />,
+    roles: ['contractor'],
   },
   {
     href: '/dashboard/services',

@@ -95,6 +95,7 @@ export interface ProposalSlot {
   time_type: TimeType
   start_time?: string
   end_time?: string
+  is_selected?: boolean
 }
 
 export interface Proposal {
@@ -120,22 +121,60 @@ export type ContractStatus =
   | 'contractor_confirmed'
   | 'auto_completed'
   | 'disputed'
+  | 'payment_held'
   | 'cancelled'
+
+export interface ContractProposal {
+  uuid: string
+  description?: string
+  offered_price: number
+  schedule_type: ScheduleType
+  provider_terms_accepted_at?: string
+  slots: ProposalSlot[]
+}
+
+export interface ContractPayment {
+  uuid: string
+  amount: number
+  status: string
+  paid_at?: string
+}
+
+export interface ContractParty {
+  uuid: string
+  first_name: string
+  last_name: string
+  name: string
+  avatar_url?: string
+  email?: string
+}
+
+export interface ContractDispute {
+  uuid: string
+  status: string
+  reason?: string
+}
 
 export interface Contract {
   uuid: string
   status: ContractStatus
-  price: number
+  price: { amount: number; currency: string }
+  agreed_price?: number
+  provider_amount?: number
   scheduled_at?: string
   auto_release_at?: string
   provider_completed_at?: string
   contractor_confirmed_at?: string
-  dispute_reason?: string
-  proposal: Proposal
-  provider: User
-  contractor: User
+  transferred_at?: string
+  can_review?: boolean
+  can_dispute?: boolean
+  proposal?: ContractProposal
+  service?: { uuid: string; title: string; category?: { uuid: string; name: string } }
+  payment?: ContractPayment
+  dispute?: ContractDispute
+  provider: ContractParty
+  contractor: ContractParty
   created_at: string
-  updated_at: string
 }
 
 export interface Review {

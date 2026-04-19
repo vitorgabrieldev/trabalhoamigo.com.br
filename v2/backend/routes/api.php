@@ -81,6 +81,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{proposal}/accept', [ProposalController::class, 'accept']);
         Route::post('/{proposal}/reject', [ProposalController::class, 'reject']);
         Route::post('/{proposal}/cancel', [ProposalController::class, 'cancel']);
+        Route::get('/{proposal}/checkout', [ProposalController::class, 'checkout']);
+        Route::post('/{proposal}/pay', [ProposalController::class, 'pay']);
         Route::post('/{proposal}/confirm-schedule', [ProposalController::class, 'confirmSchedule']);
     });
 

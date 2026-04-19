@@ -47,7 +47,7 @@ class ContractService
      * Provider marks work as done.
      * Starts the 3-day countdown for contractor confirmation.
      */
-    public function markProviderCompleted(Contract $contract, User $provider): void
+    public function markProviderCompleted(Contract $contract, User $provider, string $note): void
     {
         if ($contract->provider_id !== $provider->id) {
             throw new \RuntimeException('Não autorizado.', 403);
@@ -60,6 +60,7 @@ class ContractService
         $contract->update([
             'status' => 'provider_completed',
             'provider_completed_at' => now(),
+            'provider_completion_note' => $note,
             'auto_release_at' => now()->addDays(3),
         ]);
     }
@@ -68,7 +69,7 @@ class ContractService
      * Contractor confirms work is done.
      * Marks payout as eligible for provider bank transfer by the platform.
      */
-    public function markContractorConfirmed(Contract $contract, User $contractor): void
+    public function markContractorConfirmed(Contract $contract, User $contractor, string $note): void
     {
         if ($contract->contractor_id !== $contractor->id) {
             throw new \RuntimeException('Não autorizado.', 403);
@@ -78,10 +79,11 @@ class ContractService
             throw new \RuntimeException('Aguardando o prestador marcar como concluído primeiro.', 422);
         }
 
-        DB::transaction(function () use ($contract) {
+        DB::transaction(function () use ($contract, $note) {
             $contract->update([
                 'status' => 'contractor_confirmed',
                 'contractor_confirmed_at' => now(),
+                'contractor_completion_note' => $note,
             ]);
 
             $contract->payment->update([
@@ -123,9 +125,9 @@ class ContractService
      * Contractor opens a dispute after acceptance.
      * Requires manual admin review.
      */
-    public function openDispute(Contract $contract, User $contractor, string $reason): Dispute
+    public function openDispute(Contract $contract, User $user, string $reason): Dispute
     {
-        if ($contract->contractor_id !== $contractor->id) {
+        if (! in_array($user->id, [$contract->contractor_id, $contract->provider_id])) {
             throw new \RuntimeException('Não autorizado.', 403);
         }
 
@@ -137,13 +139,13 @@ class ContractService
             throw new \RuntimeException('Já existe uma disputa aberta para este contrato.', 422);
         }
 
-        DB::transaction(function () use ($contract, $reason) {
+        DB::transaction(function () use ($contract, $user, $reason) {
             $contract->update(['status' => 'disputed']);
 
             Dispute::create([
                 'uuid' => Str::uuid(),
                 'contract_id' => $contract->id,
-                'raised_by_id' => $contract->contractor_id,
+                'raised_by_id' => $user->id,
                 'reason' => $reason,
                 'status' => 'pending',
             ]);

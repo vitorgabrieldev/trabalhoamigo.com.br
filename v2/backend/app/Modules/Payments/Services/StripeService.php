@@ -53,41 +53,63 @@ class StripeService
     }
 
     /**
-     * Create PaymentIntent with manual capture (holds funds).
-     * Called when contractor submits a proposal.
+     * Create a Stripe Checkout Session (hosted page).
+     * Contractor is redirected to Stripe, pays, then returns to successUrl.
+     * Uses manual capture so funds are held until service completion.
      */
-    public function createPaymentIntent(Proposal $proposal, User $contractor): string
-    {
-        $amountCents = (int) round($proposal->offered_price * 100);
-
-        // Ensure contractor has a Stripe customer
-        if (! $contractor->stripe_customer_id) {
-            $customer = $this->stripe->customers->create([
-                'email' => $contractor->email,
-                'name' => $contractor->full_name,
-                'metadata' => ['user_uuid' => $contractor->uuid],
-            ]);
-            $contractor->update(['stripe_customer_id' => $customer->id]);
-        }
-
-        $intent = $this->stripe->paymentIntents->create([
-            'amount' => $amountCents,
-            'currency' => 'brl',
-            'customer' => $contractor->stripe_customer_id,
+    public function createCheckoutSession(
+        Proposal $proposal,
+        User $contractor,
+        string $successUrl,
+        string $cancelUrl,
+    ): string {
+        $session = $this->stripe->checkout->sessions->create([
             'payment_method_types' => ['card'],
-            'capture_method' => 'manual', // Hold funds, capture on acceptance
-            'metadata' => [
-                'proposal_uuid' => $proposal->uuid,
-                'contractor_uuid' => $contractor->uuid,
-                'provider_uuid' => $proposal->provider->uuid,
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'brl',
+                    'product_data' => [
+                        'name' => $proposal->service->title,
+                        'description' => 'Proposta #' . $proposal->uuid,
+                    ],
+                    'unit_amount' => (int) round($proposal->offered_price * 100),
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'customer_email' => $contractor->email,
+            'payment_intent_data' => [
+                'capture_method' => 'manual',
+                'metadata' => [
+                    'proposal_uuid' => $proposal->uuid,
+                    'contractor_uuid' => $contractor->uuid,
+                    'provider_uuid' => $proposal->provider->uuid,
+                ],
             ],
+            'metadata' => ['proposal_uuid' => $proposal->uuid],
+            'success_url' => $successUrl . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => $cancelUrl,
         ]);
 
-        return $intent->id;
+        return $session->url;
     }
 
     /**
-     * Capture the held PaymentIntent when provider accepts proposal.
+     * Retrieve the PaymentIntent ID from a completed Checkout Session.
+     */
+    public function getPaymentIntentFromSession(string $sessionId): string
+    {
+        $session = $this->stripe->checkout->sessions->retrieve($sessionId, [
+            'expand' => ['payment_intent'],
+        ]);
+
+        return is_string($session->payment_intent)
+            ? $session->payment_intent
+            : $session->payment_intent->id;
+    }
+
+    /**
+     * Capture the held PaymentIntent after contractor confirms payment.
      */
     public function capturePaymentIntent(string $paymentIntentId): void
     {

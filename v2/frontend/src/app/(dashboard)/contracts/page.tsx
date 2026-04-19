@@ -42,10 +42,8 @@ export default function ContractsPage() {
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="all">Todos</TabsTrigger>
-          <TabsTrigger value="active">Ativos</TabsTrigger>
-          <TabsTrigger value="provider_completed">Aguardando confirmação</TabsTrigger>
+          <TabsTrigger value="active">Em andamento</TabsTrigger>
           <TabsTrigger value="contractor_confirmed">Concluídos</TabsTrigger>
-          <TabsTrigger value="disputed">Em disputa</TabsTrigger>
         </TabsList>
 
         <TabsContent value={tab} className="mt-4">

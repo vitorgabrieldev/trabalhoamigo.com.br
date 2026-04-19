@@ -23,10 +23,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert } from '@/components/ui/alert'
 import { Lightbox } from '@/components/ui/lightbox'
 import { ServiceCarousel } from '@/components/services/ServiceCarousel'
-import { servicesApi } from '@/lib/api'
+import { servicesApi, proposalsApi } from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
 import { formatBRL, formatDate, getInitials } from '@/lib/utils'
-import type { Service, PaginatedResponse, Review } from '@/types'
+import type { Service, PaginatedResponse, Proposal, Review } from '@/types'
 
 export default function ServiceDetailPage({
   params,
@@ -78,6 +78,12 @@ export default function ServiceDetailPage({
     enabled: !!service,
   })
 
+  const { data: sentProposals } = useQuery({
+    queryKey: ['proposals-sent'],
+    queryFn: () => proposalsApi.listSent().then((r) => r.data.data as Proposal[]),
+    enabled: user?.role === 'contractor',
+  })
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -109,7 +115,13 @@ export default function ServiceDetailPage({
 
   const isOwner = user?.uuid === service.provider.uuid
   const isContractor = user?.role === 'contractor'
-  const canPropose = user && isContractor
+  const hasActiveProposal = sentProposals?.some(
+    (p) =>
+      p.service?.uuid === uuid &&
+      ['pending', 'accepted'].includes(p.status) &&
+      p.payment_status !== 'captured',
+  ) ?? false
+  const canPropose = user && isContractor && !hasActiveProposal
   const images = service.images?.length
     ? service.images
     : service.image_url
@@ -381,6 +393,16 @@ export default function ServiceDetailPage({
                   <Button className="w-full" asChild>
                     <Link href={`/proposals/new/${uuid}`}>Fazer proposta</Link>
                   </Button>
+                )}
+                {isContractor && hasActiveProposal && (
+                  <div className="text-center space-y-2">
+                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      Você já tem uma proposta ativa para este serviço.
+                    </p>
+                    <Button variant="outline" className="w-full" size="sm" asChild>
+                      <Link href="/proposals">Ver minhas propostas</Link>
+                    </Button>
+                  </div>
                 )}
                 {!user && (
                   <Button className="w-full" asChild>

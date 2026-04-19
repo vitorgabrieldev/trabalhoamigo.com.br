@@ -35,7 +35,7 @@ class ContractController extends Controller
     public function show(Request $request, Contract $contract): JsonResponse
     {
         $this->authorizeAccess($request->user(), $contract);
-        $contract->load(['service.category', 'contractor', 'provider', 'review', 'dispute', 'calendarBlock']);
+        $contract->load(['service.category', 'contractor', 'provider', 'review', 'dispute', 'payment', 'calendarBlock', 'proposal.scheduleSlots']);
 
         return response()->json(new ContractResource($contract));
     }
@@ -43,7 +43,11 @@ class ContractController extends Controller
     // Provider marks work as done
     public function markProviderCompleted(Request $request, Contract $contract): JsonResponse
     {
-        $this->contractService->markProviderCompleted($contract, $request->user());
+        $data = $request->validate([
+            'completion_note' => ['required', 'string', 'min:10', 'max:1000'],
+        ]);
+
+        $this->contractService->markProviderCompleted($contract, $request->user(), $data['completion_note']);
 
         return response()->json([
             'message' => 'Serviço marcado como concluído. O contratante tem 3 dias para confirmar.',
@@ -54,7 +58,11 @@ class ContractController extends Controller
     // Contractor confirms work done
     public function markContractorConfirmed(Request $request, Contract $contract): JsonResponse
     {
-        $this->contractService->markContractorConfirmed($contract, $request->user());
+        $data = $request->validate([
+            'completion_note' => ['required', 'string', 'min:10', 'max:1000'],
+        ]);
+
+        $this->contractService->markContractorConfirmed($contract, $request->user(), $data['completion_note']);
 
         return response()->json(['message' => 'Serviço confirmado. O pagamento foi retido na plataforma e entrou na fila de repasse bancário ao prestador.']);
     }

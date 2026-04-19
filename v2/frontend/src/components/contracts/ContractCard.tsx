@@ -43,7 +43,7 @@ export function ContractCard({ contract, viewAs }: ContractCardProps) {
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
               <div className="flex items-center gap-1">
                 <DollarSign className="h-3.5 w-3.5" />
-                <span className="font-medium text-gray-900">{formatBRL(contract.price)}</span>
+                <span className="font-medium text-gray-900">{formatBRL(contract.price?.amount)}</span>
               </div>
               {contract.scheduled_at && (
                 <div className="flex items-center gap-1">
@@ -55,7 +55,7 @@ export function ContractCard({ contract, viewAs }: ContractCardProps) {
           </div>
 
           {/* Status */}
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium flex-shrink-0 ${statusColor(contract.status)}`}>
+          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0 ${statusColor(contract.status)}`}>
             {statusLabel(contract.status)}
           </span>
         </div>

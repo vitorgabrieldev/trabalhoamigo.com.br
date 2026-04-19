@@ -14,17 +14,20 @@ export default function ProposalsPage() {
   const { user } = useAuthStore()
   const isProvider = user?.role === 'provider'
 
-  const { data: sentProposals, isLoading: loadingSent, isError: errSent } = useQuery({
+  const { data: rawSentProposals, isLoading: loadingSent, isError: errSent } = useQuery({
     queryKey: ['proposals-sent'],
     queryFn: () => proposalsApi.listSent().then((r) => r.data.data as Proposal[]),
     enabled: !isProvider,
   })
 
-  const { data: receivedProposals, isLoading: loadingReceived, isError: errReceived } = useQuery({
+  const { data: rawReceivedProposals, isLoading: loadingReceived, isError: errReceived } = useQuery({
     queryKey: ['proposals-received'],
     queryFn: () => proposalsApi.listReceived().then((r) => r.data.data as Proposal[]),
     enabled: isProvider,
   })
+
+  const sentProposals = rawSentProposals?.filter((p) => p.payment_status !== 'captured')
+  const receivedProposals = rawReceivedProposals?.filter((p) => p.payment_status !== 'captured')
 
   if (isProvider) {
     return (

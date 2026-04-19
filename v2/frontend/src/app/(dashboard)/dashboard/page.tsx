@@ -10,6 +10,7 @@ import {
   ArrowRight,
   Clock,
   CalendarClock,
+  CreditCard,
   Plus,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -89,7 +90,8 @@ export default function DashboardPage() {
     queryFn: () => contractsApi.list().then((r) => r.data.data as Contract[]),
   })
 
-  const proposals = isProvider ? receivedProposals : sentProposals
+  const rawProposals = isProvider ? receivedProposals : sentProposals
+  const proposals = rawProposals?.filter((p) => p.payment_status !== 'captured') ?? undefined
   const loadingProposals = isProvider ? loadingReceived : loadingSent
   const pendingProposals = proposals?.filter((p) => p.status === 'pending') ?? []
   const activeContracts = contracts?.filter((c) => c.status === 'active') ?? []
@@ -164,27 +166,37 @@ export default function DashboardPage() {
               </div>
             ) : proposals && proposals.length > 0 ? (
               <div className="space-y-2">
-                {proposals.slice(0, 5).map((p) => (
-                  <Link
-                    key={p.uuid}
-                    href={`/proposals/${p.uuid}`}
-                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{p.service?.title}</p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                        <Clock className="h-3 w-3" />
-                        {formatDate(p.created_at)}
-                      </p>
-                    </div>
-                    <Badge
-                      className={`ml-2 text-xs ${statusColor(p.status)}`}
-                      variant="outline"
+                {proposals.slice(0, 5).map((p) => {
+                  const needsPayment = !isProvider && p.status === 'accepted' && p.payment_status === 'pending_payment'
+                  return (
+                    <Link
+                      key={p.uuid}
+                      href={`/proposals/${p.uuid}`}
+                      className={`flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors ${needsPayment ? 'border border-amber-200 bg-amber-50 hover:bg-amber-100 rounded-lg' : ''}`}
                     >
-                      {statusLabel(p.status)}
-                    </Badge>
-                  </Link>
-                ))}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{p.service?.title}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <Clock className="h-3 w-3" />
+                          {formatDate(p.created_at)}
+                        </p>
+                      </div>
+                      {needsPayment ? (
+                        <span className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-100 border border-amber-300 rounded-full px-2.5 py-0.5 shrink-0">
+                          <CreditCard className="h-3 w-3" />
+                          Pagar
+                        </span>
+                      ) : (
+                        <Badge
+                          className={`ml-2 text-xs ${statusColor(p.status)}`}
+                          variant="outline"
+                        >
+                          {statusLabel(p.status)}
+                        </Badge>
+                      )}
+                    </Link>
+                  )
+                })}
               </div>
             ) : (
               <div className="text-center py-8 text-sm text-muted-foreground">
@@ -220,7 +232,7 @@ export default function DashboardPage() {
                         {c.proposal?.service?.title}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {formatBRL(c.price)}
+                        {formatBRL(c.price?.amount)}
                         {c.scheduled_at && ` · ${formatDate(c.scheduled_at)}`}
                       </p>
                     </div>

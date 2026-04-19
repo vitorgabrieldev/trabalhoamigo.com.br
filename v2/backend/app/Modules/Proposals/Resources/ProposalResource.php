@@ -23,6 +23,8 @@ class ProposalResource extends JsonResource
 
             // Price — provider only sees what they'll receive
             'price' => $this->priceForUser($user),
+            'offered_price' => (float) $this->offered_price,
+            'provider_amount' => (float) $this->provider_amount,
 
             'slots' => $this->whenLoaded('scheduleSlots', fn () =>
                 $this->scheduleSlots->map(fn ($s) => [

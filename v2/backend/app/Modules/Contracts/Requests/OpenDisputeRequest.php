@@ -8,7 +8,7 @@ class OpenDisputeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->isContractor();
+        return in_array($this->user()->role, ['contractor', 'provider']);
     }
 
     public function rules(): array

@@ -338,13 +338,19 @@ export const proposalsApi = {
   ) => api.post(`/proposals/services/${serviceUuid}`, data),
 
   accept: (uuid: string, slot_uuid?: string) =>
-    api.post(`/proposals/${uuid}/accept`, slot_uuid ? { slot_uuid } : {}),
+    api.post(`/proposals/${uuid}/accept`, { terms_accepted: true, ...(slot_uuid ? { slot_uuid } : {}) }),
 
   reject: (uuid: string) => api.post(`/proposals/${uuid}/reject`),
 
   cancel: (uuid: string) => api.post(`/proposals/${uuid}/cancel`),
 
   confirmSchedule: (uuid: string) => api.post(`/proposals/${uuid}/confirm-schedule`),
+
+  getCheckout: (uuid: string) =>
+    api.get<{ url: string }>(`/proposals/${uuid}/checkout`),
+
+  pay: (uuid: string, session_id: string) =>
+    api.post(`/proposals/${uuid}/pay`, { session_id }),
 }
 
 // ─── Contracts ───────────────────────────────────────────────────────────────
@@ -354,9 +360,11 @@ export const contractsApi = {
 
   get: (uuid: string) => api.get(`/contracts/${uuid}`),
 
-  providerComplete: (uuid: string) => api.post(`/contracts/${uuid}/provider-complete`),
+  providerComplete: (uuid: string, completionNote: string) =>
+    api.post(`/contracts/${uuid}/provider-complete`, { completion_note: completionNote }),
 
-  contractorConfirm: (uuid: string) => api.post(`/contracts/${uuid}/contractor-confirm`),
+  contractorConfirm: (uuid: string, completionNote: string) =>
+    api.post(`/contracts/${uuid}/contractor-confirm`, { completion_note: completionNote }),
 
   dispute: (uuid: string, reason: string) =>
     api.post(`/contracts/${uuid}/dispute`, { reason }),

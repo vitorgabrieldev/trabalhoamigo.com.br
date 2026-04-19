@@ -84,26 +84,6 @@ class ProposalService
                 }
             }
 
-            // Create Stripe PaymentIntent (manual capture — holds funds)
-            $paymentIntentId = $this->stripeService->createPaymentIntent($proposal, $contractor);
-            $proposal->update(['stripe_payment_intent_id' => $paymentIntentId]);
-
-            // Create payment record
-            Payment::create([
-                'uuid' => Str::uuid(),
-                'proposal_id' => $proposal->id,
-                'contractor_id' => $contractor->id,
-                'provider_id' => $provider->id,
-                'stripe_payment_intent_id' => $paymentIntentId,
-                'amount_cents' => $this->feeCalculator->toCents($data['offered_price']),
-                'platform_fee_cents' => $this->feeCalculator->toCents($fee['fee_amount']),
-                'provider_amount_cents' => $this->feeCalculator->toCents($fee['provider_amount']),
-                'fee_rate' => $fee['fee_rate'],
-                'currency' => 'brl',
-                'status' => 'pending',
-                'is_community' => $service->is_community,
-            ]);
-
             // Open conversation thread
             Conversation::create([
                 'uuid' => Str::uuid(),
@@ -118,7 +98,7 @@ class ProposalService
 
     /**
      * Provider accepts a proposal.
-     * Captures the PaymentIntent and creates the Contract.
+     * Creates the PaymentIntent and waits for contractor to pay.
      */
     public function accept(Proposal $proposal, string $selectedSlotUuid): Proposal
     {
@@ -127,38 +107,100 @@ class ProposalService
         }
 
         $provider = $proposal->provider;
-
-        // Validate selected slot (or to_be_arranged)
+        $contractor = $proposal->contractor;
         $scheduledAt = $this->resolveScheduleForAcceptance($proposal, $selectedSlotUuid);
 
-        // Check calendar conflict
         if ($scheduledAt) {
-            $end = $scheduledAt->copy()->addHours(2); // Default duration
+            $end = $scheduledAt->copy()->addHours(2);
             if ($this->scheduleService->hasConflict($provider, $scheduledAt, $end)) {
                 throw new \RuntimeException('Conflito de agenda neste horário.', 422);
             }
         }
 
         return DB::transaction(function () use ($proposal, $scheduledAt, $selectedSlotUuid) {
-            // Mark selected slot
             if ($selectedSlotUuid) {
                 $proposal->scheduleSlots()->where('uuid', $selectedSlotUuid)
                     ->update(['is_selected' => true]);
             }
 
-            // Capture payment
-            $this->stripeService->capturePaymentIntent($proposal->stripe_payment_intent_id);
-            $proposal->payment->update(['status' => 'captured', 'captured_at' => now()]);
-
             $proposal->update([
                 'status' => 'accepted',
+                'payment_status' => 'pending_payment',
+                'accepted_scheduled_at' => $scheduledAt,
+                'provider_terms_accepted_at' => now(),
+            ]);
+
+            return $proposal->fresh(['scheduleSlots']);
+        });
+    }
+
+    /**
+     * Generate Stripe Checkout Session URL — contractor is redirected to Stripe to pay.
+     */
+    public function getCheckoutUrl(Proposal $proposal, User $contractor, string $baseUrl): string
+    {
+        if ($proposal->contractor_id !== $contractor->id) {
+            throw new \RuntimeException('Não autorizado.', 403);
+        }
+
+        if ($proposal->status !== 'accepted' || $proposal->payment_status !== 'pending_payment') {
+            throw new \RuntimeException('Esta proposta não está aguardando pagamento.', 422);
+        }
+
+        $successUrl = $baseUrl . '/proposals/' . $proposal->uuid . '/payment-success';
+        $cancelUrl  = $baseUrl . '/proposals/' . $proposal->uuid;
+
+        $checkoutUrl = $this->stripeService->createCheckoutSession($proposal, $contractor, $successUrl, $cancelUrl);
+
+        return $checkoutUrl;
+    }
+
+    /**
+     * Contractor returns from Stripe — capture PaymentIntent and create Contract.
+     */
+    public function completePayment(Proposal $proposal, User $contractor, string $sessionId): Proposal
+    {
+        if ($proposal->contractor_id !== $contractor->id) {
+            throw new \RuntimeException('Não autorizado.', 403);
+        }
+
+        if ($proposal->status !== 'accepted' || $proposal->payment_status !== 'pending_payment') {
+            throw new \RuntimeException('Esta proposta não está aguardando pagamento.', 422);
+        }
+
+        $paymentIntentId = $this->stripeService->getPaymentIntentFromSession($sessionId);
+
+        $scheduledAt = $proposal->accepted_scheduled_at
+            ? Carbon::parse($proposal->accepted_scheduled_at)
+            : null;
+
+        return DB::transaction(function () use ($proposal, $scheduledAt, $paymentIntentId) {
+            $this->stripeService->capturePaymentIntent($paymentIntentId);
+
+            $proposal->update([
+                'stripe_payment_intent_id' => $paymentIntentId,
                 'payment_status' => 'captured',
             ]);
 
-            // Create Contract
-            $contract = $this->contractService->createFromProposal($proposal, $scheduledAt);
+            Payment::create([
+                'uuid' => Str::uuid(),
+                'proposal_id' => $proposal->id,
+                'contractor_id' => $proposal->contractor_id,
+                'provider_id' => $proposal->provider_id,
+                'stripe_payment_intent_id' => $paymentIntentId,
+                'amount_cents' => $this->feeCalculator->toCents($proposal->offered_price),
+                'platform_fee_cents' => $this->feeCalculator->toCents($proposal->platform_fee_amount),
+                'provider_amount_cents' => $this->feeCalculator->toCents($proposal->provider_amount),
+                'fee_rate' => $proposal->platform_fee_rate,
+                'currency' => 'brl',
+                'status' => 'captured',
+                'captured_at' => now(),
+                'is_community' => $proposal->service->is_community,
+            ]);
 
-            return $proposal->fresh(['contract', 'scheduleSlots']);
+            $this->contractService->createFromProposal($proposal, $scheduledAt);
+
+            return $proposal->fresh(['contract', 'scheduleSlots', 'payment']);
         });
     }
 
@@ -172,8 +214,6 @@ class ProposalService
         }
 
         DB::transaction(function () use ($proposal) {
-            $this->stripeService->cancelPaymentIntent($proposal->stripe_payment_intent_id);
-            $proposal->payment->update(['status' => 'refunded', 'refunded_at' => now()]);
             $proposal->update(['status' => 'rejected', 'payment_status' => 'refunded']);
         });
     }
@@ -192,8 +232,10 @@ class ProposalService
         }
 
         DB::transaction(function () use ($proposal) {
-            $this->stripeService->cancelPaymentIntent($proposal->stripe_payment_intent_id);
-            $proposal->payment->update(['status' => 'refunded', 'refunded_at' => now()]);
+            if ($proposal->stripe_payment_intent_id) {
+                $this->stripeService->cancelPaymentIntent($proposal->stripe_payment_intent_id);
+                $proposal->payment?->update(['status' => 'refunded', 'refunded_at' => now()]);
+            }
             $proposal->update(['status' => 'cancelled', 'payment_status' => 'refunded']);
         });
     }

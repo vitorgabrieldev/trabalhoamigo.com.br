@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Calendar, DollarSign, Clock } from 'lucide-react'
+import { Calendar, CreditCard, DollarSign, Clock } from 'lucide-react'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,7 @@ interface ProposalCardProps {
 export function ProposalCard({ proposal, viewAs }: ProposalCardProps) {
   const otherParty = viewAs === 'provider' ? proposal.contractor : proposal.provider
   const price = (proposal as unknown as { price?: { amount: number } }).price?.amount
+  const needsPayment = viewAs === 'contractor' && proposal.status === 'accepted' && proposal.payment_status === 'pending_payment'
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -70,15 +71,23 @@ export function ProposalCard({ proposal, viewAs }: ProposalCardProps) {
 
           {/* Status badge */}
           <div className="flex-shrink-0">
-            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor(proposal.status)}`}>
-              {statusLabel(proposal.status)}
+            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor(proposal.status, proposal.payment_status)}`}>
+              {statusLabel(proposal.status, proposal.payment_status)}
             </span>
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
-        <Button variant="outline" size="sm" asChild>
+      <CardFooter className="p-4 pt-0 gap-2 flex-wrap">
+        {needsPayment && (
+          <Button size="sm" asChild className="flex items-center gap-1.5">
+            <Link href={`/proposals/${proposal.uuid}`}>
+              <CreditCard className="h-3.5 w-3.5" />
+              Pagar agora
+            </Link>
+          </Button>
+        )}
+        <Button variant={needsPayment ? 'outline' : 'outline'} size="sm" asChild>
           <Link href={`/proposals/${proposal.uuid}`}>Ver detalhes</Link>
         </Button>
       </CardFooter>

@@ -28,7 +28,10 @@ class Proposal extends Model
         'schedule_agreed',
         'schedule_agreed_at',
         'stripe_payment_intent_id',
+        'stripe_checkout_session_id',
         'payment_status',
+        'accepted_scheduled_at',
+        'provider_terms_accepted_at',
     ];
 
     protected $hidden = ['id', 'service_id', 'contractor_id', 'provider_id'];
@@ -43,6 +46,8 @@ class Proposal extends Model
             'any_time_date' => 'date',
             'schedule_agreed' => 'boolean',
             'schedule_agreed_at' => 'datetime',
+            'accepted_scheduled_at' => 'datetime',
+            'provider_terms_accepted_at' => 'datetime',
         ];
     }
 

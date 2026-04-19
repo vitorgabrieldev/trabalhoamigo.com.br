@@ -73,7 +73,10 @@ class ProposalController extends Controller
     // Provider accepts
     public function accept(Request $request, Proposal $proposal): JsonResponse
     {
-        $request->validate(['slot_uuid' => ['nullable', 'string']]);
+        $request->validate([
+            'slot_uuid' => ['nullable', 'string'],
+            'terms_accepted' => ['required', 'accepted'],
+        ]);
 
         if ($request->user()->id !== $proposal->provider_id) {
             return response()->json(['message' => 'Não autorizado.'], 403);
@@ -102,6 +105,29 @@ class ProposalController extends Controller
         $this->proposalService->cancelBeforeAcceptance($proposal, $request->user());
 
         return response()->json(['message' => 'Proposta cancelada. O valor será estornado integralmente.']);
+    }
+
+    // Contractor: get Stripe Checkout Session ID → frontend redirects to Stripe
+    public function checkout(Request $request, Proposal $proposal): JsonResponse
+    {
+        $baseUrl = rtrim(config('app.frontend_url', 'http://localhost:3000'), '/');
+        $url = $this->proposalService->getCheckoutUrl($proposal, $request->user(), $baseUrl);
+
+        return response()->json(['url' => $url]);
+    }
+
+    // Contractor: called on success return from Stripe
+    public function pay(Request $request, Proposal $proposal): JsonResponse
+    {
+        $request->validate(['session_id' => ['required', 'string']]);
+
+        $updated = $this->proposalService->completePayment(
+            $proposal,
+            $request->user(),
+            $request->input('session_id'),
+        );
+
+        return response()->json(new ProposalResource($updated));
     }
 
     // Confirm "to be arranged" schedule agreement

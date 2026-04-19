@@ -5,11 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatBRL(value: number): string {
+export function formatBRL(value: number | string | null | undefined): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-  }).format(value)
+  }).format(Number(value ?? 0))
 }
 
 export function formatDate(date: string | Date, opts?: Intl.DateTimeFormatOptions): string {
@@ -45,22 +45,29 @@ export function slugify(text: string): string {
     .replace(/(^-|-$)/g, '')
 }
 
-export function statusLabel(status: string): string {
+export function statusLabel(status: string, paymentStatus?: string | null): string {
+  if (status === 'accepted' && paymentStatus === 'pending_payment') {
+    return 'Aceito · Pagamento pendente'
+  }
   const labels: Record<string, string> = {
     pending: 'Pendente',
     accepted: 'Aceito',
     rejected: 'Rejeitado',
     cancelled: 'Cancelado',
-    active: 'Ativo',
+    active: 'Em andamento',
     provider_completed: 'Aguardando confirmação',
     contractor_confirmed: 'Concluído',
     auto_completed: 'Concluído automaticamente',
     disputed: 'Em disputa',
+    payment_held: 'Aguardando pagamento',
   }
   return labels[status] ?? status
 }
 
-export function statusColor(status: string): string {
+export function statusColor(status: string, paymentStatus?: string | null): string {
+  if (status === 'accepted' && paymentStatus === 'pending_payment') {
+    return 'bg-amber-100 text-amber-800'
+  }
   const colors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',
     accepted: 'bg-green-100 text-green-800',
@@ -71,6 +78,7 @@ export function statusColor(status: string): string {
     contractor_confirmed: 'bg-green-100 text-green-800',
     auto_completed: 'bg-green-100 text-green-800',
     disputed: 'bg-red-100 text-red-800',
+    payment_held: 'bg-amber-100 text-amber-800',
   }
   return colors[status] ?? 'bg-gray-100 text-gray-800'
 }

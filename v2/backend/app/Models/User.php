@@ -30,6 +30,17 @@ class User extends Authenticatable implements JWTSubject
         'stripe_account_id',
         'stripe_onboarding_completed',
         'stripe_customer_id',
+        'bank_holder_name',
+        'bank_holder_document',
+        'bank_name',
+        'bank_code',
+        'bank_agency',
+        'bank_agency_digit',
+        'bank_account_number',
+        'bank_account_digit',
+        'bank_account_type',
+        'bank_pix_key',
+        'bank_details_completed',
         'totp_secret',
         'totp_enabled',
         'totp_last_timestamp',
@@ -43,6 +54,16 @@ class User extends Authenticatable implements JWTSubject
         'totp_secret',
         'stripe_account_id',
         'stripe_customer_id',
+        'bank_holder_name',
+        'bank_holder_document',
+        'bank_name',
+        'bank_code',
+        'bank_agency',
+        'bank_agency_digit',
+        'bank_account_number',
+        'bank_account_digit',
+        'bank_account_type',
+        'bank_pix_key',
     ];
 
     protected function casts(): array
@@ -53,6 +74,7 @@ class User extends Authenticatable implements JWTSubject
             'totp_enabled' => 'boolean',
             'totp_last_timestamp' => 'integer',
             'stripe_onboarding_completed' => 'boolean',
+            'bank_details_completed' => 'boolean',
             'needs_onboarding' => 'boolean',
         ];
     }
@@ -95,7 +117,12 @@ class User extends Authenticatable implements JWTSubject
 
     public function isStripeReady(): bool
     {
-        return $this->stripe_onboarding_completed && $this->stripe_account_id !== null;
+        return $this->hasBankDetails();
+    }
+
+    public function hasBankDetails(): bool
+    {
+        return (bool) $this->bank_details_completed;
     }
 
     public function getFullNameAttribute(): string

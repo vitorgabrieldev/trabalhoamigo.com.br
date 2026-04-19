@@ -17,14 +17,13 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(Google2FA::class, fn () => new Google2FA());
+        $this->app->singleton(Google2FA::class, fn () => new Google2FA);
         $this->app->singleton(FeeCalculator::class);
         $this->app->singleton(StripeService::class);
         $this->app->singleton(ScheduleService::class);
         $this->app->singleton(ServiceManager::class);
 
         $this->app->singleton(ContractService::class, fn ($app) => new ContractService(
-            $app->make(StripeService::class),
             $app->make(ScheduleService::class),
         ));
 

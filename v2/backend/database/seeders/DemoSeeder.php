@@ -43,6 +43,16 @@ class DemoSeeder extends Seeder
             'role'                        => 'provider',
             'email_verified_at'           => now(),
             'stripe_onboarding_completed' => true,
+            'bank_details_completed'      => true,
+            'bank_holder_name'            => $data['first_name'] . ' ' . $data['last_name'],
+            'bank_holder_document'        => preg_replace('/\D+/', '', fake('pt_BR')->cpf(false)),
+            'bank_name'                   => 'Banco do Brasil',
+            'bank_code'                   => '001',
+            'bank_agency'                 => fake()->numerify('####'),
+            'bank_agency_digit'           => (string) fake()->randomDigitNotNull(),
+            'bank_account_number'         => fake()->numerify('########'),
+            'bank_account_digit'          => (string) fake()->randomDigitNotNull(),
+            'bank_account_type'           => fake()->randomElement(['checking', 'savings']),
             'phone'                       => '(11) 9' . fake()->numerify('####-####'),
         ]));
 

@@ -56,7 +56,7 @@ class ContractController extends Controller
     {
         $this->contractService->markContractorConfirmed($contract, $request->user());
 
-        return response()->json(['message' => 'Serviço confirmado. O pagamento foi liberado ao prestador.']);
+        return response()->json(['message' => 'Serviço confirmado. O pagamento foi retido na plataforma e entrou na fila de repasse bancário ao prestador.']);
     }
 
     // Contractor opens dispute

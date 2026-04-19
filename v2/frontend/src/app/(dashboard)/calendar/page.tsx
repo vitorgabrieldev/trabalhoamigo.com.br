@@ -1,11 +1,23 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ProviderCalendar } from '@/components/calendar/ProviderCalendar'
 import { Alert } from '@/components/ui/alert'
 import { meApi } from '@/lib/api'
-import type { CalendarEvent } from '@/types'
+
+interface CalendarDayPayload {
+  date?: string
+  contracts?: Array<{ status?: string; proposal?: { service?: { title?: string } } }>
+  slots?: Array<{ date?: string }>
+  blocks?: Array<{ starts_at?: string; contract_uuid?: string }>
+}
+
+const toDateOnly = (value?: string): string | null => {
+  if (!value) return null
+  const date = value.slice(0, 10)
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null
+}
 
 export default function CalendarPage() {
   const today = new Date()
@@ -14,27 +26,51 @@ export default function CalendarPage() {
 
   const { data: calendarData, isError } = useQuery({
     queryKey: ['calendar', year, month],
-    queryFn: () => meApi.getCalendar(year, month).then((r) => r.data.days as Record<string, CalendarEvent>),
+    queryFn: () =>
+      meApi
+        .getCalendar(year, month)
+        .then((r) => r.data.days as Record<string, CalendarDayPayload> | CalendarDayPayload[]),
   })
 
-  const events = Object.values(calendarData ?? {}).flatMap((ce) => [
-    ...ce.contracts.map((c) => ({
-      date: ce.date,
-      type: 'contract' as const,
-      title: c.proposal?.service?.title ?? 'Contrato',
-      status: c.status,
-    })),
-    ...ce.slots.map((s) => ({
-      date: s.date,
-      type: 'proposal' as const,
-      title: 'Proposta',
-    })),
-  ])
+  const dayValues = Array.isArray(calendarData)
+    ? calendarData
+    : Object.values(calendarData ?? {})
 
-  const handlePeriodChange = useCallback((y: number, m: number) => {
+  const events = dayValues.flatMap((day) => {
+    const fallbackDate = toDateOnly(day.date)
+
+    const contractEvents = (day.contracts ?? [])
+      .map((contract) => ({
+        date: fallbackDate,
+        type: 'contract' as const,
+        title: contract.proposal?.service?.title ?? 'Contrato',
+        status: contract.status,
+      }))
+      .filter((event): event is { date: string; type: 'contract'; title: string; status?: string } => Boolean(event.date))
+
+    const slotEvents = (day.slots ?? [])
+      .map((slot) => ({
+        date: toDateOnly(slot.date) ?? fallbackDate,
+        type: 'proposal' as const,
+        title: 'Proposta',
+      }))
+      .filter((event): event is { date: string; type: 'proposal'; title: string } => Boolean(event.date))
+
+    const blockEvents = (day.blocks ?? [])
+      .map((block) => ({
+        date: toDateOnly(block.starts_at) ?? fallbackDate,
+      type: 'contract' as const,
+        title: block.contract_uuid ? `Contrato ${block.contract_uuid.slice(0, 8)}` : 'Compromisso',
+      }))
+      .filter((event): event is { date: string; type: 'contract'; title: string } => Boolean(event.date))
+
+    return [...contractEvents, ...slotEvents, ...blockEvents]
+  })
+
+  const handlePeriodChange = (y: number, m: number) => {
     setYear(y)
     setMonth(m)
-  }, [])
+  }
 
   return (
     <div className="space-y-6">

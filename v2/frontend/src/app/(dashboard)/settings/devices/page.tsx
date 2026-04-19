@@ -1,12 +1,13 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Monitor, Smartphone, Trash2, LogOut } from 'lucide-react'
+import { Monitor, Smartphone, Trash2, LogOut, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert } from '@/components/ui/alert'
+import { Input } from '@/components/ui/input'
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,9 @@ import { useState } from 'react'
 export default function DevicesPage() {
   const queryClient = useQueryClient()
   const [revokeAllOpen, setRevokeAllOpen] = useState(false)
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
+  const [sessionToRename, setSessionToRename] = useState<Session | null>(null)
+  const [deviceName, setDeviceName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
@@ -59,6 +63,36 @@ export default function DevicesPage() {
       setError(axiosErr.response?.data?.message ?? 'Erro ao revogar sessões.')
     },
   })
+
+  const { mutate: renameSession, isPending: renaming } = useMutation({
+    mutationFn: ({ uuid, name }: { uuid: string; name: string }) =>
+      authApi.renameSession(uuid, name),
+    onSuccess: () => {
+      invalidate()
+      setRenameDialogOpen(false)
+      setSessionToRename(null)
+      setDeviceName('')
+      setSuccess('Dispositivo renomeado com sucesso.')
+      setTimeout(() => setSuccess(null), 3000)
+    },
+    onError: (err: unknown) => {
+      const axiosErr = err as { response?: { data?: { message?: string } } }
+      setError(axiosErr.response?.data?.message ?? 'Erro ao renomear dispositivo.')
+    },
+  })
+
+  const openRenameDialog = (session: Session) => {
+    setSessionToRename(session)
+    setDeviceName(session.device_name ?? '')
+    setRenameDialogOpen(true)
+  }
+
+  const handleRename = () => {
+    if (!sessionToRename) return
+    const cleanName = deviceName.trim()
+    if (cleanName.length < 2) return
+    renameSession({ uuid: sessionToRename.uuid, name: cleanName })
+  }
 
   return (
     <div className="space-y-6">
@@ -115,13 +149,19 @@ export default function DevicesPage() {
 
           {!isLoading && sessions && sessions.length > 0 && (
             <div className="space-y-2">
-              {sessions.map((session) => (
+              {sessions.map((session) => {
+                const isMobileDevice =
+                  session.device_type === 'mobile' ||
+                  session.device_type === 'tablet' ||
+                  (session.device_name ?? '').toLowerCase().includes('mobile')
+
+                return (
                 <div
                   key={session.uuid}
                   className="flex items-center gap-3 p-3 border rounded-lg"
                 >
                   <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    {session.device?.toLowerCase().includes('mobile') ? (
+                    {isMobileDevice ? (
                       <Smartphone className="h-4 w-4 text-gray-500" />
                     ) : (
                       <Monitor className="h-4 w-4 text-gray-500" />
@@ -131,7 +171,7 @@ export default function DevicesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium truncate">
-                        {session.device ?? 'Dispositivo desconhecido'}
+                        {session.device_name ?? 'Dispositivo desconhecido'}
                       </p>
                       {session.is_current && (
                         <Badge variant="success" className="text-[10px]">Atual</Badge>
@@ -144,19 +184,32 @@ export default function DevicesPage() {
                     </p>
                   </div>
 
-                  {!session.is_current && (
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50 flex-shrink-0"
-                      onClick={() => revokeSession(session.uuid)}
-                      disabled={revoking}
+                      onClick={() => openRenameDialog(session)}
+                      title="Renomear dispositivo"
+                      disabled={renaming}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Pencil className="h-4 w-4" />
                     </Button>
-                  )}
+
+                    {!session.is_current && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => revokeSession(session.uuid)}
+                        disabled={revoking}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </CardContent>
@@ -181,6 +234,47 @@ export default function DevicesPage() {
               disabled={revokingAll}
             >
               {revokingAll ? 'Encerrando...' : 'Encerrar todas'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={renameDialogOpen}
+        onOpenChange={(open) => {
+          setRenameDialogOpen(open)
+          if (!open) {
+            setSessionToRename(null)
+            setDeviceName('')
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Renomear dispositivo</DialogTitle>
+            <DialogDescription>
+              Escolha um nome para identificar este dispositivo mais facilmente.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <Input
+              value={deviceName}
+              onChange={(event) => setDeviceName(event.target.value)}
+              maxLength={100}
+              placeholder="Ex.: Meu iPhone"
+            />
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenameDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleRename}
+              disabled={renaming || deviceName.trim().length < 2}
+            >
+              {renaming ? 'Salvando...' : 'Salvar nome'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,18 +3,18 @@
 namespace App\Modules\Users\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Payments\Services\StripeService;
+use App\Models\User;
 use App\Modules\Users\Requests\UpdateAddressRequest;
+use App\Modules\Users\Requests\UpdatePayoutDetailsRequest;
 use App\Modules\Users\Requests\UpdateProfileRequest;
 use App\Modules\Users\Resources\UserProfileResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function __construct(private readonly StripeService $stripeService) {}
-
     public function profile(Request $request): JsonResponse
     {
         $user = $request->user()->load('address');
@@ -39,30 +39,30 @@ class UserController extends Controller
         return response()->json($user->fresh('address')->address);
     }
 
-    // Provider: initiate Stripe Connect onboarding
-    public function stripeOnboarding(Request $request): JsonResponse
+    // Provider: save payout bank details
+    public function stripeOnboarding(UpdatePayoutDetailsRequest $request): JsonResponse
     {
         $user = $request->user();
 
         if (! $user->isProvider()) {
-            return response()->json(['message' => 'Somente prestadores podem conectar uma conta de pagamento.'], 403);
+            return response()->json(['message' => 'Somente prestadores podem configurar dados de recebimento.'], 403);
         }
 
-        if ($user->stripe_onboarding_completed) {
-            return response()->json(['message' => 'Conta de pagamento já configurada.'], 422);
-        }
+        $user->update([
+            ...$request->validated(),
+            'bank_details_completed' => true,
+            // Keep legacy field aligned while frontend migrates.
+            'stripe_onboarding_completed' => true,
+        ]);
 
-        if ($user->stripe_account_id) {
-            // Refresh existing onboarding link
-            $url = $this->stripeService->createOnboardingLink($user->stripe_account_id, $user->uuid);
-        } else {
-            $url = $this->stripeService->createConnectAccount($user);
-        }
-
-        return response()->json(['onboarding_url' => $url]);
+        return response()->json([
+            'message' => 'Dados bancários salvos com sucesso.',
+            'payout_details_completed' => true,
+            'bank_details' => $this->bankDetailsPayload($user->fresh()),
+        ]);
     }
 
-    // Provider: check onboarding status
+    // Provider: check payout setup status
     public function stripeStatus(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -71,13 +71,16 @@ class UserController extends Controller
             return response()->json(['message' => 'Não aplicável.'], 422);
         }
 
-        $completed = $this->stripeService->checkOnboardingStatus($user);
+        $completed = $user->hasBankDetails();
 
         return response()->json([
+            // Legacy compatibility with existing frontend typings.
             'stripe_onboarding_completed' => $completed,
+            'payout_details_completed' => $completed,
             'message' => $completed
-                ? 'Conta de pagamento configurada. Seus serviços estão visíveis.'
-                : 'Configure sua conta de pagamento para que seus serviços fiquem disponíveis.',
+                ? 'Dados bancários cadastrados. Os pagamentos aprovados ficam retidos na plataforma até o repasse.'
+                : 'Cadastre seus dados bancários para habilitar recebimentos dos contratos.',
+            'bank_details' => $this->bankDetailsPayload($user),
         ]);
     }
 
@@ -89,7 +92,7 @@ class UserController extends Controller
 
         $user = $request->user();
         $path = $request->file('avatar')->store("avatars/{$user->uuid}", 'public');
-        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+        $url = Storage::disk('public')->url($path);
 
         $user->update(['avatar_url' => $url]);
 
@@ -105,7 +108,7 @@ class UserController extends Controller
 
     public function show(string $uuid): JsonResponse
     {
-        $user = \App\Models\User::where('uuid', $uuid)
+        $user = User::where('uuid', $uuid)
             ->withCount(['services as active_services_count' => fn ($q) => $q->where('status', 'active')])
             ->withAvg('reviews as average_rating', 'stars')
             ->firstOrFail();
@@ -117,8 +120,24 @@ class UserController extends Controller
             'role' => $user->role,
             'active_services_count' => $user->active_services_count,
             'average_rating' => round($user->average_rating ?? 0, 1),
-            'stripe_ready' => $user->isStripeReady(),
+            'stripe_ready' => $user->hasBankDetails(),
             'member_since' => $user->created_at->toDateString(),
         ]);
+    }
+
+    private function bankDetailsPayload(User $user): array
+    {
+        return [
+            'bank_holder_name' => $user->bank_holder_name,
+            'bank_holder_document' => $user->bank_holder_document,
+            'bank_name' => $user->bank_name,
+            'bank_code' => $user->bank_code,
+            'bank_agency' => $user->bank_agency,
+            'bank_agency_digit' => $user->bank_agency_digit,
+            'bank_account_number' => $user->bank_account_number,
+            'bank_account_digit' => $user->bank_account_digit,
+            'bank_account_type' => $user->bank_account_type,
+            'bank_pix_key' => $user->bank_pix_key,
+        ];
     }
 }

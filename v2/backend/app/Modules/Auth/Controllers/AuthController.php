@@ -5,10 +5,10 @@ namespace App\Modules\Auth\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Requests\LoginRequest;
 use App\Modules\Auth\Requests\RegisterRequest;
+use App\Modules\Auth\Requests\RenameSessionRequest;
 use App\Modules\Auth\Requests\TotpConfirmRequest;
-use App\Modules\Auth\Services\AuthService;
-use App\Modules\Auth\Resources\AuthResource;
 use App\Modules\Auth\Resources\SessionResource;
+use App\Modules\Auth\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,7 +42,7 @@ class AuthController extends Controller
         } catch (\RuntimeException $e) {
             if ($e->getCode() === 422 && str_contains($e->getMessage(), '2FA')) {
                 return response()->json([
-                    'message'       => $e->getMessage(),
+                    'message' => $e->getMessage(),
                     'requires_totp' => true,
                 ], 422);
             }
@@ -71,24 +71,25 @@ class AuthController extends Controller
 
         try {
             $socialUser = Socialite::driver('google')->stateless()->user();
-            $result     = $this->authService->loginWithGoogle($socialUser, $request);
+            $result = $this->authService->loginWithGoogle($socialUser, $request);
 
             if (isset($result['totp_required'])) {
                 $query = http_build_query([
                     'totp_required' => '1',
-                    'temp_token'    => $result['temp_token'],
+                    'temp_token' => $result['temp_token'],
                 ]);
+
                 return redirect("{$frontendUrl}/auth/google/callback?{$query}");
             }
 
             $query = http_build_query([
-                'access_token'  => $result['access_token'],
+                'access_token' => $result['access_token'],
                 'refresh_token' => $result['refresh_token'],
             ]);
 
             return redirect("{$frontendUrl}/auth/google/callback?{$query}");
         } catch (\Throwable $e) {
-            return redirect("{$frontendUrl}/login?error=" . urlencode($e->getMessage()));
+            return redirect("{$frontendUrl}/login?error=".urlencode($e->getMessage()));
         }
     }
 
@@ -96,7 +97,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'temp_token' => 'required|string',
-            'code'       => 'required|string|size:6',
+            'code' => 'required|string|size:6',
         ]);
 
         try {
@@ -105,6 +106,7 @@ class AuthController extends Controller
                 $request->code,
                 $request
             );
+
             return response()->json($result);
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], (int) $e->getCode() ?: 400);
@@ -145,6 +147,17 @@ class AuthController extends Controller
         $this->authService->revokeSession($request->user(), $sessionUuid);
 
         return response()->json(['message' => 'Dispositivo desconectado.']);
+    }
+
+    public function renameSession(RenameSessionRequest $request, string $sessionUuid): JsonResponse
+    {
+        $this->authService->renameSession(
+            $request->user(),
+            $sessionUuid,
+            $request->validated('device_name')
+        );
+
+        return response()->json(['message' => 'Dispositivo renomeado com sucesso.']);
     }
 
     public function revokeAllSessions(Request $request): JsonResponse

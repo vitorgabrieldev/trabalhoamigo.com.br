@@ -25,16 +25,16 @@ class AuthService
             ->forceDelete();
 
         $user = User::create([
-            'uuid'              => Str::uuid(),
-            'first_name'        => $data['first_name'],
-            'last_name'         => $data['last_name'],
-            'email'             => $data['email'],
-            'password'          => $data['password'],
-            'cpf'               => $data['cpf'] ?? null,
-            'phone'             => $data['phone'] ?? null,
-            'whatsapp'          => $data['whatsapp'] ?? null,
-            'role'              => 'contractor',
-            'needs_onboarding'  => true,
+            'uuid' => Str::uuid(),
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'cpf' => $data['cpf'] ?? null,
+            'phone' => $data['phone'] ?? null,
+            'whatsapp' => $data['whatsapp'] ?? null,
+            'role' => $data['role'] ?? 'contractor',
+            'needs_onboarding' => true,
         ]);
 
         if (isset($data['address'])) {
@@ -88,7 +88,7 @@ class AuthService
             ->whereNotNull('deleted_at')
             ->where(function ($q) use ($socialUser) {
                 $q->where('google_id', $socialUser->getId())
-                  ->orWhere('email', $socialUser->getEmail());
+                    ->orWhere('email', $socialUser->getEmail());
             })
             ->forceDelete();
 
@@ -97,29 +97,30 @@ class AuthService
 
         if ($user) {
             $user->update([
-                'google_id'          => $socialUser->getId(),
-                'avatar_url'         => $user->avatar_url ?? $socialUser->getAvatar(),
-                'email_verified_at'  => $user->email_verified_at ?? now(),
+                'google_id' => $socialUser->getId(),
+                'avatar_url' => $user->avatar_url ?? $socialUser->getAvatar(),
+                'email_verified_at' => $user->email_verified_at ?? now(),
             ]);
         } else {
             $nameParts = explode(' ', $socialUser->getName(), 2);
             $user = User::create([
-                'uuid'              => Str::uuid(),
-                'first_name'        => $nameParts[0],
-                'last_name'         => $nameParts[1] ?? '',
-                'email'             => $socialUser->getEmail(),
-                'google_id'         => $socialUser->getId(),
-                'avatar_url'        => $socialUser->getAvatar(),
+                'uuid' => Str::uuid(),
+                'first_name' => $nameParts[0],
+                'last_name' => $nameParts[1] ?? '',
+                'email' => $socialUser->getEmail(),
+                'google_id' => $socialUser->getId(),
+                'avatar_url' => $socialUser->getAvatar(),
                 'email_verified_at' => now(),
-                'role'              => 'contractor',
-                'needs_onboarding'  => true,
-                'password'          => Hash::make(Str::random(32)),
+                'role' => 'contractor',
+                'needs_onboarding' => true,
+                'password' => Hash::make(Str::random(32)),
             ]);
         }
 
         if ($user->totp_enabled) {
             $tempToken = Str::random(64);
             Cache::put("totp_pending:{$tempToken}", $user->id, now()->addMinutes(5));
+
             return ['totp_required' => true, 'temp_token' => $tempToken];
         }
 
@@ -157,7 +158,7 @@ class AuthService
     public function completeOnboarding(User $user, string $role): void
     {
         $user->update([
-            'role'             => $role,
+            'role' => $role,
             'needs_onboarding' => false,
         ]);
     }
@@ -189,6 +190,18 @@ class AuthService
     public function revokeSession(User $user, string $sessionUuid): void
     {
         $user->sessions()->where('uuid', $sessionUuid)->update(['is_revoked' => true]);
+    }
+
+    public function renameSession(User $user, string $sessionUuid, string $deviceName): void
+    {
+        $updated = $user->sessions()
+            ->where('uuid', $sessionUuid)
+            ->where('is_revoked', false)
+            ->update(['device_name' => $deviceName]);
+
+        if (! $updated) {
+            throw new \RuntimeException('Sessão não encontrada.', 404);
+        }
     }
 
     public function revokeAllSessions(User $user, ?string $exceptJti = null): void

@@ -30,16 +30,15 @@ class ServiceResource extends JsonResource
                 'uuid' => $this->user->uuid,
                 'name' => $this->user->full_name,
                 'avatar_url' => $this->user->avatar_url,
-                'stripe_ready' => $this->user->isStripeReady(),
+                'stripe_ready' => $this->user->hasBankDetails(),
             ]),
 
-            'reviews' => $this->whenLoaded('reviews', fn () =>
-                $this->reviews->map(fn ($r) => [
-                    'uuid' => $r->uuid,
-                    'stars' => $r->stars,
-                    'comment' => $r->comment,
-                    'created_at' => $r->created_at->toIso8601String(),
-                ])
+            'reviews' => $this->whenLoaded('reviews', fn () => $this->reviews->map(fn ($r) => [
+                'uuid' => $r->uuid,
+                'stars' => $r->stars,
+                'comment' => $r->comment,
+                'created_at' => $r->created_at->toIso8601String(),
+            ])
             ),
 
             'created_at' => $this->created_at->toIso8601String(),

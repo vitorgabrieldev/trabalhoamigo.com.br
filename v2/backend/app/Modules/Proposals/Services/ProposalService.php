@@ -12,6 +12,7 @@ use App\Modules\Contracts\Services\ContractService;
 use App\Modules\Payments\Services\FeeCalculator;
 use App\Modules\Payments\Services\StripeService;
 use App\Modules\Schedule\Services\ScheduleService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -32,8 +33,8 @@ class ProposalService
     {
         $provider = $service->user;
 
-        if (! $provider->isStripeReady()) {
-            throw new \RuntimeException('Este prestador não está disponível para contratação no momento.', 422);
+        if (! $provider->hasBankDetails()) {
+            throw new \RuntimeException('Este prestador ainda não cadastrou os dados bancários para recebimento.', 422);
         }
 
         $fee = $this->feeCalculator->calculate($data['offered_price'], $service->is_community);
@@ -203,14 +204,14 @@ class ProposalService
         ]);
     }
 
-    private function resolveScheduleForAcceptance(Proposal $proposal, string $selectedSlotUuid): ?\Carbon\Carbon
+    private function resolveScheduleForAcceptance(Proposal $proposal, string $selectedSlotUuid): ?Carbon
     {
         if ($proposal->schedule_type === 'to_be_arranged') {
             return null;
         }
 
         if ($proposal->schedule_type === 'any_time_on_day') {
-            return \Carbon\Carbon::parse($proposal->any_time_date)->startOfDay();
+            return Carbon::parse($proposal->any_time_date)->startOfDay();
         }
 
         $slot = $proposal->scheduleSlots()->where('uuid', $selectedSlotUuid)->first();

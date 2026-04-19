@@ -6,7 +6,6 @@ use App\Models\Contract;
 use App\Models\Dispute;
 use App\Models\Proposal;
 use App\Models\User;
-use App\Modules\Payments\Services\StripeService;
 use App\Modules\Schedule\Services\ScheduleService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -14,10 +13,7 @@ use Illuminate\Support\Str;
 
 class ContractService
 {
-    public function __construct(
-        private readonly StripeService $stripeService,
-        private readonly ScheduleService $scheduleService,
-    ) {}
+    public function __construct(private readonly ScheduleService $scheduleService) {}
 
     public function createFromProposal(Proposal $proposal, ?Carbon $scheduledAt): Contract
     {
@@ -70,7 +66,7 @@ class ContractService
 
     /**
      * Contractor confirms work is done.
-     * Triggers transfer to provider.
+     * Marks payout as eligible for provider bank transfer by the platform.
      */
     public function markContractorConfirmed(Contract $contract, User $contractor): void
     {
@@ -83,19 +79,15 @@ class ContractService
         }
 
         DB::transaction(function () use ($contract) {
-            $transferId = $this->stripeService->transferToProvider($contract);
-
             $contract->update([
                 'status' => 'contractor_confirmed',
                 'contractor_confirmed_at' => now(),
-                'transferred_at' => now(),
-                'stripe_transfer_provider_id' => $transferId,
             ]);
 
             $contract->payment->update([
-                'status' => 'transferred',
-                'stripe_transfer_id' => $transferId,
-                'transferred_at' => now(),
+                'status' => 'captured',
+                'provider_payout_status' => 'eligible',
+                'provider_payout_eligible_at' => now(),
             ]);
         });
 
@@ -113,18 +105,14 @@ class ContractService
         }
 
         DB::transaction(function () use ($contract) {
-            $transferId = $this->stripeService->transferToProvider($contract);
-
             $contract->update([
                 'status' => 'auto_completed',
-                'transferred_at' => now(),
-                'stripe_transfer_provider_id' => $transferId,
             ]);
 
             $contract->payment->update([
-                'status' => 'transferred',
-                'stripe_transfer_id' => $transferId,
-                'transferred_at' => now(),
+                'status' => 'captured',
+                'provider_payout_status' => 'eligible',
+                'provider_payout_eligible_at' => now(),
             ]);
         });
 

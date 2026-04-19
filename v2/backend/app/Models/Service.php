@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Service extends Model
 {
@@ -50,7 +51,7 @@ class Service extends Model
     {
         return $query->active()
             ->whereHas('user', fn ($q) => $q
-                ->where('stripe_onboarding_completed', true)
+                ->where('bank_details_completed', true)
                 ->whereNull('deleted_at')
             );
     }
@@ -67,13 +68,13 @@ class Service extends Model
             return $query;
         }
 
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
+        if (DB::getDriverName() === 'pgsql') {
             $n = count($words);
 
             // ── Layer 1: FTS (OR per word, Portuguese stemming) ───────────────
             // plainto_tsquery('portuguese', w) handles morphology:
             //   "pintando" → "pint", "casas" → "cas"
-            $ftsParts   = implode(' || ', array_fill(0, $n, "plainto_tsquery('portuguese', ?)"));
+            $ftsParts = implode(' || ', array_fill(0, $n, "plainto_tsquery('portuguese', ?)"));
 
             // ── Layer 2: similarity() — full query vs title ───────────────────
             // Good for short queries; uses GIN trgm index.
@@ -86,7 +87,7 @@ class Service extends Model
             // Catches single-char typos ("pintira" → "pintura").
 
             // Candidate filter — any of the 4 layers can surface a result
-            $query->where(function ($q) use ($words, $ftsParts, $term, $n) {
+            $query->where(function ($q) use ($words, $ftsParts, $term) {
                 // L1
                 $q->whereRaw("search_vector @@ ({$ftsParts})", $words);
 
@@ -96,24 +97,24 @@ class Service extends Model
                 // L3 + L4 per word
                 foreach ($words as $word) {
                     $q->orWhereRaw('word_similarity(?, title)       > 0.3', [$word])
-                      ->orWhereRaw('word_similarity(?, description) > 0.2', [$word])
+                        ->orWhereRaw('word_similarity(?, description) > 0.2', [$word])
                       // L4: edit distance ≤ 2 against any token inside title
-                      ->orWhereRaw(
-                          "EXISTS (
+                        ->orWhereRaw(
+                            "EXISTS (
                               SELECT 1
                               FROM   unnest(regexp_split_to_array(lower(title), '\\s+')) AS tok
                               WHERE  length(tok) > 2
                               AND    levenshtein_less_equal(?, tok, 2) <= 2
                           )",
-                          [$word]
-                      );
+                            [$word]
+                        );
                 }
             });
 
             // Combined relevance score (higher = more relevant)
             // L1 weight 4 · L2 weight 2 · L3 weight 3 (title) + 1 (desc)
             $wordSimTitle = implode(', ', array_fill(0, $n, 'word_similarity(?, title)'));
-            $wordSimDesc  = implode(', ', array_fill(0, $n, 'word_similarity(?, description)'));
+            $wordSimDesc = implode(', ', array_fill(0, $n, 'word_similarity(?, description)'));
 
             $query->orderByRaw(
                 "( ts_rank(search_vector, ({$ftsParts}))      * 4
@@ -130,8 +131,8 @@ class Service extends Model
         // ── SQLite fallback (development) ─────────────────────────────────────
         return $query->where(function ($q) use ($words) {
             foreach ($words as $word) {
-                $q->orWhere('title',       'like', "%{$word}%")
-                  ->orWhere('description', 'like', "%{$word}%");
+                $q->orWhere('title', 'like', "%{$word}%")
+                    ->orWhere('description', 'like', "%{$word}%");
             }
         });
     }

@@ -22,9 +22,13 @@ class Payment extends Model
         'fee_rate',
         'currency',
         'status',
+        'provider_payout_status',
         'is_community',
         'captured_at',
         'transferred_at',
+        'provider_payout_eligible_at',
+        'provider_payout_paid_at',
+        'provider_payout_reference',
         'refunded_at',
     ];
 
@@ -37,6 +41,8 @@ class Payment extends Model
             'is_community' => 'boolean',
             'captured_at' => 'datetime',
             'transferred_at' => 'datetime',
+            'provider_payout_eligible_at' => 'datetime',
+            'provider_payout_paid_at' => 'datetime',
             'refunded_at' => 'datetime',
         ];
     }

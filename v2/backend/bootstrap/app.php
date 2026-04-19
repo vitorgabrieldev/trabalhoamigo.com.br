@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Middleware\HandleCors;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -15,27 +19,36 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
-            \App\Http\Middleware\HandleCors::class,
+            HandleCors::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (\Throwable $e, Request $request) {
+        $exceptions->report(function (RuntimeException $e) {
+            $code = (int) $e->getCode();
+            if ($code >= 400 && $code < 500) {
+                return false;
+            }
+
+            return null;
+        });
+
+        $exceptions->render(function (Throwable $e, Request $request) {
             if (! $request->is('api/*')) {
                 return null;
             }
 
-            if ($e instanceof \Illuminate\Validation\ValidationException) {
+            if ($e instanceof ValidationException) {
                 return response()->json([
                     'message' => 'Dados inválidos.',
                     'errors' => $e->errors(),
                 ], 422);
             }
 
-            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+            if ($e instanceof AuthenticationException) {
                 return response()->json(['message' => 'Não autenticado.'], 401);
             }
 
-            if ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+            if ($e instanceof AuthorizationException) {
                 return response()->json(['message' => 'Não autorizado.'], 403);
             }
 
@@ -43,7 +56,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json(['message' => 'Recurso não encontrado.'], 404);
             }
 
-            if ($e instanceof \RuntimeException && $e->getCode() >= 400 && $e->getCode() < 600) {
+            if ($e instanceof RuntimeException && $e->getCode() >= 400 && $e->getCode() < 600) {
                 return response()->json(['message' => $e->getMessage()], (int) $e->getCode());
             }
 

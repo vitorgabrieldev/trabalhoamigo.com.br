@@ -34,7 +34,17 @@ class UserFactory extends Factory
         return $this->state(fn () => [
             'role' => 'provider',
             'stripe_onboarding_completed' => true,
-            'stripe_account_id' => 'acct_' . Str::random(16),
+            'stripe_account_id' => 'acct_'.Str::random(16),
+            'bank_details_completed' => true,
+            'bank_holder_name' => fake('pt_BR')->name(),
+            'bank_holder_document' => preg_replace('/\D+/', '', fake('pt_BR')->cpf(false)),
+            'bank_name' => 'Banco do Brasil',
+            'bank_code' => '001',
+            'bank_agency' => fake()->numerify('####'),
+            'bank_agency_digit' => fake()->randomDigitNotNull(),
+            'bank_account_number' => fake()->numerify('########'),
+            'bank_account_digit' => fake()->randomDigitNotNull(),
+            'bank_account_type' => fake()->randomElement(['checking', 'savings']),
         ]);
     }
 

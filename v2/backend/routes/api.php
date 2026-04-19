@@ -45,6 +45,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/onboarding', [AuthController::class, 'completeOnboarding']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/sessions', [AuthController::class, 'sessions']);
+        Route::patch('/sessions/{sessionUuid}', [AuthController::class, 'renameSession']);
         Route::delete('/sessions/{sessionUuid}', [AuthController::class, 'revokeSession']);
         Route::delete('/sessions', [AuthController::class, 'revokeAllSessions']);
         Route::post('/totp/setup', [AuthController::class, 'setupTotp']);

@@ -120,6 +120,9 @@ export const authApi = {
 
   getSessions: () => api.get('/auth/sessions'),
 
+  renameSession: (uuid: string, device_name: string) =>
+    api.patch(`/auth/sessions/${uuid}`, { device_name }),
+
   revokeSession: (uuid: string) => api.delete(`/auth/sessions/${uuid}`),
 
   revokeAllSessions: () => api.delete('/auth/sessions'),
@@ -166,7 +169,18 @@ export const meApi = {
 
   deleteAccount: () => api.delete('/me'),
 
-  stripeOnboarding: () => api.post('/me/stripe/onboarding'),
+  stripeOnboarding: (data: {
+    bank_holder_name: string
+    bank_holder_document: string
+    bank_name: string
+    bank_code: string
+    bank_agency: string
+    bank_agency_digit?: string
+    bank_account_number: string
+    bank_account_digit?: string
+    bank_account_type: 'checking' | 'savings'
+    bank_pix_key?: string
+  }) => api.post('/me/stripe/onboarding', data),
 
   stripeStatus: () => api.get('/me/stripe/status'),
 

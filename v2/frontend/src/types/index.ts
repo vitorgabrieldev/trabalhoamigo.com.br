@@ -1,4 +1,18 @@
 export type UserRole = 'provider' | 'contractor' | 'admin'
+export type BankAccountType = 'checking' | 'savings'
+
+export interface ProviderBankDetails {
+  bank_holder_name: string
+  bank_holder_document: string
+  bank_name: string
+  bank_code: string
+  bank_agency: string
+  bank_agency_digit?: string
+  bank_account_number: string
+  bank_account_digit?: string
+  bank_account_type: BankAccountType
+  bank_pix_key?: string
+}
 
 export interface User {
   uuid: string
@@ -11,6 +25,8 @@ export interface User {
   whatsapp?: string
   cpf?: string
   stripe_onboarding_completed?: boolean
+  payout_details_completed?: boolean
+  bank_details?: ProviderBankDetails
   totp_enabled: boolean
   needs_onboarding?: boolean
   email_verified_at?: string | null
@@ -159,7 +175,9 @@ export interface CalendarEvent {
 
 export interface StripeStatus {
   stripe_onboarding_completed: boolean
+  payout_details_completed: boolean
   message: string
+  bank_details?: ProviderBankDetails
 }
 
 export interface CommunityAvailability {
@@ -171,7 +189,8 @@ export interface CommunityAvailability {
 
 export interface Session {
   uuid: string
-  device?: string
+  device_name?: string
+  device_type?: 'browser' | 'mobile' | 'tablet' | 'desktop' | string
   ip_address?: string
   last_active_at?: string
   is_current: boolean

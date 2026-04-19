@@ -166,7 +166,7 @@ export default function ServiceDetailPage({
 
   const isOwner = user?.uuid === service.provider.uuid
   const isContractor = user?.role === 'contractor'
-  const canPropose = user && user.role === 'provider' && !isOwner
+  const canPropose = user && isContractor
   const images = service.images?.length
     ? service.images
     : service.image_url
@@ -444,9 +444,9 @@ export default function ServiceDetailPage({
                     <Link href="/login">Entrar para fazer proposta</Link>
                   </Button>
                 )}
-                {isContractor && (
+                {user && !isContractor && !isOwner && (
                   <p className="text-xs text-center text-muted-foreground pt-1">
-                    Entre em contato com o prestador para contratar este serviço.
+                    Prestadores não podem contratar serviços de outros prestadores.
                   </p>
                 )}
               </CardContent>

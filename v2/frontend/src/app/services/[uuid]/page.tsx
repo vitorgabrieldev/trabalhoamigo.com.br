@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState } from 'react'
+import { use, useState, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  ZoomIn,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -32,6 +33,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ScheduleSlotPicker } from '@/components/proposals/ScheduleSlotPicker'
+import { Lightbox } from '@/components/ui/lightbox'
 import { servicesApi, proposalsApi } from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
 import { formatBRL, formatDate, getInitials } from '@/lib/utils'
@@ -63,6 +65,15 @@ export default function ServiceDetailPage({
   const [proposalError, setProposalError] = useState<string | null>(null)
   const [reviewPage, setReviewPage] = useState(1)
   const [imageIndex, setImageIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
+  const [heroLoaded, setHeroLoaded] = useState(false)
+  const [heroError, setHeroError] = useState(false)
+
+  const openLightbox = useCallback((i: number) => {
+    setLightboxIndex(i)
+    setLightboxOpen(true)
+  }, [])
 
   const { data: service, isLoading, isError } = useQuery({
     queryKey: ['service', uuid],
@@ -156,20 +167,40 @@ export default function ServiceDetailPage({
 
         {/* Hero image */}
         <div className="relative h-64 sm:h-80 bg-gray-100 rounded-xl overflow-hidden mb-6">
-          {images.length > 0 ? (
-            <Image
-              src={images[currentImageIndex]}
-              alt={service.title}
-              fill
-              className="object-cover"
-            />
+          {images.length > 0 && !heroError ? (
+            <>
+              {!heroLoaded && (
+                <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+              )}
+              <button
+                type="button"
+                onClick={() => openLightbox(currentImageIndex)}
+                className="absolute inset-0 w-full h-full group cursor-zoom-in"
+                aria-label="Ver imagem ampliada"
+              >
+                <Image
+                  src={images[currentImageIndex]}
+                  alt={service.title}
+                  fill
+                  unoptimized
+                  className={`object-cover transition-all duration-300 group-hover:brightness-90 ${heroLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  onLoad={() => setHeroLoaded(true)}
+                  onError={() => setHeroError(true)}
+                />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="bg-black/40 rounded-full p-2.5">
+                    <ZoomIn className="h-5 w-5 text-white drop-shadow" />
+                  </div>
+                </div>
+              </button>
+            </>
           ) : (
-            <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary/10 to-primary/20">
+            <div className="flex items-center justify-center h-full bg-linear-to-br from-primary/10 to-primary/20">
               <Tag className="h-16 w-16 text-primary/30" />
             </div>
           )}
           {service.is_community && (
-            <div className="absolute top-4 left-4">
+            <div className="absolute top-4 left-4 z-10">
               <Badge variant="success">Comunitário</Badge>
             </div>
           )}
@@ -178,16 +209,16 @@ export default function ServiceDetailPage({
             <>
               <button
                 type="button"
-                onClick={() => setImageIndex((i) => (i - 1 + images.length) % images.length)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white"
+                onClick={() => { setImageIndex((i) => (i - 1 + images.length) % images.length); setHeroLoaded(false) }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white cursor-pointer"
                 aria-label="Imagem anterior"
               >
                 <ChevronLeft className="h-4 w-4 text-gray-700" />
               </button>
               <button
                 type="button"
-                onClick={() => setImageIndex((i) => (i + 1) % images.length)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white"
+                onClick={() => { setImageIndex((i) => (i + 1) % images.length); setHeroLoaded(false) }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white cursor-pointer"
                 aria-label="Próxima imagem"
               >
                 <ChevronRight className="h-4 w-4 text-gray-700" />
@@ -198,8 +229,8 @@ export default function ServiceDetailPage({
                     key={i}
                     type="button"
                     aria-label={`Ir para imagem ${i + 1}`}
-                    onClick={() => setImageIndex(i)}
-                    className={`rounded-full transition-all ${
+                    onClick={() => { setImageIndex(i); setHeroLoaded(false) }}
+                    className={`rounded-full transition-all cursor-pointer ${
                       i === currentImageIndex ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/70'
                     }`}
                   />
@@ -208,6 +239,16 @@ export default function ServiceDetailPage({
             </>
           )}
         </div>
+
+        {lightboxOpen && (
+          <Lightbox
+            images={images}
+            index={lightboxIndex}
+            alt={service.title}
+            onClose={() => setLightboxOpen(false)}
+            onNavigate={setLightboxIndex}
+          />
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main content */}

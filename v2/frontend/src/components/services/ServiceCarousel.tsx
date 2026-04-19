@@ -14,6 +14,8 @@ import { formatBRL } from '@/lib/utils'
 /* ─── Individual slide card ─────────────────────────────────────────────── */
 function SlideCard({ service }: { service: Service }) {
   const imageUrl = service.images?.[0] ?? service.image_url
+  const [imgLoaded, setImgLoaded] = useState(false)
+  const [imgError, setImgError] = useState(false)
 
   return (
     <Link
@@ -23,20 +25,28 @@ function SlideCard({ service }: { service: Service }) {
       <div className="rounded-2xl overflow-hidden border border-gray-100 bg-white hover:shadow-lg active:shadow-sm transition-all duration-200">
         {/* Image */}
         <div className="relative h-44 bg-gray-100 overflow-hidden">
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={service.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+          {imageUrl && !imgError ? (
+            <>
+              {!imgLoaded && (
+                <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+              )}
+              <Image
+                src={imageUrl}
+                alt={service.title}
+                fill
+                unoptimized
+                className={`object-cover group-hover:scale-105 transition-all duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgError(true)}
+              />
+            </>
           ) : (
-            <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary/10 to-primary/20">
+            <div className="flex items-center justify-center h-full bg-linear-to-br from-primary/10 to-primary/20">
               <Tag className="h-10 w-10 text-primary/30" />
             </div>
           )}
           {service.is_community && (
-            <div className="absolute top-2 left-2">
+            <div className="absolute top-2 left-2 z-10">
               <Badge variant="success" className="text-[10px] px-1.5">Comunitário</Badge>
             </div>
           )}

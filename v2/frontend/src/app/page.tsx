@@ -80,7 +80,7 @@ export default function LandingPage() {
         <HeroCanvas />
 
         {/* Subtle vignette so text stays readable */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/10 via-transparent to-black/20 pointer-events-none" />
 
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-20 sm:py-28">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-3 tracking-tight">

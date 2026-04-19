@@ -157,6 +157,11 @@ class Service extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ServiceImage::class)->orderBy('position');
+    }
+
     public function getAverageRatingAttribute(): float
     {
         return (float) $this->reviews()->avg('stars') ?? 0;

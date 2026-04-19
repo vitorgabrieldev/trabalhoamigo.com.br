@@ -221,7 +221,28 @@ export const servicesApi = {
     accepts_offer: boolean
     is_community: boolean
     image_url?: string
-  }) => api.post('/services', data),
+    images?: File[]
+  }) => {
+    const form = new FormData()
+    form.append('title', data.title)
+    form.append('description', data.description)
+    form.append('category_uuid', data.category_uuid)
+    if (data.base_price !== undefined) {
+      form.append('base_price', data.base_price.toString())
+    }
+    form.append('accepts_offer', data.accepts_offer ? '1' : '0')
+    form.append('is_community', data.is_community ? '1' : '0')
+    if (data.image_url) {
+      form.append('image_url', data.image_url)
+    }
+    for (const file of data.images ?? []) {
+      form.append('images[]', file)
+    }
+
+    return api.post('/services', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
 
   update: (uuid: string, data: Partial<{
     title: string
@@ -231,8 +252,47 @@ export const servicesApi = {
     accepts_offer: boolean
     is_community: boolean
     image_url: string
+    images: File[]
     status: string
-  }>) => api.patch(`/services/${uuid}`, data),
+  }>) => {
+    if (!data.images || data.images.length === 0) {
+      return api.patch(`/services/${uuid}`, data)
+    }
+
+    const form = new FormData()
+    if (data.title !== undefined) {
+      form.append('title', data.title)
+    }
+    if (data.description !== undefined) {
+      form.append('description', data.description)
+    }
+    if (data.category_uuid !== undefined) {
+      form.append('category_uuid', data.category_uuid)
+    }
+    if (data.base_price !== undefined) {
+      form.append('base_price', data.base_price.toString())
+    }
+    if (data.accepts_offer !== undefined) {
+      form.append('accepts_offer', data.accepts_offer ? '1' : '0')
+    }
+    if (data.is_community !== undefined) {
+      form.append('is_community', data.is_community ? '1' : '0')
+    }
+    if (data.image_url !== undefined) {
+      form.append('image_url', data.image_url)
+    }
+    if (data.status !== undefined) {
+      form.append('status', data.status)
+    }
+    form.append('_method', 'PATCH')
+    for (const file of data.images) {
+      form.append('images[]', file)
+    }
+
+    return api.post(`/services/${uuid}`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
 
   delete: (uuid: string) => api.delete(`/services/${uuid}`),
 }

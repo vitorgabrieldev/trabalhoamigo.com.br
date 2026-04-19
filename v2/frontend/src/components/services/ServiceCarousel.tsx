@@ -13,6 +13,8 @@ import { formatBRL } from '@/lib/utils'
 
 /* ─── Individual slide card ─────────────────────────────────────────────── */
 function SlideCard({ service }: { service: Service }) {
+  const imageUrl = service.images?.[0] ?? service.image_url
+
   return (
     <Link
       href={`/services/${service.uuid}`}
@@ -21,9 +23,9 @@ function SlideCard({ service }: { service: Service }) {
       <div className="rounded-2xl overflow-hidden border border-gray-100 bg-white hover:shadow-lg active:shadow-sm transition-all duration-200">
         {/* Image */}
         <div className="relative h-44 bg-gray-100 overflow-hidden">
-          {service.image_url ? (
+          {imageUrl ? (
             <Image
-              src={service.image_url}
+              src={imageUrl}
               alt={service.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -127,6 +129,7 @@ export function ServiceCarousel({
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return
+    setScrollSnaps(emblaApi.scrollSnapList())
     setSelectedIndex(emblaApi.selectedScrollSnap())
     setCanScrollPrev(emblaApi.canScrollPrev())
     setCanScrollNext(emblaApi.canScrollNext())
@@ -134,11 +137,11 @@ export function ServiceCarousel({
 
   useEffect(() => {
     if (!emblaApi) return
-    setScrollSnaps(emblaApi.scrollSnapList())
-    onSelect()
+    const frame = requestAnimationFrame(onSelect)
     emblaApi.on('select', onSelect)
     emblaApi.on('reInit', onSelect)
     return () => {
+      cancelAnimationFrame(frame)
       emblaApi.off('select', onSelect)
       emblaApi.off('reInit', onSelect)
     }

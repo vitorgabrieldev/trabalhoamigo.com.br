@@ -62,6 +62,7 @@ export default function ServiceDetailPage({
   const [description, setDescription] = useState('')
   const [proposalError, setProposalError] = useState<string | null>(null)
   const [reviewPage, setReviewPage] = useState(1)
+  const [imageIndex, setImageIndex] = useState(0)
 
   const { data: service, isLoading, isError } = useQuery({
     queryKey: ['service', uuid],
@@ -135,6 +136,12 @@ export default function ServiceDetailPage({
 
   const isOwner = user?.uuid === service.provider.uuid
   const canPropose = user && user.role === 'contractor' && !isOwner
+  const images = service.images?.length
+    ? service.images
+    : service.image_url
+    ? [service.image_url]
+    : []
+  const currentImageIndex = images.length > 0 ? imageIndex % images.length : 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -149,9 +156,9 @@ export default function ServiceDetailPage({
 
         {/* Hero image */}
         <div className="relative h-64 sm:h-80 bg-gray-100 rounded-xl overflow-hidden mb-6">
-          {service.image_url ? (
+          {images.length > 0 ? (
             <Image
-              src={service.image_url}
+              src={images[currentImageIndex]}
               alt={service.title}
               fill
               className="object-cover"
@@ -165,6 +172,40 @@ export default function ServiceDetailPage({
             <div className="absolute top-4 left-4">
               <Badge variant="success">Comunitário</Badge>
             </div>
+          )}
+
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => setImageIndex((i) => (i - 1 + images.length) % images.length)}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white"
+                aria-label="Imagem anterior"
+              >
+                <ChevronLeft className="h-4 w-4 text-gray-700" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setImageIndex((i) => (i + 1) % images.length)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white"
+                aria-label="Próxima imagem"
+              >
+                <ChevronRight className="h-4 w-4 text-gray-700" />
+              </button>
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Ir para imagem ${i + 1}`}
+                    onClick={() => setImageIndex(i)}
+                    className={`rounded-full transition-all ${
+                      i === currentImageIndex ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/70'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
 

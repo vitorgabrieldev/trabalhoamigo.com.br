@@ -4,7 +4,9 @@ namespace App\Modules\Services\Services;
 
 use App\Models\Service;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ServiceManager
@@ -14,14 +16,22 @@ class ServiceManager
     // Global cap: community services must not exceed 10% of all active services
     private const COMMUNITY_PLATFORM_RATIO = 0.10;
 
-    public function create(User $provider, array $data): Service
+    /**
+     * @param array<int, UploadedFile> $imageFiles
+     */
+    public function create(User $provider, array $data, array $imageFiles = []): Service
     {
+        $this->assertMutuallyExclusiveFlags(
+            acceptsOffer: (bool) ($data['accepts_offer'] ?? false),
+            isCommunity: (bool) ($data['is_community'] ?? false),
+        );
+
         if ($data['is_community'] ?? false) {
             $this->validateCommunityLimits($provider);
         }
 
-        return DB::transaction(function () use ($provider, $data) {
-            return Service::create([
+        return DB::transaction(function () use ($provider, $data, $imageFiles) {
+            $service = Service::create([
                 'uuid' => Str::uuid(),
                 'user_id' => $provider->id,
                 'category_id' => $this->resolveCategoryId($data['category_uuid']),
@@ -33,28 +43,55 @@ class ServiceManager
                 'image_url' => $data['image_url'] ?? null,
                 'status' => 'active',
             ]);
+
+            if (! empty($imageFiles)) {
+                $this->syncServiceImages($service, $imageFiles);
+            }
+
+            return $service;
         });
     }
 
-    public function update(Service $service, array $data): Service
+    /**
+     * @param array<int, UploadedFile> $imageFiles
+     */
+    public function update(Service $service, array $data, array $imageFiles = []): Service
     {
+        $nextAcceptsOffer = array_key_exists('accepts_offer', $data)
+            ? (bool) $data['accepts_offer']
+            : (bool) $service->accepts_offer;
+        $nextIsCommunity = array_key_exists('is_community', $data)
+            ? (bool) $data['is_community']
+            : (bool) $service->is_community;
+
+        $this->assertMutuallyExclusiveFlags(
+            acceptsOffer: $nextAcceptsOffer,
+            isCommunity: $nextIsCommunity,
+        );
+
         $becomingCommunity = ($data['is_community'] ?? false) && ! $service->is_community;
 
         if ($becomingCommunity) {
             $this->validateCommunityLimits($service->user);
         }
 
-        $service->update([
-            'title' => $data['title'] ?? $service->title,
-            'description' => $data['description'] ?? $service->description,
-            'base_price' => $data['base_price'] ?? $service->base_price,
-            'accepts_offer' => $data['accepts_offer'] ?? $service->accepts_offer,
-            'is_community' => $data['is_community'] ?? $service->is_community,
-            'image_url' => $data['image_url'] ?? $service->image_url,
-            'status' => $data['status'] ?? $service->status,
-        ]);
+        return DB::transaction(function () use ($service, $data, $imageFiles) {
+            $service->update([
+                'title' => $data['title'] ?? $service->title,
+                'description' => $data['description'] ?? $service->description,
+                'base_price' => $data['base_price'] ?? $service->base_price,
+                'accepts_offer' => $data['accepts_offer'] ?? $service->accepts_offer,
+                'is_community' => $data['is_community'] ?? $service->is_community,
+                'image_url' => $data['image_url'] ?? $service->image_url,
+                'status' => $data['status'] ?? $service->status,
+            ]);
 
-        return $service->fresh();
+            if (! empty($imageFiles)) {
+                $this->syncServiceImages($service, $imageFiles);
+            }
+
+            return $service->fresh();
+        });
     }
 
     public function checkCommunityAvailability(User $provider): array
@@ -95,5 +132,66 @@ class ServiceManager
     {
         return \App\Models\Category::where('uuid', $categoryUuid)->value('id')
             ?? throw new \RuntimeException('Categoria inválida.', 422);
+    }
+
+    private function assertMutuallyExclusiveFlags(bool $acceptsOffer, bool $isCommunity): void
+    {
+        if ($acceptsOffer && $isCommunity) {
+            throw new \RuntimeException('Serviço comunitário não pode aceitar propostas.', 422);
+        }
+    }
+
+    /**
+     * @param array<int, UploadedFile> $imageFiles
+     */
+    private function syncServiceImages(Service $service, array $imageFiles): void
+    {
+        if (empty($imageFiles)) {
+            return;
+        }
+
+        $existingUrls = $service->images()->pluck('image_url')->all();
+        foreach ($existingUrls as $url) {
+            $this->deletePublicImageIfManaged($url);
+        }
+
+        $service->images()->delete();
+
+        $imagesData = [];
+        foreach ($imageFiles as $index => $file) {
+            $path = $file->store("services/{$service->uuid}", 'public');
+            $imagesData[] = [
+                'image_url' => Storage::disk('public')->url($path),
+                'position' => $index,
+            ];
+        }
+
+        $service->images()->createMany($imagesData);
+        $service->update(['image_url' => $imagesData[0]['image_url'] ?? $service->image_url]);
+    }
+
+    private function deletePublicImageIfManaged(string $url): void
+    {
+        $publicDisk = Storage::disk('public');
+        $publicBaseUrl = rtrim($publicDisk->url(''), '/');
+
+        if (str_starts_with($url, "{$publicBaseUrl}/")) {
+            $relativePath = ltrim(Str::replaceFirst($publicBaseUrl, '', $url), '/');
+            if ($relativePath !== '') {
+                $publicDisk->delete($relativePath);
+            }
+
+            return;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (! is_string($path) || ! str_contains($path, '/storage/')) {
+            return;
+        }
+
+        $relativePath = ltrim(Str::after($path, '/storage/'), '/');
+        if ($relativePath !== '') {
+            $publicDisk->delete($relativePath);
+        }
     }
 }

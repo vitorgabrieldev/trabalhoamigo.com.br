@@ -24,7 +24,7 @@ class ServiceController extends Controller
         $services = QueryBuilder::for(
             Service::visible()
                 ->withAvg('reviews', 'stars')
-                ->with(['user:id,uuid,first_name,last_name,avatar_url,created_at', 'user.address', 'category:id,uuid,name,slug'])
+                ->with(['user:id,uuid,first_name,last_name,avatar_url,created_at', 'user.address', 'category:id,uuid,name,slug', 'images'])
         )
             ->allowedFilters(
                 AllowedFilter::callback('category_uuid', function ($query, $value) {
@@ -61,7 +61,7 @@ class ServiceController extends Controller
     public function show(Service $service): JsonResponse
     {
         abort_if($service->status !== 'active', 404);
-        $service->load(['user:id,uuid,first_name,last_name,avatar_url', 'category', 'reviews' => fn ($q) => $q->latest()->limit(5)]);
+        $service->load(['user:id,uuid,first_name,last_name,avatar_url', 'category', 'images', 'reviews' => fn ($q) => $q->latest()->limit(5)]);
 
         return response()->json(new ServiceResource($service));
     }
@@ -70,7 +70,7 @@ class ServiceController extends Controller
     public function myServices(Request $request): JsonResponse
     {
         $services = QueryBuilder::for(
-            Service::where('user_id', $request->user()->id)->with('category')
+            Service::where('user_id', $request->user()->id)->with(['category', 'images'])
         )
             ->allowedFilters(AllowedFilter::exact('status'))
             ->defaultSort('-created_at')
@@ -81,18 +81,26 @@ class ServiceController extends Controller
 
     public function store(StoreServiceRequest $request): JsonResponse
     {
-        $service = $this->serviceManager->create($request->user(), $request->validated());
+        $service = $this->serviceManager->create(
+            $request->user(),
+            $request->validated(),
+            $request->file('images', [])
+        );
 
-        return response()->json(new ServiceResource($service->load('category')), 201);
+        return response()->json(new ServiceResource($service->load(['category', 'images'])), 201);
     }
 
     public function update(UpdateServiceRequest $request, Service $service): JsonResponse
     {
         abort_if($service->user_id !== $request->user()->id, 403);
 
-        $updated = $this->serviceManager->update($service, $request->validated());
+        $updated = $this->serviceManager->update(
+            $service,
+            $request->validated(),
+            $request->file('images', [])
+        );
 
-        return response()->json(new ServiceResource($updated->load('category')));
+        return response()->json(new ServiceResource($updated->load(['category', 'images'])));
     }
 
     public function destroy(Request $request, Service $service): JsonResponse

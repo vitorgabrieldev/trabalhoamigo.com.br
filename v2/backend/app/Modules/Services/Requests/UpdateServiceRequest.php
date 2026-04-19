@@ -21,6 +21,8 @@ class UpdateServiceRequest extends FormRequest
             'accepts_offer' => ['boolean'],
             'is_community' => ['boolean'],
             'image_url' => ['nullable', 'url'],
+            'images' => ['sometimes', 'array', 'max:10'],
+            'images.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'status' => ['sometimes', 'in:active,inactive'],
         ];
     }

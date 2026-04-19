@@ -56,8 +56,20 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json(['message' => 'Recurso não encontrado.'], 404);
             }
 
-            if ($e instanceof RuntimeException && $e->getCode() >= 400 && $e->getCode() < 600) {
-                return response()->json(['message' => $e->getMessage()], (int) $e->getCode());
+            if ($e instanceof RuntimeException) {
+                $rawCode = $e->getCode();
+                $status = null;
+
+                if (is_int($rawCode) || (is_string($rawCode) && ctype_digit($rawCode))) {
+                    $numericCode = (int) $rawCode;
+                    if ($numericCode >= 400 && $numericCode < 600) {
+                        $status = $numericCode;
+                    }
+                }
+
+                if ($status !== null) {
+                    return response()->json(['message' => $e->getMessage()], $status);
+                }
             }
 
             return null;

@@ -9,6 +9,14 @@ class ServiceResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $images = $this->relationLoaded('images')
+            ? $this->images->pluck('image_url')->filter()->values()->all()
+            : [];
+
+        if (empty($images) && $this->image_url) {
+            $images = [$this->image_url];
+        }
+
         return [
             'uuid' => $this->uuid,
             'title' => $this->title,
@@ -16,7 +24,8 @@ class ServiceResource extends JsonResource
             'base_price' => $this->base_price ? (float) $this->base_price : null,
             'accepts_offer' => $this->accepts_offer,
             'is_community' => $this->is_community,
-            'image_url' => $this->image_url,
+            'image_url' => $images[0] ?? $this->image_url,
+            'images' => $images,
             'status' => $this->status,
             'average_rating' => round($this->average_rating, 1),
 

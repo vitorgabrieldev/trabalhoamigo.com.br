@@ -34,6 +34,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ScheduleSlotPicker } from '@/components/proposals/ScheduleSlotPicker'
 import { Lightbox } from '@/components/ui/lightbox'
+import { ServiceCarousel } from '@/components/services/ServiceCarousel'
 import { servicesApi, proposalsApi } from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
 import { formatBRL, formatDate, getInitials } from '@/lib/utils'
@@ -84,6 +85,24 @@ export default function ServiceDetailPage({
     queryKey: ['service-reviews', uuid, reviewPage],
     queryFn: () =>
       servicesApi.getReviews(uuid, reviewPage).then((r) => r.data as PaginatedResponse<Review>),
+    enabled: !!service,
+  })
+
+  const { data: providerServices, isLoading: loadingProviderServices } = useQuery({
+    queryKey: ['provider-services', service?.provider?.uuid, uuid],
+    queryFn: () =>
+      servicesApi
+        .list({ 'filter[provider_uuid]': service!.provider.uuid, 'filter[exclude_uuid]': uuid })
+        .then((r) => (r.data as PaginatedResponse<Service>).data),
+    enabled: !!service,
+  })
+
+  const { data: similarServices, isLoading: loadingSimilarServices } = useQuery({
+    queryKey: ['similar-services', service?.category?.uuid, uuid],
+    queryFn: () =>
+      servicesApi
+        .list({ 'filter[category_uuid]': service!.category.uuid, 'filter[exclude_uuid]': uuid })
+        .then((r) => (r.data as PaginatedResponse<Service>).data),
     enabled: !!service,
   })
 
@@ -475,6 +494,29 @@ export default function ServiceDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Related sections */}
+      {(loadingProviderServices || (providerServices && providerServices.length > 0)) && (
+        <div className="mt-12">
+          <ServiceCarousel
+            title={`Outros serviços de ${service.provider.first_name}`}
+            viewAllHref={`/services?filter[provider_uuid]=${service.provider.uuid}`}
+            services={providerServices ?? []}
+            isLoading={loadingProviderServices}
+          />
+        </div>
+      )}
+
+      {(loadingSimilarServices || (similarServices && similarServices.length > 0)) && (
+        <div className="mt-4">
+          <ServiceCarousel
+            title={`Serviços similares em ${service.category.name}`}
+            viewAllHref={`/services?filter[category_uuid]=${service.category.uuid}`}
+            services={similarServices ?? []}
+            isLoading={loadingSimilarServices}
+          />
+        </div>
+      )}
 
       {/* Proposal dialog */}
       <Dialog open={proposalOpen} onOpenChange={setProposalOpen}>

@@ -31,6 +31,12 @@ class ServiceController extends Controller
                     $uuids = is_array($value) ? $value : explode(',', (string) $value);
                     $query->whereHas('category', fn ($q) => $q->whereIn('uuid', array_filter($uuids)));
                 }),
+                AllowedFilter::callback('provider_uuid', function ($query, $value) {
+                    $query->whereHas('user', fn ($q) => $q->where('uuid', $value));
+                }),
+                AllowedFilter::callback('exclude_uuid', function ($query, $value) {
+                    $query->where('uuid', '!=', $value);
+                }),
                 AllowedFilter::exact('is_community'),
                 AllowedFilter::exact('accepts_offer'),
                 AllowedFilter::scope('search'),

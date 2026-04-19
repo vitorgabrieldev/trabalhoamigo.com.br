@@ -200,6 +200,8 @@ export const servicesApi = {
   list: (params?: {
     'filter[search]'?: string
     'filter[category_uuid]'?: string
+    'filter[provider_uuid]'?: string
+    'filter[exclude_uuid]'?: string
     sort?: string
     page?: number
   }) => api.get('/services', { params }),

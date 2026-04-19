@@ -12,6 +12,7 @@ class Message extends Model
         'conversation_id',
         'sender_id',
         'body',
+        'media',
         'read_at',
     ];
 
@@ -19,7 +20,10 @@ class Message extends Model
 
     protected function casts(): array
     {
-        return ['read_at' => 'datetime'];
+        return [
+            'read_at' => 'datetime',
+            'media' => 'array',
+        ];
     }
 
     public function getRouteKeyName(): string

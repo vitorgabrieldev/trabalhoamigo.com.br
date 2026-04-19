@@ -327,6 +327,7 @@ export const proposalsApi = {
       description?: string
       schedule_type: 'specific_slots' | 'any_time_on_day' | 'to_be_arranged'
       any_time_date?: string
+      any_time_dates?: string[]
       slots?: Array<{
         date: string
         time_type: 'specific_time' | 'all_day'
@@ -371,6 +372,15 @@ export const messagingApi = {
 
   getMessages: (uuid: string) => api.get(`/conversations/${uuid}/messages`),
 
-  sendMessage: (uuid: string, body: string) =>
-    api.post(`/conversations/${uuid}/messages`, { body }),
+  sendMessage: (uuid: string, body: string, files?: File[]) => {
+    if (files && files.length > 0) {
+      const form = new FormData()
+      if (body) form.append('body', body)
+      for (const file of files) form.append('files[]', file)
+      return api.post(`/conversations/${uuid}/messages`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+    }
+    return api.post(`/conversations/${uuid}/messages`, { body })
+  },
 }

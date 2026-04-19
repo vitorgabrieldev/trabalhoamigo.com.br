@@ -1,10 +1,9 @@
 'use client'
 
 import { use, useState, useCallback } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import {
   Star,
   Tag,
@@ -22,30 +21,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert } from '@/components/ui/alert'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { ScheduleSlotPicker } from '@/components/proposals/ScheduleSlotPicker'
 import { Lightbox } from '@/components/ui/lightbox'
 import { ServiceCarousel } from '@/components/services/ServiceCarousel'
-import { servicesApi, proposalsApi } from '@/lib/api'
+import { servicesApi } from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
 import { formatBRL, formatDate, getInitials } from '@/lib/utils'
-import type { Service, PaginatedResponse, Review, ScheduleType } from '@/types'
-
-interface Slot {
-  date: string
-  time_type: 'specific_time' | 'all_day'
-  start_time?: string
-  end_time?: string
-}
+import type { Service, PaginatedResponse, Review } from '@/types'
 
 export default function ServiceDetailPage({
   params,
@@ -54,16 +35,7 @@ export default function ServiceDetailPage({
 }) {
   const { uuid } = use(params)
   const { user } = useAuthStore()
-  const router = useRouter()
-  const queryClient = useQueryClient()
 
-  const [proposalOpen, setProposalOpen] = useState(false)
-  const [scheduleType, setScheduleType] = useState<ScheduleType>('to_be_arranged')
-  const [slots, setSlots] = useState<Slot[]>([])
-  const [anyTimeDate, setAnyTimeDate] = useState('')
-  const [offeredPrice, setOfferedPrice] = useState('')
-  const [description, setDescription] = useState('')
-  const [proposalError, setProposalError] = useState<string | null>(null)
   const [reviewPage, setReviewPage] = useState(1)
   const [imageIndex, setImageIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -105,35 +77,6 @@ export default function ServiceDetailPage({
         .then((r) => (r.data as PaginatedResponse<Service>).data),
     enabled: !!service,
   })
-
-  const { mutate: submitProposal, isPending: submittingProposal } = useMutation({
-    mutationFn: () =>
-      proposalsApi.create(uuid, {
-        offered_price: parseFloat(offeredPrice),
-        description: description || undefined,
-        schedule_type: scheduleType,
-        any_time_date: scheduleType === 'any_time_on_day' ? anyTimeDate : undefined,
-        slots: scheduleType === 'specific_slots' ? slots : undefined,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['proposals-sent'] })
-      setProposalOpen(false)
-      router.push('/proposals')
-    },
-    onError: (err: unknown) => {
-      const axiosErr = err as { response?: { data?: { message?: string } } }
-      setProposalError(axiosErr.response?.data?.message ?? 'Erro ao enviar proposta.')
-    },
-  })
-
-  const handleProposalSubmit = () => {
-    setProposalError(null)
-    if (!offeredPrice || isNaN(parseFloat(offeredPrice))) {
-      setProposalError('Informe um valor válido.')
-      return
-    }
-    submitProposal()
-  }
 
   if (isLoading) {
     return (
@@ -435,8 +378,8 @@ export default function ServiceDetailPage({
                   </Button>
                 )}
                 {canPropose && (
-                  <Button className="w-full" onClick={() => setProposalOpen(true)}>
-                    Fazer proposta
+                  <Button className="w-full" asChild>
+                    <Link href={`/proposals/new/${uuid}`}>Fazer proposta</Link>
                   </Button>
                 )}
                 {!user && (
@@ -524,69 +467,6 @@ export default function ServiceDetailPage({
         </div>
       )}
 
-      {/* Proposal dialog */}
-      <Dialog open={proposalOpen} onOpenChange={setProposalOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Fazer proposta</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4 py-2">
-            {proposalError && (
-              <Alert variant="destructive">{proposalError}</Alert>
-            )}
-
-            <div>
-              <Label htmlFor="offered_price">Valor oferecido (R$)</Label>
-              <Input
-                id="offered_price"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0,00"
-                value={offeredPrice}
-                onChange={(e) => setOfferedPrice(e.target.value)}
-                className="mt-1"
-              />
-              {service.base_price && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Preço base: {formatBRL(service.base_price)}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="description">Descrição (opcional)</Label>
-              <Textarea
-                id="description"
-                placeholder="Descreva o que você precisa..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-
-            <ScheduleSlotPicker
-              scheduleType={scheduleType}
-              onScheduleTypeChange={setScheduleType}
-              slots={slots}
-              onSlotsChange={setSlots}
-              anyTimeDate={anyTimeDate}
-              onAnyTimeDateChange={setAnyTimeDate}
-            />
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setProposalOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleProposalSubmit} disabled={submittingProposal}>
-              {submittingProposal ? 'Enviando...' : 'Enviar proposta'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

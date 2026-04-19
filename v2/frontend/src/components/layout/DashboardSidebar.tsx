@@ -58,6 +58,7 @@ const navItems: NavItem[] = [
     href: '/calendar',
     label: 'Calendário',
     icon: <Calendar className="h-4 w-4" />,
+    roles: ['provider'],
   },
   {
     href: '/conversations',

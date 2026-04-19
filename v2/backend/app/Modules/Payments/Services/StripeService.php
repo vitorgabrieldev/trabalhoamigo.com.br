@@ -74,6 +74,7 @@ class StripeService
             'amount' => $amountCents,
             'currency' => 'brl',
             'customer' => $contractor->stripe_customer_id,
+            'payment_method_types' => ['card'],
             'capture_method' => 'manual', // Hold funds, capture on acceptance
             'metadata' => [
                 'proposal_uuid' => $proposal->uuid,

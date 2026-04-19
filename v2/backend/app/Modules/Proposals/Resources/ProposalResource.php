@@ -46,13 +46,15 @@ class ProposalResource extends JsonResource
 
             'contractor' => $this->whenLoaded('contractor', fn () => [
                 'uuid' => $this->contractor->uuid,
-                'name' => $this->contractor->full_name,
+                'first_name' => $this->contractor->first_name,
+                'last_name' => $this->contractor->last_name,
                 'avatar_url' => $this->contractor->avatar_url,
             ]),
 
             'provider' => $this->whenLoaded('provider', fn () => [
                 'uuid' => $this->provider->uuid,
-                'name' => $this->provider->full_name,
+                'first_name' => $this->provider->first_name,
+                'last_name' => $this->provider->last_name,
                 'avatar_url' => $this->provider->avatar_url,
             ]),
 

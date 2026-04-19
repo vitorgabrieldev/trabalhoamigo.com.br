@@ -67,7 +67,7 @@ class ServiceController extends Controller
     public function show(Service $service): JsonResponse
     {
         abort_if($service->status !== 'active', 404);
-        $service->load(['user:id,uuid,first_name,last_name,avatar_url', 'category', 'images', 'reviews' => fn ($q) => $q->latest()->limit(5)]);
+        $service->load(['user:id,uuid,first_name,last_name,avatar_url,created_at', 'user.address', 'category', 'images', 'reviews' => fn ($q) => $q->latest()->limit(5)]);
 
         return response()->json(new ServiceResource($service));
     }

@@ -37,9 +37,14 @@ class ServiceResource extends JsonResource
 
             'provider' => $this->whenLoaded('user', fn () => [
                 'uuid' => $this->user->uuid,
-                'name' => $this->user->full_name,
+                'first_name' => $this->user->first_name,
+                'last_name' => $this->user->last_name,
                 'avatar_url' => $this->user->avatar_url,
                 'stripe_ready' => $this->user->hasBankDetails(),
+                'created_at' => $this->user->created_at?->toIso8601String(),
+                'address' => $this->user->relationLoaded('address') ? $this->user->address : null,
+                'average_rating' => $this->user->average_rating ?? null,
+                'reviews_count' => $this->user->reviews_count ?? null,
             ]),
 
             'reviews' => $this->whenLoaded('reviews', fn () => $this->reviews->map(fn ($r) => [

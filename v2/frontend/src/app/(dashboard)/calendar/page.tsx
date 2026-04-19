@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Calendar } from 'lucide-react'
 import { ProviderCalendar } from '@/components/calendar/ProviderCalendar'
 import { Alert } from '@/components/ui/alert'
 import { meApi } from '@/lib/api'
+import { useAuthStore } from '@/store/auth'
 
 interface CalendarDayPayload {
   date?: string
@@ -20,9 +22,22 @@ const toDateOnly = (value?: string): string | null => {
 }
 
 export default function CalendarPage() {
+  const { user } = useAuthStore()
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth() + 1)
+
+  if (user?.role === 'contractor') {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <Calendar className="h-14 w-14 text-gray-200 mb-4" />
+        <h2 className="text-lg font-semibold text-gray-700 mb-1">Calendário não disponível</h2>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          Esta funcionalidade é exclusiva para prestadores de serviço.
+        </p>
+      </div>
+    )
+  }
 
   const { data: calendarData, isError } = useQuery({
     queryKey: ['calendar', year, month],

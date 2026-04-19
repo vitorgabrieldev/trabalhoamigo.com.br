@@ -7,6 +7,7 @@ use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MessagingController extends Controller
@@ -20,9 +21,11 @@ class MessagingController extends Controller
                 ->orWhere('provider_id', $user->id);
         })
             ->with([
-                'proposal:id,uuid,status',
+                'proposal:id,uuid,status,service_id',
+                'proposal.service:id,uuid,title',
                 'contractor:id,uuid,first_name,last_name,avatar_url',
                 'provider:id,uuid,first_name,last_name,avatar_url',
+                'messages' => fn ($q) => $q->latest()->limit(1),
             ])
             ->withCount(['messages as unread_count' => fn ($q) => $q
                 ->where('sender_id', '!=', $user->id)
@@ -35,11 +38,29 @@ class MessagingController extends Controller
             'uuid' => $c->uuid,
             'proposal_uuid' => $c->proposal?->uuid,
             'proposal_status' => $c->proposal?->status,
+            'service_title' => $c->proposal?->service?->title,
+            'service_uuid' => $c->proposal?->service?->uuid,
             'other_party' => $user->id === $c->contractor_id
-                ? ['uuid' => $c->provider->uuid, 'name' => $c->provider->full_name, 'avatar_url' => $c->provider->avatar_url]
-                : ['uuid' => $c->contractor->uuid, 'name' => $c->contractor->full_name, 'avatar_url' => $c->contractor->avatar_url],
+                ? [
+                    'uuid' => $c->provider->uuid,
+                    'first_name' => $c->provider->first_name,
+                    'last_name' => $c->provider->last_name,
+                    'avatar_url' => $c->provider->avatar_url,
+                ]
+                : [
+                    'uuid' => $c->contractor->uuid,
+                    'first_name' => $c->contractor->first_name,
+                    'last_name' => $c->contractor->last_name,
+                    'avatar_url' => $c->contractor->avatar_url,
+                ],
             'unread_count' => $c->unread_count,
             'last_message_at' => $c->last_message_at?->toIso8601String(),
+            'last_message' => $c->messages->first()
+                ? [
+                    'body' => $c->messages->first()->body,
+                    'media' => $c->messages->first()->media,
+                ]
+                : null,
         ]));
     }
 
@@ -47,7 +68,6 @@ class MessagingController extends Controller
     {
         $this->authorizeConversation($request->user(), $conversation);
 
-        // Mark messages as read
         $conversation->messages()
             ->where('sender_id', '!=', $request->user()->id)
             ->whereNull('read_at')
@@ -55,16 +75,18 @@ class MessagingController extends Controller
 
         $messages = $conversation->messages()
             ->with('sender:id,uuid,first_name,last_name,avatar_url')
-            ->latest()
+            ->oldest()
             ->paginate(50);
 
         return response()->json($messages->through(fn ($m) => [
             'uuid' => $m->uuid,
             'body' => $m->body,
+            'media' => $m->media,
             'read_at' => $m->read_at?->toIso8601String(),
             'sender' => [
                 'uuid' => $m->sender->uuid,
-                'name' => $m->sender->full_name,
+                'first_name' => $m->sender->first_name,
+                'last_name' => $m->sender->last_name,
                 'avatar_url' => $m->sender->avatar_url,
                 'is_me' => $m->sender_id === $request->user()->id,
             ],
@@ -77,14 +99,41 @@ class MessagingController extends Controller
         $this->authorizeConversation($request->user(), $conversation);
 
         $request->validate([
-            'body' => ['required', 'string', 'max:2000'],
+            'body' => ['nullable', 'string', 'max:2000'],
+            'files' => ['nullable', 'array', 'max:5'],
+            'files.*' => [
+                'file',
+                'mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi,pdf,doc,docx,xls,xlsx,zip',
+                'max:20480',
+            ],
         ]);
+
+        $media = null;
+
+        if ($request->hasFile('files')) {
+            $media = [];
+            foreach ($request->file('files') as $file) {
+                $path = $file->store('messages', 'public');
+                $mime = $file->getMimeType() ?? '';
+                $media[] = [
+                    'url' => Storage::disk('public')->url($path),
+                    'type' => str_starts_with($mime, 'image/') ? 'image'
+                        : (str_starts_with($mime, 'video/') ? 'video' : 'document'),
+                    'name' => $file->getClientOriginalName(),
+                ];
+            }
+        }
+
+        if (! $request->body && ! $media) {
+            return response()->json(['message' => 'Mensagem ou arquivo é obrigatório.'], 422);
+        }
 
         $message = Message::create([
             'uuid' => Str::uuid(),
             'conversation_id' => $conversation->id,
             'sender_id' => $request->user()->id,
-            'body' => $request->body,
+            'body' => $request->input('body') ?? null,
+            'media' => $media,
         ]);
 
         $conversation->update(['last_message_at' => now()]);
@@ -92,6 +141,14 @@ class MessagingController extends Controller
         return response()->json([
             'uuid' => $message->uuid,
             'body' => $message->body,
+            'media' => $message->media,
+            'sender' => [
+                'uuid' => $request->user()->uuid,
+                'first_name' => $request->user()->first_name,
+                'last_name' => $request->user()->last_name,
+                'avatar_url' => $request->user()->avatar_url,
+                'is_me' => true,
+            ],
             'created_at' => $message->created_at->toIso8601String(),
         ], 201);
     }

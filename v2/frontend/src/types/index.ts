@@ -55,6 +55,18 @@ export interface Category {
   icon_url?: string
 }
 
+export interface ServiceProvider {
+  uuid: string
+  first_name: string
+  last_name: string
+  avatar_url?: string
+  stripe_ready?: boolean
+  created_at?: string
+  address?: Address
+  average_rating?: number
+  reviews_count?: number
+}
+
 export interface Service {
   uuid: string
   title: string
@@ -68,7 +80,7 @@ export interface Service {
   average_rating?: number
   reviews_count?: number
   category: Category
-  provider: User
+  provider: ServiceProvider
   created_at: string
   updated_at: string
 }
@@ -134,10 +146,23 @@ export interface Review {
   created_at: string
 }
 
+export interface MessageMedia {
+  url: string
+  type: 'image' | 'video' | 'document'
+  name?: string
+}
+
 export interface Message {
   uuid: string
-  body: string
-  sender: User
+  body?: string
+  sender: {
+    uuid: string
+    first_name: string
+    last_name: string
+    avatar_url?: string
+    is_me: boolean
+  }
+  media?: MessageMedia[]
   read_at?: string
   created_at: string
 }
@@ -145,10 +170,13 @@ export interface Message {
 export interface Conversation {
   uuid: string
   proposal_uuid: string
-  other_party: User
+  proposal_status?: string
+  service_title?: string
+  service_uuid?: string
+  other_party: Pick<User, 'uuid' | 'first_name' | 'last_name' | 'avatar_url'>
   unread_count: number
   last_message_at?: string
-  last_message?: Message
+  last_message?: { body?: string; media?: MessageMedia[] }
 }
 
 export interface PaginatedResponse<T> {

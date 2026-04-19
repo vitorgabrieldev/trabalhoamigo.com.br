@@ -20,8 +20,10 @@ class StoreProposalRequest extends FormRequest
             // Schedule
             'schedule_type' => ['required', 'in:specific_slots,any_time_on_day,to_be_arranged'],
 
-            // When schedule_type = any_time_on_day
-            'any_time_date' => ['required_if:schedule_type,any_time_on_day', 'nullable', 'date', 'after:today'],
+            // When schedule_type = any_time_on_day (accepts single date or array)
+            'any_time_date' => ['nullable', 'date', 'after:today'],
+            'any_time_dates' => ['required_if:schedule_type,any_time_on_day', 'nullable', 'array', 'min:1'],
+            'any_time_dates.*' => ['required', 'date', 'after:today'],
 
             // When schedule_type = specific_slots
             'slots' => ['required_if:schedule_type,specific_slots', 'nullable', 'array', 'min:1'],

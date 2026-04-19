@@ -16,7 +16,7 @@ interface ProposalCardProps {
 
 export function ProposalCard({ proposal, viewAs }: ProposalCardProps) {
   const otherParty = viewAs === 'provider' ? proposal.contractor : proposal.provider
-  const price = viewAs === 'provider' ? proposal.provider_amount : proposal.offered_price
+  const price = (proposal as unknown as { price?: { amount: number } }).price?.amount
 
   return (
     <Card className="hover:shadow-md transition-shadow">

@@ -51,7 +51,7 @@ class ProposalService
                 'provider_amount' => $fee['provider_amount'],
                 'description' => $data['description'] ?? null,
                 'schedule_type' => $data['schedule_type'],
-                'any_time_date' => $data['any_time_date'] ?? null,
+                'any_time_date' => $data['any_time_date'] ?? ($data['any_time_dates'][0] ?? null),
                 'schedule_agreed' => false,
                 'status' => 'pending',
                 'payment_status' => 'pending',
@@ -67,6 +67,19 @@ class ProposalService
                         'time_type' => $slot['time_type'],
                         'start_time' => $slot['start_time'] ?? null,
                         'end_time' => $slot['end_time'] ?? null,
+                    ]);
+                }
+            }
+
+            if ($data['schedule_type'] === 'any_time_on_day' && ! empty($data['any_time_dates'])) {
+                foreach ($data['any_time_dates'] as $date) {
+                    ProposalScheduleSlot::create([
+                        'uuid' => Str::uuid(),
+                        'proposal_id' => $proposal->id,
+                        'proposed_date' => $date,
+                        'time_type' => 'all_day',
+                        'start_time' => null,
+                        'end_time' => null,
                     ]);
                 }
             }

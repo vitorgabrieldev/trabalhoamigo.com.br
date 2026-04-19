@@ -57,6 +57,10 @@ class ProposalController extends Controller
     // Contractor submits proposal
     public function store(StoreProposalRequest $request, Service $service): JsonResponse
     {
+        if ($request->user()->role === 'contractor') {
+            return response()->json(['message' => 'Contratantes não podem enviar propostas.'], 403);
+        }
+
         $proposal = $this->proposalService->submit(
             $request->user(),
             $service,

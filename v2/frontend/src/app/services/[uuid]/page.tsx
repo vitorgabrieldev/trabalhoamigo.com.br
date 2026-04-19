@@ -165,7 +165,8 @@ export default function ServiceDetailPage({
   }
 
   const isOwner = user?.uuid === service.provider.uuid
-  const canPropose = user && user.role === 'contractor' && !isOwner
+  const isContractor = user?.role === 'contractor'
+  const canPropose = user && user.role === 'provider' && !isOwner
   const images = service.images?.length
     ? service.images
     : service.image_url
@@ -428,6 +429,11 @@ export default function ServiceDetailPage({
                   )}
                 </div>
 
+                {isOwner && (
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href={`/services/${uuid}/edit`}>Editar serviço</Link>
+                  </Button>
+                )}
                 {canPropose && (
                   <Button className="w-full" onClick={() => setProposalOpen(true)}>
                     Fazer proposta
@@ -438,10 +444,10 @@ export default function ServiceDetailPage({
                     <Link href="/login">Entrar para fazer proposta</Link>
                   </Button>
                 )}
-                {isOwner && (
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/services/${uuid}/edit`}>Editar serviço</Link>
-                  </Button>
+                {isContractor && (
+                  <p className="text-xs text-center text-muted-foreground pt-1">
+                    Entre em contato com o prestador para contratar este serviço.
+                  </p>
                 )}
               </CardContent>
             </Card>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -22,11 +23,12 @@ import {
 } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
-interface CalendarEvent {
+export interface CalendarEvent {
   date: string
   type: 'proposal' | 'contract'
   title: string
   status?: string
+  contract_uuid?: string
 }
 
 type View = 'month' | 'week' | 'year'
@@ -39,6 +41,11 @@ interface ProviderCalendarProps {
 export function ProviderCalendar({ events = [], onPeriodChange }: ProviderCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [view, setView] = useState<View>('month')
+  const router = useRouter()
+
+  const handleEventClick = (event: CalendarEvent) => {
+    if (event.contract_uuid) router.push(`/contracts/${event.contract_uuid}`)
+  }
 
   const navigate = (direction: 'prev' | 'next') => {
     let newDate: Date
@@ -121,9 +128,11 @@ export function ProviderCalendar({ events = [], onPeriodChange }: ProviderCalend
                 {dayEvents.slice(0, 2).map((event, eIdx) => (
                   <div
                     key={eIdx}
+                    onClick={() => handleEventClick(event)}
                     className={cn(
                       'text-xs px-1 py-0.5 rounded truncate',
-                      event.type === 'contract' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700',
+                      event.type === 'contract' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
+                      event.contract_uuid && 'cursor-pointer',
                     )}
                   >
                     {event.title}

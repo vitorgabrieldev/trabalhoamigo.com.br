@@ -168,6 +168,7 @@ export interface Contract {
   transferred_at?: string
   can_review?: boolean
   can_dispute?: boolean
+  conversation_uuid?: string
   proposal?: ContractProposal
   service?: { uuid: string; title: string; category?: { uuid: string; name: string } }
   payment?: ContractPayment

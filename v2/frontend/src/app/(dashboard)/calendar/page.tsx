@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Calendar } from 'lucide-react'
-import { ProviderCalendar } from '@/components/calendar/ProviderCalendar'
+import { ProviderCalendar, type CalendarEvent } from '@/components/calendar/ProviderCalendar'
 import { Alert } from '@/components/ui/alert'
 import { meApi } from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
 
 interface CalendarDayPayload {
   date?: string
-  contracts?: Array<{ status?: string; proposal?: { service?: { title?: string } } }>
+  contracts?: Array<{ uuid?: string; status?: string; proposal?: { service?: { title?: string } } }>
   slots?: Array<{ date?: string }>
   blocks?: Array<{ starts_at?: string; contract_uuid?: string }>
 }
@@ -51,35 +51,26 @@ export default function CalendarPage() {
     ? calendarData
     : Object.values(calendarData ?? {})
 
-  const events = dayValues.flatMap((day) => {
+  const events: CalendarEvent[] = dayValues.flatMap((day) => {
     const fallbackDate = toDateOnly(day.date)
+    const result: CalendarEvent[] = []
 
-    const contractEvents = (day.contracts ?? [])
-      .map((contract) => ({
-        date: fallbackDate,
-        type: 'contract' as const,
-        title: contract.proposal?.service?.title ?? 'Contrato',
-        status: contract.status,
-      }))
-      .filter((event): event is { date: string; type: 'contract'; title: string; status?: string } => Boolean(event.date))
+    for (const contract of day.contracts ?? []) {
+      const date = fallbackDate
+      if (date) result.push({ date, type: 'contract', title: contract.proposal?.service?.title ?? 'Contrato', status: contract.status, contract_uuid: contract.uuid })
+    }
 
-    const slotEvents = (day.slots ?? [])
-      .map((slot) => ({
-        date: toDateOnly(slot.date) ?? fallbackDate,
-        type: 'proposal' as const,
-        title: 'Proposta',
-      }))
-      .filter((event): event is { date: string; type: 'proposal'; title: string } => Boolean(event.date))
+    for (const slot of day.slots ?? []) {
+      const date = toDateOnly(slot.date) ?? fallbackDate
+      if (date) result.push({ date, type: 'proposal', title: 'Proposta' })
+    }
 
-    const blockEvents = (day.blocks ?? [])
-      .map((block) => ({
-        date: toDateOnly(block.starts_at) ?? fallbackDate,
-      type: 'contract' as const,
-        title: block.contract_uuid ? `Contrato ${block.contract_uuid.slice(0, 8)}` : 'Compromisso',
-      }))
-      .filter((event): event is { date: string; type: 'contract'; title: string } => Boolean(event.date))
+    for (const block of day.blocks ?? []) {
+      const date = toDateOnly(block.starts_at) ?? fallbackDate
+      if (date) result.push({ date, type: 'contract', title: 'Compromisso', contract_uuid: block.contract_uuid })
+    }
 
-    return [...contractEvents, ...slotEvents, ...blockEvents]
+    return result
   })
 
   const handlePeriodChange = (y: number, m: number) => {

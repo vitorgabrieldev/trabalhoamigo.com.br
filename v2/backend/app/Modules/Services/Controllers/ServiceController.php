@@ -64,9 +64,11 @@ class ServiceController extends Controller
         return response()->json(ServiceResource::collection($services)->response()->getData(true));
     }
 
-    public function show(Service $service): JsonResponse
+    public function show(Request $request, Service $service): JsonResponse
     {
-        abort_if($service->status !== 'active', 404);
+        $isOwner = $request->user()?->id === $service->user_id;
+        abort_if(! $isOwner && $service->status !== 'active', 404);
+
         $service->load(['user:id,uuid,first_name,last_name,avatar_url,created_at', 'user.address', 'category', 'images', 'reviews' => fn ($q) => $q->latest()->limit(5)]);
 
         return response()->json(new ServiceResource($service));
@@ -112,6 +114,21 @@ class ServiceController extends Controller
     public function destroy(Request $request, Service $service): JsonResponse
     {
         abort_if($service->user_id !== $request->user()->id, 403);
+
+        $hasBlockingContracts = $service->contracts()
+            ->whereIn('status', ['active', 'provider_completed', 'disputed'])
+            ->exists();
+
+        if ($hasBlockingContracts) {
+            return response()->json([
+                'message' => 'Não é possível excluir este serviço enquanto houver contratos em andamento ou em disputa.',
+            ], 422);
+        }
+
+        $service->proposals()
+            ->whereIn('status', ['pending', 'accepted'])
+            ->update(['status' => 'cancelled']);
+
         $service->update(['status' => 'inactive']);
         $service->delete();
 

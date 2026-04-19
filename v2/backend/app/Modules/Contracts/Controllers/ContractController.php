@@ -35,7 +35,7 @@ class ContractController extends Controller
     public function show(Request $request, Contract $contract): JsonResponse
     {
         $this->authorizeAccess($request->user(), $contract);
-        $contract->load(['service.category', 'contractor', 'provider', 'review', 'dispute', 'payment', 'calendarBlock', 'proposal.scheduleSlots']);
+        $contract->load(['service.category', 'contractor', 'provider', 'review', 'dispute', 'payment', 'calendarBlock', 'proposal.scheduleSlots', 'proposal.conversation']);
 
         return response()->json(new ContractResource($contract));
     }

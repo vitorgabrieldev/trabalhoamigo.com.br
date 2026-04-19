@@ -42,6 +42,12 @@ class ContractResource extends JsonResource
                 ] : null,
             ]),
 
+            'conversation_uuid' => $this->whenLoaded('proposal', fn () =>
+                $this->proposal?->relationLoaded('conversation')
+                    ? $this->proposal->conversation?->uuid
+                    : null
+            ),
+
             'proposal' => $this->whenLoaded('proposal', fn () => $this->proposal ? [
                 'uuid' => $this->proposal->uuid,
                 'description' => $this->proposal->description,

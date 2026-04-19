@@ -339,7 +339,7 @@ export default function ContractDetailPage({
           </div>
         </div>
         <Button variant="outline" size="sm" className="w-full" asChild>
-          <Link href="/conversations">
+          <Link href={contract.conversation_uuid ? `/conversations/${contract.conversation_uuid}` : '/conversations'}>
             <MessageCircle className="h-4 w-4 mr-2" />
             Abrir conversa
           </Link>

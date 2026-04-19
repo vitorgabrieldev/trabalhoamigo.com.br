@@ -104,7 +104,7 @@ export default function EditServicePage({
   }, [])
 
   useEffect(() => {
-    if (service) {
+    if (service && categories.length > 0) {
       reset({
         title: service.title,
         description: service.description,
@@ -123,7 +123,7 @@ export default function EditServicePage({
         setExistingImages([{ id: 'existing-0', url: service.image_url }])
       }
     }
-  }, [service, reset])
+  }, [service, categories, reset])
 
   const addUploadedImages = (files: File[]) => {
     const imageFiles = files.filter((f) => f.type.startsWith('image/'))
